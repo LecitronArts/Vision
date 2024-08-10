@@ -1,6 +1,10 @@
 # Vision
 
-An utility tweak system based on Minecraft Moder Pack version 1.20.4
+A utility tweak system based on Minecraft Moder Pack version 1.20.4
+
+## 须知
+
+ - 若您的编译器可使用内存大小 < 1024Mb ，请尽量设置到 1024Mb 大小，防止编译器以 OutOfMemory 等错误停止构建。
 
 ## 目录
 

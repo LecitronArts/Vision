@@ -26,7 +26,7 @@ import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.Protocol1_19To1_18_2;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets.WorldPackets;
 import de.florianmichael.viafabricplus.fixes.ClientsideFixes;
-import de.florianmichael.viafabricplus.injection.access.IClientPlayerInteractionManager;
+import de.florianmichael.viafabricplus.access.IClientPlayerInteractionManager;
 import de.florianmichael.viafabricplus.protocoltranslator.translator.BlockStateTranslator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;

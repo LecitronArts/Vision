@@ -19,7 +19,7 @@
 
 package de.florianmichael.viafabricplus.injection.mixin.compat.classic4j;
 
-import de.florianmichael.viafabricplus.injection.access.ITextFieldWidget;
+import de.florianmichael.viafabricplus.access.ITextFieldWidget;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.components.EditBox;
 import org.spongepowered.asm.mixin.Mixin;

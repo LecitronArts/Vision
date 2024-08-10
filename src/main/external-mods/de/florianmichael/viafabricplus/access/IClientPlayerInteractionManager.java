@@ -17,12 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.florianmichael.viafabricplus.injection.access;
+package de.florianmichael.viafabricplus.access;
 
-public interface IScreenHandler {
+import de.florianmichael.viafabricplus.fixes.versioned.ClientPlayerInteractionManager1_18_2;
 
-    short viaFabricPlus$getActionId();
+public interface IClientPlayerInteractionManager {
 
-    short viaFabricPlus$incrementAndGetActionId();
+    ClientPlayerInteractionManager1_18_2 viaFabricPlus$get1_18_2InteractionManager();
 
 }

@@ -20,7 +20,7 @@
 package de.florianmichael.viafabricplus.injection.mixin.fixes.authlib;
 
 import com.mojang.authlib.yggdrasil.response.KeyPairResponse;
-import de.florianmichael.viafabricplus.injection.access.ILegacyKeySignatureStorage;
+import de.florianmichael.viafabricplus.access.ILegacyKeySignatureStorage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 

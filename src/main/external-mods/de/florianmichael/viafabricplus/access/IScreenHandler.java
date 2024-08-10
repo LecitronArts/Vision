@@ -17,19 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.florianmichael.viafabricplus.injection.access;
+package de.florianmichael.viafabricplus.access;
 
-import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+public interface IScreenHandler {
 
-public interface IClientConnection {
+    short viaFabricPlus$getActionId();
 
-    void viaFabricPlus$setupPreNettyDecryption();
-
-    ProtocolVersion viaFabricPlus$getTargetVersion();
-    void viaFabricPlus$setTargetVersion(final ProtocolVersion serverVersion);
-
-    UserConnection viaFabricPlus$getUserConnection();
-    void viaFabricPlus$setUserConnection(final UserConnection userConnection);
+    short viaFabricPlus$incrementAndGetActionId();
 
 }

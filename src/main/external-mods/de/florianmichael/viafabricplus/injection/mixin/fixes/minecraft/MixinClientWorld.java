@@ -20,7 +20,7 @@
 package de.florianmichael.viafabricplus.injection.mixin.fixes.minecraft;
 
 import de.florianmichael.viafabricplus.fixes.versioned.PendingUpdateManager1_18_2;
-import de.florianmichael.viafabricplus.injection.access.IEntity;
+import de.florianmichael.viafabricplus.access.IEntity;
 import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;

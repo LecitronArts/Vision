@@ -421,7 +421,6 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
    public Minecraft(GameConfig pGameConfig) {
       super("Client");
       instance = this;
-      ViaFabricPlus.global().init();
       this.clientStartTimeMs = System.currentTimeMillis();
       this.gameDirectory = pGameConfig.location.gameDirectory;
       File file1 = pGameConfig.location.assetDirectory;

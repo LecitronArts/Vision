@@ -20,7 +20,7 @@
 package de.florianmichael.viafabricplus.injection.mixin.base.perserverversion;
 
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import de.florianmichael.viafabricplus.injection.access.IPerformanceLog;
+import de.florianmichael.viafabricplus.access.IPerformanceLog;
 import net.minecraft.util.SampleLogger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;

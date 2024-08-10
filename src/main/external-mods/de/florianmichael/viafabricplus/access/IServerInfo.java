@@ -17,12 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.florianmichael.viafabricplus.injection.access;
+package de.florianmichael.viafabricplus.access;
 
-import de.florianmichael.viafabricplus.fixes.versioned.ClientPlayerInteractionManager1_18_2;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 
-public interface IClientPlayerInteractionManager {
+public interface IServerInfo {
 
-    ClientPlayerInteractionManager1_18_2 viaFabricPlus$get1_18_2InteractionManager();
+    ProtocolVersion viaFabricPlus$forcedVersion();
+    void viaFabricPlus$forceVersion(final ProtocolVersion version);
+
+    boolean viaFabricPlus$passedDirectConnectScreen();
+    void viaFabricPlus$passDirectConnectScreen(final boolean state);
+
+    ProtocolVersion viaFabricPlus$translatingVersion();
+    void viaFabricPlus$setTranslatingVersion(final ProtocolVersion version);
 
 }

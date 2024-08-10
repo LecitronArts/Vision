@@ -17,11 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.florianmichael.viafabricplus.injection.access;
+package de.florianmichael.viafabricplus.access;
 
-public interface ILegacyKeySignatureStorage {
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 
-    byte[] viafabricplus$getLegacyPublicKeySignature();
+public interface IPerformanceLog {
 
-    void viafabricplus$setLegacyPublicKeySignature(final byte[] signature);
+    ProtocolVersion viaFabricPlus$getForcedVersion();
+    void viaFabricPlus$setForcedVersion(final ProtocolVersion version);
+
 }

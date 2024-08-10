@@ -17,14 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.florianmichael.viafabricplus.injection.access;
+package de.florianmichael.viafabricplus.access;
 
-public interface IChunkTracker {
+public interface ILegacyKeySignatureStorage {
 
-    int viaFabricPlus$getSubChunkRequests();
+    byte[] viafabricplus$getLegacyPublicKeySignature();
 
-    int viaFabricPlus$getPendingSubChunks();
-
-    int viaFabricPlus$getChunks();
-
+    void viafabricplus$setLegacyPublicKeySignature(final byte[] signature);
 }

@@ -17,12 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.florianmichael.viafabricplus.injection.access;
+package de.florianmichael.viafabricplus.access;
 
-import java.util.Queue;
+public interface IChunkTracker {
 
-public interface IMouseKeyboard {
+    int viaFabricPlus$getSubChunkRequests();
 
-    Queue<Runnable> viaFabricPlus$getPendingScreenEvents();
+    int viaFabricPlus$getPendingSubChunks();
+
+    int viaFabricPlus$getChunks();
 
 }

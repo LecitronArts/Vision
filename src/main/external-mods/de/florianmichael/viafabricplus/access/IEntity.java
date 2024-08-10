@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.florianmichael.viafabricplus.injection.access;
+package de.florianmichael.viafabricplus.access;
 
-import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+public interface IEntity {
 
-public interface IPerformanceLog {
+    boolean viaFabricPlus$isInLoadedChunkAndShouldTick();
 
-    ProtocolVersion viaFabricPlus$getForcedVersion();
-    void viaFabricPlus$setForcedVersion(final ProtocolVersion version);
+    void viaFabricPlus$setInLoadedChunkAndShouldTick(final boolean inLoadedChunkAndShouldTick);
 
 }

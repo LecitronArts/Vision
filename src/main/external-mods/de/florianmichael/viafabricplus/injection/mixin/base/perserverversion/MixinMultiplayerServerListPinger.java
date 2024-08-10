@@ -20,10 +20,9 @@
 package de.florianmichael.viafabricplus.injection.mixin.base.perserverversion;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import de.florianmichael.viafabricplus.fixes.ClientsideFixes;
-import de.florianmichael.viafabricplus.injection.access.IPerformanceLog;
-import de.florianmichael.viafabricplus.injection.access.IServerInfo;
+import de.florianmichael.viafabricplus.access.IPerformanceLog;
+import de.florianmichael.viafabricplus.access.IServerInfo;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;

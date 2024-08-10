@@ -17,14 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.florianmichael.viafabricplus.injection.access;
+package de.florianmichael.viafabricplus.access;
 
-public interface IItemStack {
+public interface ITextFieldWidget {
 
-    boolean viaFabricPlus$has1_10Tag();
-
-    int viaFabricPlus$get1_10Count();
-
-    void viaFabricPlus$set1_10Count(final int count);
-
+    void viaFabricPlus$unlockForbiddenCharacters();
 }

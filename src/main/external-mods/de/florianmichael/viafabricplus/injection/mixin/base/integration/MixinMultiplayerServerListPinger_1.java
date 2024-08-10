@@ -20,8 +20,8 @@
 package de.florianmichael.viafabricplus.injection.mixin.base.integration;
 
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import de.florianmichael.viafabricplus.injection.access.IClientConnection;
-import de.florianmichael.viafabricplus.injection.access.IServerInfo;
+import de.florianmichael.viafabricplus.access.IClientConnection;
+import de.florianmichael.viafabricplus.access.IServerInfo;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.network.Connection;

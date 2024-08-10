@@ -17,13 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.florianmichael.viafabricplus.injection.access;
+package de.florianmichael.viafabricplus.access;
 
-import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.data.ClassicProtocolExtension;
+public interface IItemStack {
 
-import java.util.EnumMap;
+    boolean viaFabricPlus$has1_10Tag();
 
-public interface IExtensionProtocolMetadataStorage {
+    int viaFabricPlus$get1_10Count();
 
-    EnumMap<ClassicProtocolExtension, Integer> viaFabricPlus$getServerExtensions();
+    void viaFabricPlus$set1_10Count(final int count);
+
 }

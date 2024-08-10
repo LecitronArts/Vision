@@ -28,8 +28,8 @@ public class Vision {
         try {
             EntityCullingMod.INSTANCE.init();
             AccountsX.INSTANCE.init();
-            ViaFabricPlus.global().init();
-           // BARITONE = new BaritoneProvider();
+            //ViaFabricPlus.global().init();
+            //BARITONE = new BaritoneProvider(); already registered by it self.
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

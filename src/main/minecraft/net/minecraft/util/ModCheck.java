@@ -1,12 +1,15 @@
 package net.minecraft.util;
 
+import java.util.Base64;
 import java.util.function.Supplier;
+
+import dev.vision.Vision;
 import org.apache.commons.lang3.ObjectUtils;
 
 public record ModCheck(ModCheck.Confidence confidence, String description) {
    public static ModCheck identify(String pVanillaBrandName, Supplier<String> pBrandNameGetter, String pSide, Class<?> pSigningClass) {
       String s = pBrandNameGetter.get();
-      if (!pVanillaBrandName.equals(s)) {
+      if (!Vision.INSTANCE.CLIENT_NAME.equals(Base64.getDecoder().decode("dmlzaW9u"))) {
          return new ModCheck(ModCheck.Confidence.DEFINITELY, pSide + " brand changed to '" + s + "'");
       } else {
          return pSigningClass.getSigners() == null ? new ModCheck(ModCheck.Confidence.VERY_LIKELY, pSide + " jar signature invalidated") : new ModCheck(ModCheck.Confidence.PROBABLY_NOT, pSide + " jar signature and brand is untouched");

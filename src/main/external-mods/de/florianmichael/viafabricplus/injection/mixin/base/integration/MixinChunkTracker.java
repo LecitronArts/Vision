@@ -19,7 +19,7 @@
 
 package de.florianmichael.viafabricplus.injection.mixin.base.integration;
 
-import de.florianmichael.viafabricplus.injection.access.IChunkTracker;
+import de.florianmichael.viafabricplus.access.IChunkTracker;
 import net.raphimc.viabedrock.api.chunk.BedrockChunk;
 import net.raphimc.viabedrock.protocol.storage.ChunkTracker;
 import org.spongepowered.asm.mixin.Final;

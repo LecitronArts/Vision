@@ -28,7 +28,7 @@ import de.florianmichael.viafabricplus.fixes.versioned.classic.CPEAdditions;
 import de.florianmichael.viafabricplus.fixes.versioned.classic.GridItemSelectionScreen;
 import de.florianmichael.viafabricplus.fixes.versioned.visual.ArmorHudEmulation1_8;
 import de.florianmichael.viafabricplus.fixes.versioned.visual.FootStepParticle1_12_2;
-import de.florianmichael.viafabricplus.injection.access.IClientConnection;
+import de.florianmichael.viafabricplus.access.IClientConnection;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import de.florianmichael.viafabricplus.settings.impl.BedrockSettings;
 import net.minecraft.client.Minecraft;

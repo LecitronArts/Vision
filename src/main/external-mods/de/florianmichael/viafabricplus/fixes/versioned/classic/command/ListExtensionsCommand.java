@@ -20,7 +20,7 @@
 package de.florianmichael.viafabricplus.fixes.versioned.classic.command;
 
 import com.viaversion.viaversion.api.command.ViaCommandSender;
-import de.florianmichael.viafabricplus.injection.access.IExtensionProtocolMetadataStorage;
+import de.florianmichael.viafabricplus.access.IExtensionProtocolMetadataStorage;
 import de.florianmichael.viafabricplus.protocoltranslator.impl.command.VFPViaSubCommand;
 import net.minecraft.ChatFormatting;
 import net.raphimc.vialegacy.api.LegacyProtocolVersion;

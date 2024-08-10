@@ -98,9 +98,6 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
    private volatile Component delayedDisconnect;
    @Nullable
    BandwidthDebugMonitor bandwidthDebugMonitor;
-   private Cipher viaForge$decryptionCipher;
-
-   private ProtocolVersion viaForge$targetVersion;
 
    public Connection(PacketFlow pReceiving) {
       this.receiving = pReceiving;
@@ -484,7 +481,6 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
             ChannelPipeline channelpipeline = p_129552_.pipeline().addLast("timeout", new ReadTimeoutHandler(30));
             Connection.configureSerialization(channelpipeline, PacketFlow.CLIENTBOUND, pConnection.bandwidthDebugMonitor);
             pConnection.configurePacketHandler(channelpipeline);
-            ProtocolTranslator.injectViaPipeline(pConnection, p_129552_);
          }
       }).channel(oclass).connect(pAddress.getAddress(), pAddress.getPort());
    }

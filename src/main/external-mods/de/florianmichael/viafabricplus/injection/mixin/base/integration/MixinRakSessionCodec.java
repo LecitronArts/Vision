@@ -19,7 +19,7 @@
 
 package de.florianmichael.viafabricplus.injection.mixin.base.integration;
 
-import de.florianmichael.viafabricplus.injection.access.IRakSessionCodec;
+import de.florianmichael.viafabricplus.access.IRakSessionCodec;
 import io.netty.util.collection.IntObjectMap;
 import org.cloudburstmc.netty.channel.raknet.packet.EncapsulatedPacket;
 import org.cloudburstmc.netty.channel.raknet.packet.RakDatagramPacket;

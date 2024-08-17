@@ -2,6 +2,10 @@ package net.minecraft.world.level.block;
 
 import com.mojang.serialization.MapCodec;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.injection.ViaFabricPlusMixinPlugin;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.stats.Stats;
@@ -33,6 +37,7 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.spongepowered.asm.mixin.Unique;
 
 public class HopperBlock extends BaseEntityBlock {
    public static final MapCodec<HopperBlock> CODEC = simpleCodec(HopperBlock::new);
@@ -52,6 +57,13 @@ public class HopperBlock extends BaseEntityBlock {
    private static final VoxelShape NORTH_INTERACTION_SHAPE = Shapes.or(Hopper.INSIDE, Block.box(6.0D, 8.0D, 0.0D, 10.0D, 10.0D, 4.0D));
    private static final VoxelShape SOUTH_INTERACTION_SHAPE = Shapes.or(Hopper.INSIDE, Block.box(6.0D, 8.0D, 12.0D, 10.0D, 10.0D, 16.0D));
    private static final VoxelShape WEST_INTERACTION_SHAPE = Shapes.or(Hopper.INSIDE, Block.box(0.0D, 8.0D, 6.0D, 4.0D, 10.0D, 10.0D));
+   @Unique
+   private boolean viaFabricPlus$requireOriginalShape;
+   @Unique
+   private static final VoxelShape viaFabricPlus$inside_shape_r1_12_2 = Block.box(2.0D, 10.0D, 2.0D, 14.0D, 16.0D, 14.0D);
+
+   @Unique
+   private static final VoxelShape viaFabricPlus$hopper_shape_r1_12_2 = Shapes.join(Shapes.block(), viaFabricPlus$inside_shape_r1_12_2, BooleanOp.ONLY_FIRST);
 
    public MapCodec<HopperBlock> codec() {
       return CODEC;
@@ -63,6 +75,11 @@ public class HopperBlock extends BaseEntityBlock {
    }
 
    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+      if (ViaFabricPlusMixinPlugin.MORE_CULLING_PRESENT && viaFabricPlus$requireOriginalShape) {
+         viaFabricPlus$requireOriginalShape = false;
+      } else if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
+         return (viaFabricPlus$hopper_shape_r1_12_2);
+      }
       switch ((Direction)pState.getValue(FACING)) {
          case DOWN:
             return DOWN_SHAPE;
@@ -79,7 +96,17 @@ public class HopperBlock extends BaseEntityBlock {
       }
    }
 
+   @Override
+   public VoxelShape getOcclusionShape(BlockState state, BlockGetter world, BlockPos pos) {
+      // Workaround for https://github.com/ViaVersion/ViaFabricPlus/issues/45
+      viaFabricPlus$requireOriginalShape = true;
+      return super.getOcclusionShape(state, world, pos);
+   }
    public VoxelShape getInteractionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos) {
+
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
+         return (viaFabricPlus$inside_shape_r1_12_2);
+      }
       switch ((Direction)pState.getValue(FACING)) {
          case DOWN:
             return DOWN_INTERACTION_SHAPE;

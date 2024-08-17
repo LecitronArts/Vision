@@ -3,6 +3,11 @@ package net.minecraft.client.gui.screens.multiplayer;
 import com.mojang.logging.LogUtils;
 import java.util.List;
 import javax.annotation.Nullable;
+
+import de.florianmichael.viafabricplus.fixes.ClientsideFixes;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+import de.florianmichael.viafabricplus.screen.base.ProtocolSelectionScreen;
+import de.florianmichael.viafabricplus.settings.impl.GeneralSettings;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.layouts.EqualSpacingLayout;
@@ -131,6 +136,15 @@ public class JoinMultiplayerScreen extends Screen {
       linearlayout.arrangeElements();
       FrameLayout.centerInRectangle(linearlayout, 0, this.height - 64, this.width, 64);
       this.onSelectedChange();
+
+      final int buttonPosition = GeneralSettings.global().multiplayerScreenButtonOrientation.getIndex();
+      if (buttonPosition == 0) { // Off
+         return;
+      }
+      Button.Builder builder = Button.builder(Component.literal("ViaFabricPlus"), bt -> ProtocolSelectionScreen.INSTANCE.open(this)).size(98, 20);
+
+      // Set the button's position according to the configured orientation and add the button to the screen
+      this.addRenderableWidget(GeneralSettings.withOrientation(builder, buttonPosition, width, height).build());
    }
 
    public void tick() {
@@ -207,8 +221,10 @@ public class JoinMultiplayerScreen extends Screen {
          if (serverdata == null) {
             this.servers.add(this.editingServer, true);
             this.servers.save();
+            this.editingServer.viaFabricPlus$passDirectConnectScreen(true);
             this.join(this.editingServer);
          } else {
+            serverdata.viaFabricPlus$passDirectConnectScreen(true);
             this.join(serverdata);
          }
       } else {
@@ -258,9 +274,18 @@ public class JoinMultiplayerScreen extends Screen {
    }
 
    private void join(ServerData pServer) {
-      ConnectScreen.startConnecting(this, this.minecraft, ServerAddress.parseString(pServer.ip), pServer, false);
+      ConnectScreen.startConnecting(this, this.minecraft, /*ServerAddress.parseString(pServer.ip)*/ viaFixIp(pServer.ip,pServer), pServer, false);
    }
 
+   private ServerAddress viaFixIp(String address,ServerData entry){
+      if (( entry).viaFabricPlus$passedDirectConnectScreen()) {
+         // If the user has already passed the direct connect screen, we use the target version
+         return ClientsideFixes.replaceDefaultPort(address, ProtocolTranslator.getTargetVersion());
+      } else {
+         // Otherwise the forced version is used
+         return ClientsideFixes.replaceDefaultPort(address, (entry).viaFabricPlus$forcedVersion());
+      }
+   }
    public void setSelected(ServerSelectionList.Entry pSelected) {
       this.serverSelectionList.setSelected(pSelected);
       this.onSelectedChange();

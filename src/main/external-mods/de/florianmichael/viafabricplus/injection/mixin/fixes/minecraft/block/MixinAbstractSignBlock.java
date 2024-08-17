@@ -41,7 +41,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(SignBlock.class)
 public abstract class MixinAbstractSignBlock {
 
-    @Inject(method = "use", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "use", at = @At("HEAD"), cancellable = true)
     private void changeInteractionCalculation(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit, CallbackInfoReturnable<InteractionResult> cir) {
         if (!world.isClientSide) {
             return;
@@ -59,6 +59,6 @@ public abstract class MixinAbstractSignBlock {
 
             cir.setReturnValue(isSuccess ? InteractionResult.SUCCESS : InteractionResult.CONSUME);
         }
-    }
+    }*/
 
 }

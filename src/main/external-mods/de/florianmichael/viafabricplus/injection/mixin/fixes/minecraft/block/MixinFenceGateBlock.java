@@ -46,7 +46,7 @@ public abstract class MixinFenceGateBlock extends HorizontalDirectionalBlock {
         super(settings);
     }
 
-    @Inject(method = "getShape", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "getShape", at = @At("HEAD"), cancellable = true)
     private void changeOutlineShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context, CallbackInfoReturnable<VoxelShape> cir) {
         if (!state.getValue(FenceGateBlock.IN_WALL) && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_8tob1_8_1)) {
             cir.setReturnValue(Shapes.block());
@@ -58,6 +58,6 @@ public abstract class MixinFenceGateBlock extends HorizontalDirectionalBlock {
         if (!state.getValue(FenceGateBlock.OPEN) && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_8tob1_8_1)) {
             cir.setReturnValue(viaFabricPlus$x_and_z_axis_collision_shape_b1_8_1);
         }
-    }
+    }*/
 
 }

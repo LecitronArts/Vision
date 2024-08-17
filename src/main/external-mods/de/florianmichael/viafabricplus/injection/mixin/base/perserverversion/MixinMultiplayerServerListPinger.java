@@ -21,8 +21,6 @@ package de.florianmichael.viafabricplus.injection.mixin.base.perserverversion;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import de.florianmichael.viafabricplus.fixes.ClientsideFixes;
-import de.florianmichael.viafabricplus.access.IPerformanceLog;
-import de.florianmichael.viafabricplus.access.IServerInfo;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -37,17 +35,17 @@ import net.minecraft.util.SampleLogger;
 @Mixin(ServerStatusPinger.class)
 public abstract class MixinMultiplayerServerListPinger {
 
+/*
     @Redirect(method = "pingServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/resolver/ServerAddress;parseString(Ljava/lang/String;)Lnet/minecraft/client/multiplayer/resolver/ServerAddress;"))
     private ServerAddress replaceDefaultPort(String address, @Local(argsOnly = true) ServerData entry) {
         // Replace port when pinging the server and the forced version is set
-        return ClientsideFixes.replaceDefaultPort(address, ((IServerInfo) entry).viaFabricPlus$forcedVersion());
+        return ClientsideFixes.replaceDefaultPort(address, (entry).viaFabricPlus$forcedVersion());
     }
 
     @Redirect(method = "pingServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/Connection;connectToServer(Ljava/net/InetSocketAddress;ZLnet/minecraft/util/SampleLogger;)Lnet/minecraft/network/Connection;"))
     private Connection setForcedVersion(InetSocketAddress address, boolean useEpoll, SampleLogger packetSizeLog, @Local(argsOnly = true) ServerData serverInfo) {
-        final IServerInfo mixinServerInfo = (IServerInfo) serverInfo;
 
-        if (mixinServerInfo.viaFabricPlus$forcedVersion() != null && !mixinServerInfo.viaFabricPlus$passedDirectConnectScreen()) {
+        if (serverInfo.viaFabricPlus$forcedVersion() != null && !serverInfo.viaFabricPlus$passedDirectConnectScreen()) {
             // We use the PerformanceLog field to store the forced version since it's always null when pinging a server
             // So we can create a dummy instance, store the forced version in it and later destroy the instance again
             // To avoid any side effects, we also support cases where a mod is also creating a PerformanceLog instance
@@ -56,11 +54,12 @@ public abstract class MixinMultiplayerServerListPinger {
             }
 
             // Attach the forced version to the PerformanceLog instance
-            ((IPerformanceLog) packetSizeLog).viaFabricPlus$setForcedVersion(mixinServerInfo.viaFabricPlus$forcedVersion());
-            mixinServerInfo.viaFabricPlus$passDirectConnectScreen(false);
+            ( packetSizeLog).viaFabricPlus$setForcedVersion(serverInfo.viaFabricPlus$forcedVersion());
+            serverInfo.viaFabricPlus$passDirectConnectScreen(false);
         }
 
         return Connection.connectToServer(address, useEpoll, packetSizeLog);
     }
+*/
 
 }

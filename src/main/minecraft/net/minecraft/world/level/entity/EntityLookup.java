@@ -3,6 +3,8 @@ package net.minecraft.world.level.entity;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.mojang.logging.LogUtils;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import java.util.Map;
@@ -32,7 +34,7 @@ public class EntityLookup<T extends EntityAccess> {
 
    public void add(T pEntity) {
       UUID uuid = pEntity.getUUID();
-      if (this.byUuid.containsKey(uuid)) {
+      if ( this.byUuid.containsKey(uuid) && ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_16_4)) {
          LOGGER.warn("Duplicate entity UUID {}: {}", uuid, pEntity);
       } else {
          this.byUuid.put(uuid, pEntity);
@@ -56,6 +58,9 @@ public class EntityLookup<T extends EntityAccess> {
    }
 
    public int count() {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4)) {
+         return (this.byId.size());
+      }
       return this.byUuid.size();
    }
 }

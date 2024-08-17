@@ -45,6 +45,7 @@ public class EditBox extends AbstractWidget implements Renderable {
    private int highlightPos;
    private int textColor = 14737632;
    private int textColorUneditable = 7368816;
+   private boolean viaFabricPlus$forbiddenCharactersUnlocked = false;
    @Nullable
    private String suggestion;
    @Nullable
@@ -120,7 +121,11 @@ public class EditBox extends AbstractWidget implements Renderable {
       int j = Math.max(this.cursorPos, this.highlightPos);
       int k = this.maxLength - this.value.length() - (i - j);
       if (k > 0) {
+
          String s = SharedConstants.filterText(pTextToWrite);
+         if (this.viaFabricPlus$forbiddenCharactersUnlocked) {
+            s = pTextToWrite;
+         }
          int l = s.length();
          if (k < l) {
             if (Character.isHighSurrogate(s.charAt(k - 1))) {
@@ -338,7 +343,7 @@ public class EditBox extends AbstractWidget implements Renderable {
    public boolean charTyped(char pCodePoint, int pModifiers) {
       if (!this.canConsumeInput()) {
          return false;
-      } else if (SharedConstants.isAllowedChatCharacter(pCodePoint)) {
+      } else if (this.viaFabricPlus$forbiddenCharactersUnlocked ||SharedConstants.isAllowedChatCharacter(pCodePoint)) {
          if (this.isEditable) {
             this.insertText(Character.toString(pCodePoint));
          }
@@ -551,4 +556,8 @@ public class EditBox extends AbstractWidget implements Renderable {
    public void setHint(Component pHint) {
       this.hint = pHint;
    }
+   public void viaFabricPlus$unlockForbiddenCharacters() {
+      this.viaFabricPlus$forbiddenCharactersUnlocked = true;
+   }
+
 }

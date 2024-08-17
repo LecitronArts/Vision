@@ -31,9 +31,9 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 @Mixin(LayerDefinitions.class)
 public abstract class MixinEntityModels {
 
-    @ModifyVariable(method = "createRoots", at = @At(value = "STORE", ordinal = 0), ordinal = 0)
+/*    @ModifyVariable(method = "createRoots", at = @At(value = "STORE", ordinal = 0), ordinal = 0)
     private static ImmutableMap.Builder<ModelLayerLocation, LayerDefinition> addBoatModel(ImmutableMap.Builder<ModelLayerLocation, LayerDefinition> builder) {
         return builder.put(BoatModel1_8.MODEL_LAYER, BoatModel1_8.getTexturedModelData());
-    }
+    }*/
 
 }

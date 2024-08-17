@@ -6,17 +6,24 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.logging.LogUtils;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+import de.florianmichael.viafabricplus.settings.impl.GeneralSettings;
+import de.florianmichael.viafabricplus.settings.impl.VisualSettings;
 import net.minecraft.ChatFormatting;
 import net.minecraft.DefaultUncaughtExceptionHandler;
 import net.minecraft.SharedConstants;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.FaviconTexture;
@@ -25,10 +32,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
 import net.minecraft.client.server.LanServer;
-import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentUtils;
-import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraftforge.api.distmarker.Dist;
@@ -69,7 +73,7 @@ public class ServerSelectionList extends ObjectSelectionList<ServerSelectionList
    private final List<ServerSelectionList.OnlineServerEntry> onlineServers = Lists.newArrayList();
    private final ServerSelectionList.Entry lanHeader = new ServerSelectionList.LANHeader();
    private final List<ServerSelectionList.NetworkServerEntry> networkServers = Lists.newArrayList();
-
+   private boolean viaFabricPlus$disableServerPinging = false;
    public ServerSelectionList(JoinMultiplayerScreen pScreen, Minecraft pMinecraft, int pWidth, int pHeight, int pY, int pItemHeight) {
       super(pMinecraft, pWidth, pHeight, pY, pItemHeight);
       this.screen = pScreen;
@@ -237,25 +241,49 @@ public class ServerSelectionList extends ObjectSelectionList<ServerSelectionList
             this.serverData.ping = -2L;
             this.serverData.motd = CommonComponents.EMPTY;
             this.serverData.status = CommonComponents.EMPTY;
-            ServerSelectionList.THREAD_POOL.submit(() -> {
-               try {
-                  this.screen.getPinger().pingServer(this.serverData, () -> {
-                     this.minecraft.execute(this::updateServerList);
-                  });
-               } catch (UnknownHostException unknownhostexception) {
-                  this.serverData.ping = -1L;
-                  this.serverData.motd = ServerSelectionList.CANT_RESOLVE_TEXT;
-               } catch (Exception exception) {
-                  this.serverData.ping = -1L;
-                  this.serverData.motd = ServerSelectionList.CANT_CONNECT_TEXT;
-               }
 
-            });
+            ProtocolVersion version = ( serverData).viaFabricPlus$forcedVersion();
+            if (version == null) version = ProtocolTranslator.getTargetVersion();
+
+            viaFabricPlus$disableServerPinging = VisualSettings.global().disableServerPinging.isEnabled(version);
+            if (viaFabricPlus$disableServerPinging) {
+               this.serverData.version = Component.nullToEmpty(version.getName()); // Show target version
+            }
+
+            if(!viaFabricPlus$disableServerPinging) {
+               ServerSelectionList.THREAD_POOL.submit(() -> {
+                  try {
+                     this.screen.getPinger().pingServer(this.serverData, () -> {
+                        this.minecraft.execute(this::updateServerList);
+                     });
+                  } catch (UnknownHostException unknownhostexception) {
+                     this.serverData.ping = -1L;
+                     this.serverData.motd = ServerSelectionList.CANT_RESOLVE_TEXT;
+                  } catch (Exception exception) {
+                     this.serverData.ping = -1L;
+                     this.serverData.motd = ServerSelectionList.CANT_CONNECT_TEXT;
+                  }
+
+               });
+            }
          }
 
-         boolean flag = !this.isCompatible();
-         pGuiGraphics.drawString(this.minecraft.font, this.serverData.name, pLeft + 32 + 3, pTop + 1, 16777215, false);
-         List<FormattedCharSequence> list = this.minecraft.font.split(this.serverData.motd, pWidth - 32 - 2);
+         boolean viaflag;
+         if (viaFabricPlus$disableServerPinging) {
+            viaflag = false; // server version will always been shown (as we don't have a player count anyway)
+         } else {
+            viaflag = this.isCompatible();
+         }
+
+         boolean flag = !viaflag;
+         int x = pLeft + 32 + 3;
+         if (viaFabricPlus$disableServerPinging) { // Move server label to the right (as we remove the pingLegacyServer bar)
+            x += 15 /* pingLegacyServer bar width */ - 3 /* magical offset */;
+         }
+         pGuiGraphics.drawString(this.minecraft.font, this.serverData.name, x, pTop + 1, 16777215, false);
+
+         // List<FormattedCharSequence> list = this.minecraft.font.split(this.serverData.motd, pWidth - 32 - 2);
+         List<FormattedCharSequence> list = viaDisableServerPinging(this.minecraft.font,this.serverData.motd, pWidth - 32 - 2) ;
 
          for(int i = 0; i < Math.min(list.size(), 2); ++i) {
             pGuiGraphics.drawString(this.minecraft.font, list.get(i), pLeft + 32 + 3, pTop + 12 + 9 * i, -8355712, false);
@@ -322,7 +350,7 @@ public class ServerSelectionList extends ObjectSelectionList<ServerSelectionList
             list1 = Collections.emptyList();
          }
 
-         pGuiGraphics.blitSprite(resourcelocation, pLeft + pWidth - 15, pTop, 10, 8);
+         if(!viaFabricPlus$disableServerPinging)  pGuiGraphics.blitSprite(resourcelocation, pLeft + pWidth - 15, pTop, 10, 8);
          byte[] abyte = this.serverData.getIconBytes();
          if (!Arrays.equals(abyte, this.lastIconBytes)) {
             if (this.uploadServerIcon(abyte)) {
@@ -333,13 +361,34 @@ public class ServerSelectionList extends ObjectSelectionList<ServerSelectionList
             }
          }
 
-         this.drawIcon(pGuiGraphics, pLeft, pTop, this.icon.textureLocation());
+         // this.drawIcon(pGuiGraphics, pLeft, pTop, this.icon.textureLocation());
+         this.drawIcon(pGuiGraphics, pLeft, pTop, disableServerPinging());
          int l = pMouseX - pLeft;
          int i1 = pMouseY - pTop;
          if (l >= pWidth - 15 && l <= pWidth - 5 && i1 >= 0 && i1 <= 8) {
-            this.screen.setToolTip(Collections.singletonList(component));
+            if (!viaFabricPlus$disableServerPinging) {
+               final List<Component> tooltipCopy = new ArrayList<>(list1);
+               if (GeneralSettings.global().showAdvertisedServerVersion.getValue()) {
+                  final ProtocolVersion version = ( serverData).viaFabricPlus$translatingVersion();
+                  if (version != null) {
+                     tooltipCopy.add(Component.translatable("base.viafabricplus.via_translates_to", version.getName() + " (" + version.getOriginalVersion() + ")"));
+                     tooltipCopy.add(Component.translatable("base.viafabricplus.server_version", serverData.version.getString() + " (" + serverData.protocol + ")"));
+                  }
+               }
+               this.screen.setToolTip(tooltipCopy);
+            }
          } else if (l >= pWidth - j - 15 - 2 && l <= pWidth - 15 - 2 && i1 >= 0 && i1 <= 8) {
-            this.screen.setToolTip(list1);
+            if (!viaFabricPlus$disableServerPinging) {
+               final List<Component> tooltipCopy = new ArrayList<>(list1);
+               if (GeneralSettings.global().showAdvertisedServerVersion.getValue()) {
+                  final ProtocolVersion version = ( serverData).viaFabricPlus$translatingVersion();
+                  if (version != null) {
+                     tooltipCopy.add(Component.translatable("base.viafabricplus.via_translates_to", version.getName() + " (" + version.getOriginalVersion() + ")"));
+                     tooltipCopy.add(Component.translatable("base.viafabricplus.server_version", serverData.version.getString() + " (" + serverData.protocol + ")"));
+                  }
+               }
+               this.screen.setToolTip(tooltipCopy);
+            }
          }
 
          if (this.minecraft.options.touchscreen().get() || pHovering) {
@@ -348,31 +397,43 @@ public class ServerSelectionList extends ObjectSelectionList<ServerSelectionList
             int k1 = pMouseY - pTop;
             if (this.canJoin()) {
                if (j1 < 32 && j1 > 16) {
-                  pGuiGraphics.blitSprite(ServerSelectionList.JOIN_HIGHLIGHTED_SPRITE, pLeft, pTop, 32, 32);
+                  if(!viaFabricPlus$disableServerPinging)
+                     pGuiGraphics.blitSprite(ServerSelectionList.JOIN_HIGHLIGHTED_SPRITE, pLeft, pTop, 32, 32);
                } else {
-                  pGuiGraphics.blitSprite(ServerSelectionList.JOIN_SPRITE, pLeft, pTop, 32, 32);
+                  if(!viaFabricPlus$disableServerPinging)
+                     pGuiGraphics.blitSprite(ServerSelectionList.JOIN_SPRITE, pLeft, pTop, 32, 32);
                }
             }
 
             if (pIndex > 0) {
                if (j1 < 16 && k1 < 16) {
-                  pGuiGraphics.blitSprite(ServerSelectionList.MOVE_UP_HIGHLIGHTED_SPRITE, pLeft, pTop, 32, 32);
+                  if(!viaFabricPlus$disableServerPinging)
+                     pGuiGraphics.blitSprite(ServerSelectionList.MOVE_UP_HIGHLIGHTED_SPRITE, pLeft, pTop, 32, 32);
                } else {
-                  pGuiGraphics.blitSprite(ServerSelectionList.MOVE_UP_SPRITE, pLeft, pTop, 32, 32);
+                  if(!viaFabricPlus$disableServerPinging)
+                     pGuiGraphics.blitSprite(ServerSelectionList.MOVE_UP_SPRITE, pLeft, pTop, 32, 32);
                }
             }
 
             if (pIndex < this.screen.getServers().size() - 1) {
                if (j1 < 16 && k1 > 16) {
-                  pGuiGraphics.blitSprite(ServerSelectionList.MOVE_DOWN_HIGHLIGHTED_SPRITE, pLeft, pTop, 32, 32);
+                  if(!viaFabricPlus$disableServerPinging)
+                     pGuiGraphics.blitSprite(ServerSelectionList.MOVE_DOWN_HIGHLIGHTED_SPRITE, pLeft, pTop, 32, 32);
                } else {
-                  pGuiGraphics.blitSprite(ServerSelectionList.MOVE_DOWN_SPRITE, pLeft, pTop, 32, 32);
+                  if(!viaFabricPlus$disableServerPinging)
+                     pGuiGraphics.blitSprite(ServerSelectionList.MOVE_DOWN_SPRITE, pLeft, pTop, 32, 32);
                }
             }
          }
 
       }
-
+      private List<FormattedCharSequence> viaDisableServerPinging(Font instance, FormattedText text, int width) {
+         if (viaFabricPlus$disableServerPinging) { // server label will just show the server address
+            return instance.split(Component.nullToEmpty(serverData.ip), width);
+         } else {
+            return instance.split(text, width);
+         }
+      }
       private boolean pingCompleted() {
          return this.serverData.pinged && this.serverData.ping != -2L;
       }
@@ -435,6 +496,13 @@ public class ServerSelectionList extends ObjectSelectionList<ServerSelectionList
          ServerSelectionList.this.ensureVisible(serverselectionlist$entry);
       }
 
+      private ResourceLocation disableServerPinging() {
+         if (viaFabricPlus$disableServerPinging) { // Remove server icon
+            return FaviconTexture.MISSING_LOCATION;
+         } else {
+            return this.icon.textureLocation();
+         }
+      }
       public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
          double d0 = pMouseX - (double)ServerSelectionList.this.getRowLeft();
          double d1 = pMouseY - (double)ServerSelectionList.this.getRowTop(ServerSelectionList.this.children().indexOf(this));

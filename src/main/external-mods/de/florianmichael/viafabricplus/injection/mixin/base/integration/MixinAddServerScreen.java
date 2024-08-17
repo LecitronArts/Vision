@@ -20,7 +20,6 @@
 package de.florianmichael.viafabricplus.injection.mixin.base.integration;
 
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import de.florianmichael.viafabricplus.access.IServerInfo;
 import de.florianmichael.viafabricplus.screen.base.PerServerVersionScreen;
 import de.florianmichael.viafabricplus.settings.impl.GeneralSettings;
 import net.minecraft.client.gui.components.Button;
@@ -40,7 +39,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(EditServerScreen.class)
 public abstract class MixinAddServerScreen extends Screen {
 
-    @Shadow
+/*    @Shadow
     @Final
     private ServerData serverData;
 
@@ -54,13 +53,13 @@ public abstract class MixinAddServerScreen extends Screen {
     private String viaFabricPlus$nameField;
 
     @Unique
-    private String viaFabricPlus$addressField;
+    private String viaFabricPlus$addressField;*/
 
     public MixinAddServerScreen(Component title) {
         super(title);
     }
 
-    @Inject(method = "init", at = @At("RETURN"))
+/*    @Inject(method = "init", at = @At("RETURN"))
     private void addVersionSetterButton(CallbackInfo ci) {
         final int buttonPosition = GeneralSettings.global().addServerScreenButtonOrientation.getIndex();
         if (buttonPosition == 0) { // Off
@@ -88,6 +87,6 @@ public abstract class MixinAddServerScreen extends Screen {
 
         // Set the button's position according to the configured orientation and add the button to the screen
         this.addRenderableWidget(GeneralSettings.withOrientation(buttonBuilder, buttonPosition, width, height).build());
-    }
+    }*/
 
 }

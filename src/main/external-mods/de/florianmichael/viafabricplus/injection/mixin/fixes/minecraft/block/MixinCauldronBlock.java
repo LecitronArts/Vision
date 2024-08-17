@@ -39,18 +39,20 @@ import org.spongepowered.asm.mixin.Unique;
 @Mixin(CauldronBlock.class)
 public abstract class MixinCauldronBlock extends AbstractCauldronBlock {
 
+/*
     @Unique
     private static final VoxelShape viaFabricPlus$shape_r1_12_2 = Shapes.join(
             Shapes.block(),
             Block.box(2.0D, 5.0D, 2.0D, 14.0D, 16.0D, 14.0D),
             BooleanOp.ONLY_FIRST
     );
+*/
 
     public MixinCauldronBlock(Properties settings, CauldronInteraction.InteractionMap behaviorMap) {
         super(settings, behaviorMap);
     }
 
-    @Unique
+   /* @Unique
     private boolean viaFabricPlus$requireOriginalShape;
 
     @Override
@@ -69,6 +71,6 @@ public abstract class MixinCauldronBlock extends AbstractCauldronBlock {
         // MoreCulling is caching the culling shape and doesn't reload it, so we have to force vanilla's shape here.
         viaFabricPlus$requireOriginalShape = true;
         return super.getOcclusionShape(state, world, pos);
-    }
+    }*/
 
 }

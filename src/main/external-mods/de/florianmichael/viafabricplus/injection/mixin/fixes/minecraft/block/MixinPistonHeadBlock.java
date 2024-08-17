@@ -90,7 +90,7 @@ public abstract class MixinPistonHeadBlock extends DirectionalBlock {
         super(settings);
     }
 
-    @Inject(method = "getShape", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "getShape", at = @At("HEAD"), cancellable = true)
     private void changeOutlineShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context, CallbackInfoReturnable<VoxelShape> cir) {
         if (viaFabricPlus$selfInflicted) {
             viaFabricPlus$selfInflicted = false;
@@ -127,6 +127,6 @@ public abstract class MixinPistonHeadBlock extends DirectionalBlock {
         } else {
             return super.getCollisionShape(state, world, pos, context);
         }
-    }
+    }*/
 
 }

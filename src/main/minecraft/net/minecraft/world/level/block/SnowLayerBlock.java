@@ -2,6 +2,9 @@ package net.minecraft.world.level.block;
 
 import com.mojang.serialization.MapCodec;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -28,7 +31,17 @@ public class SnowLayerBlock extends Block {
    public static final IntegerProperty LAYERS = BlockStateProperties.LAYERS;
    protected static final VoxelShape[] SHAPE_BY_LAYER = new VoxelShape[]{Shapes.empty(), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 4.0D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 6.0D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 8.0D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 10.0D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 12.0D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 14.0D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16.0D, 16.0D)};
    public static final int HEIGHT_IMPASSABLE = 5;
-
+   private static final VoxelShape[] viaFabricPlus$layers_to_shape_r1_12_2 = new VoxelShape[]{
+           Block.box(0.0D, -0.00001 /* 0.0D */, 0.0D, 16.0D, 0.0D, 16.0D),
+           Block.box(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D),
+           Block.box(0.0D, 0.0D, 0.0D, 16.0D, 4.0D, 16.0D),
+           Block.box(0.0D, 0.0D, 0.0D, 16.0D, 6.0D, 16.0D),
+           Block.box(0.0D, 0.0D, 0.0D, 16.0D, 8.0D, 16.0D),
+           Block.box(0.0D, 0.0D, 0.0D, 16.0D, 10.0D, 16.0D),
+           Block.box(0.0D, 0.0D, 0.0D, 16.0D, 12.0D, 16.0D),
+           Block.box(0.0D, 0.0D, 0.0D, 16.0D, 14.0D, 16.0D),
+           Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16.0D, 16.0D)
+   };
    public MapCodec<SnowLayerBlock> codec() {
       return CODEC;
    }
@@ -56,6 +69,9 @@ public class SnowLayerBlock extends Block {
    }
 
    public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
+         return (viaFabricPlus$layers_to_shape_r1_12_2[pState.getValue(LAYERS) - 1]);
+      }
       return SHAPE_BY_LAYER[pState.getValue(LAYERS) - 1];
    }
 

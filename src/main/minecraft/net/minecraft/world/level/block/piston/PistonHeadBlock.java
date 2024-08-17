@@ -2,6 +2,9 @@ package net.minecraft.world.level.block.piston;
 
 import com.mojang.serialization.MapCodec;
 import java.util.Arrays;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
@@ -26,6 +29,7 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.spongepowered.asm.mixin.Unique;
 
 public class PistonHeadBlock extends DirectionalBlock {
    public static final MapCodec<PistonHeadBlock> CODEC = simpleCodec(PistonHeadBlock::new);
@@ -55,7 +59,26 @@ public class PistonHeadBlock extends DirectionalBlock {
    protected static final VoxelShape SHORT_WEST_ARM_AABB = Block.box(4.0D, 6.0D, 6.0D, 16.0D, 10.0D, 10.0D);
    private static final VoxelShape[] SHAPES_SHORT = makeShapes(true);
    private static final VoxelShape[] SHAPES_LONG = makeShapes(false);
+   @Unique
+   private static final VoxelShape viaFabricPlus$up_arm_shape_r1_8_x = Block.box(6.0, 0.0, 6.0, 10.0, 12.0, 10.0);
 
+   @Unique
+   private static final VoxelShape viaFabricPlus$down_arm_shape_r1_8_x = Block.box(6.0, 4.0, 6.0, 10.0, 16.0, 10.0);
+
+   @Unique
+   private static final VoxelShape viaFabricPlus$south_arm_shape_r1_8_x = Block.box(4.0, 6.0, 0.0, 12.0, 10.0, 12.0);
+
+   @Unique
+   private static final VoxelShape viaFabricPlus$north_arm_shape_r1_8_x = Block.box(4.0, 6.0, 4.0, 12.0, 10.0, 16.0);
+
+   @Unique
+   private static final VoxelShape viaFabricPlus$east_arm_shape_r1_8_x = Block.box(0.0, 6.0, 4.0, 12.0, 10.0, 12.0);
+
+   @Unique
+   private static final VoxelShape viaFabricPlus$west_arm_shape_r1_8_x = Block.box(6.0, 4.0, 4.0, 10.0, 12.0, 16.0);
+
+   @Unique
+   private boolean viaFabricPlus$selfInflicted = false;
    protected MapCodec<PistonHeadBlock> codec() {
       return CODEC;
    }
@@ -96,6 +119,21 @@ public class PistonHeadBlock extends DirectionalBlock {
    }
 
    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+      if (viaFabricPlus$selfInflicted) {
+         viaFabricPlus$selfInflicted = false;
+      } else  {
+         // Outline shape for piston head doesn't exist in <= 1.12.2
+         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
+            return (switch (pState.getValue(PistonHeadBlock.FACING)) {
+               case DOWN -> DOWN_AABB;
+               case UP -> UP_AABB;
+               case NORTH -> NORTH_AABB;
+               case SOUTH -> SOUTH_AABB;
+               case WEST -> WEST_AABB;
+               case EAST -> EAST_AABB;
+            });
+         }
+      }
       return (pState.getValue(SHORT) ? SHAPES_SHORT : SHAPES_LONG)[pState.getValue(FACING).ordinal()];
    }
 
@@ -160,5 +198,25 @@ public class PistonHeadBlock extends DirectionalBlock {
 
    public boolean isPathfindable(BlockState pState, BlockGetter pLevel, BlockPos pPos, PathComputationType pType) {
       return false;
+   }
+
+   @Override
+   public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+         return switch (state.getValue(PistonHeadBlock.FACING)) {
+            case DOWN -> Shapes.or(DOWN_AABB, viaFabricPlus$down_arm_shape_r1_8_x);
+            case UP -> Shapes.or(UP_AABB, viaFabricPlus$up_arm_shape_r1_8_x);
+            case NORTH -> Shapes.or(NORTH_AABB, viaFabricPlus$north_arm_shape_r1_8_x);
+            case SOUTH -> Shapes.or(SOUTH_AABB, viaFabricPlus$south_arm_shape_r1_8_x);
+            case WEST -> Shapes.or(WEST_AABB, viaFabricPlus$west_arm_shape_r1_8_x);
+            case EAST -> Shapes.or(EAST_AABB, viaFabricPlus$east_arm_shape_r1_8_x);
+         };
+      } else if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
+         // Collision shape for piston head in <= 1.12.2 needs to be the 1.13+ outline shape
+         viaFabricPlus$selfInflicted = true;
+         return getShape(state, world, pos, context);
+      } else {
+         return super.getCollisionShape(state, world, pos, context);
+      }
    }
 }

@@ -6,6 +6,8 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import net.minecraft.SharedConstants;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -14,6 +16,7 @@ import net.minecraft.util.PngInfo;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.slf4j.Logger;
+import org.spongepowered.asm.mixin.Unique;
 
 @OnlyIn(Dist.CLIENT)
 public class ServerData {
@@ -35,6 +38,9 @@ public class ServerData {
    private byte[] iconBytes;
    private ServerData.Type type;
    private boolean enforcesSecureChat;
+   private ProtocolVersion viaFabricPlus$forcedVersion = null;
+   private boolean viaFabricPlus$passedDirectConnectScreen;
+   private ProtocolVersion viaFabricPlus$translatingVersion;
 
    public ServerData(String pName, String pIp, ServerData.Type pType) {
       this.name = pName;
@@ -56,6 +62,9 @@ public class ServerData {
          compoundtag.putBoolean("acceptTextures", false);
       }
 
+      if (viaFabricPlus$forcedVersion != null) {
+         compoundtag.putString("viafabricplus_forcedversion", viaFabricPlus$forcedVersion.getName());
+      }
       return compoundtag;
    }
 
@@ -86,6 +95,13 @@ public class ServerData {
          }
       } else {
          serverdata.setResourcePackStatus(ServerData.ServerPackStatus.PROMPT);
+      }
+
+      if (pNbtCompound.contains("viafabricplus_forcedversion")) {
+         final ProtocolVersion version = ProtocolVersion.getClosest(pNbtCompound.getString("viafabricplus_forcedversion"));
+         if (version != null) {
+            ( serverdata).viaFabricPlus$forceVersion(version);
+         }
       }
       return serverdata;
    }
@@ -130,6 +146,7 @@ public class ServerData {
       this.setResourcePackStatus(pServerData.getResourcePackStatus());
       this.type = pServerData.type;
       this.enforcesSecureChat = pServerData.enforcesSecureChat;
+      viaFabricPlus$forceVersion((pServerData).viaFabricPlus$forcedVersion());
    }
 
    @Nullable
@@ -170,5 +187,35 @@ public class ServerData {
       LAN,
       REALM,
       OTHER;
+   }
+
+
+   public ProtocolVersion viaFabricPlus$forcedVersion() {
+      return viaFabricPlus$forcedVersion;
+   }
+
+
+   public void viaFabricPlus$forceVersion(ProtocolVersion version) {
+      viaFabricPlus$forcedVersion = version;
+   }
+
+
+   public boolean viaFabricPlus$passedDirectConnectScreen() {
+      return viaFabricPlus$passedDirectConnectScreen;
+   }
+
+
+   public void viaFabricPlus$passDirectConnectScreen(boolean state) {
+      viaFabricPlus$passedDirectConnectScreen = state;
+   }
+
+
+   public ProtocolVersion viaFabricPlus$translatingVersion() {
+      return viaFabricPlus$translatingVersion;
+   }
+
+
+   public void viaFabricPlus$setTranslatingVersion(ProtocolVersion version) {
+      viaFabricPlus$translatingVersion = version;
    }
 }

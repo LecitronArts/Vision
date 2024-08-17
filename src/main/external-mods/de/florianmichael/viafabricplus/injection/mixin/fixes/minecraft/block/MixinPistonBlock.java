@@ -67,7 +67,7 @@ public abstract class MixinPistonBlock extends DirectionalBlock {
         super(settings);
     }
 
-    @Inject(method = "getShape", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "getShape", at = @At("HEAD"), cancellable = true)
     private void changeOutlineShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context, CallbackInfoReturnable<VoxelShape> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.r1_1)) {
             cir.setReturnValue(Shapes.block());
@@ -92,6 +92,6 @@ public abstract class MixinPistonBlock extends DirectionalBlock {
         } else {
             return super.getOcclusionShape(state, world, pos);
         }
-    }
+    }*/
 
 }

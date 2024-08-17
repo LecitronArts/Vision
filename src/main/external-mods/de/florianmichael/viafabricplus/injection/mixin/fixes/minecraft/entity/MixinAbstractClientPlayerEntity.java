@@ -38,11 +38,13 @@ public abstract class MixinAbstractClientPlayerEntity extends Player {
         super(world, pos, yaw, gameProfile);
     }
 
+/*
     @Inject(method = "isCreative", at = @At("HEAD"), cancellable = true)
     private void fixCreativeCheck(CallbackInfoReturnable<Boolean> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             cir.setReturnValue(this.getAbilities().instabuild);
         }
     }
+*/
 
 }

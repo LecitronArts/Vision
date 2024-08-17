@@ -1,5 +1,7 @@
 package net.minecraft.world.entity.animal;
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -78,6 +80,9 @@ public class Squid extends WaterAnimal {
    }
 
    public boolean canBeLeashed(Player pPlayer) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4)) {
+         return (false);
+      }
       return !this.isLeashed();
    }
 

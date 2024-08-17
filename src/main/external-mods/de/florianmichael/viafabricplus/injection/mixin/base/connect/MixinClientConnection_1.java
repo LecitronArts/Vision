@@ -32,13 +32,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(targets = "net.minecraft.network.Connection$1")
 public abstract class MixinClientConnection_1 {
 
-    @Final
+/*    @Final
     @Shadow
     Connection val$pConnection;
 
     @Inject(method = "initChannel", at = @At("RETURN"))
     private void injectViaIntoPipeline(Channel channel, CallbackInfo ci) {
         ProtocolTranslator.injectViaPipeline(this.val$pConnection, channel);
-    }
+    }*/
 
 }

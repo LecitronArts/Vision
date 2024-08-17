@@ -2,6 +2,9 @@ package net.minecraft.world.level.block;
 
 import com.mojang.serialization.MapCodec;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -26,6 +29,7 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class FarmBlock extends Block {
@@ -65,9 +69,19 @@ public class FarmBlock extends Block {
    }
 
    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_9_3)) {
+         return (Shapes.block());
+      }
       return SHAPE;
    }
-
+   @Override
+   public VoxelShape getOcclusionShape(BlockState state, BlockGetter view, BlockPos pos) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_9_3)) {
+         return SHAPE;
+      } else {
+         return super.getOcclusionShape(state, view, pos);
+      }
+   }
    public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
       if (!pState.canSurvive(pLevel, pPos)) {
          turnToDirt((Entity)null, pState, pLevel, pPos);

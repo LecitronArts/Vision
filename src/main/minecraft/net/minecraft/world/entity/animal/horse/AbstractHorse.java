@@ -5,6 +5,9 @@ import java.util.function.DoubleSupplier;
 import java.util.function.IntUnaryOperator;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -432,7 +435,7 @@ public abstract class AbstractHorse extends Animal implements ContainerListener,
    }
 
    public InteractionResult fedFood(Player pPlayer, ItemStack pStack) {
-      boolean flag = this.handleEating(pPlayer, pStack);
+      boolean flag = ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20_2) || this.handleEating(pPlayer, pStack);
       if (flag & !pPlayer.getAbilities().instabuild) {
          pStack.shrink(1);
       }

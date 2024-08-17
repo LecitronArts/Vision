@@ -1,6 +1,7 @@
 package net.minecraft.world.level.block;
 
 import com.mojang.serialization.MapCodec;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import it.unimi.dsi.fastutil.floats.Float2FloatFunction;
 import java.util.List;
 import java.util.Optional;
@@ -52,7 +53,9 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 
 public class ChestBlock extends AbstractChestBlock<ChestBlockEntity> implements SimpleWaterloggedBlock {
    public static final MapCodec<ChestBlock> CODEC = simpleCodec((p_309280_) -> {
@@ -135,7 +138,23 @@ public class ChestBlock extends AbstractChestBlock<ChestBlockEntity> implements 
          return chesttype == ChestType.RIGHT ? DoubleBlockCombiner.BlockType.FIRST : DoubleBlockCombiner.BlockType.SECOND;
       }
    }
-
+   @Override
+   public VoxelShape getOcclusionShape(BlockState state, BlockGetter view, BlockPos pos) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.r1_4_2)) {
+         if (state.getValue(ChestBlock.TYPE) == ChestType.SINGLE) {
+            return AABB;
+         } else {
+            return switch (ChestBlock.getConnectedDirection(state)) {
+               case NORTH -> NORTH_AABB;
+               case SOUTH -> SOUTH_AABB;
+               case WEST -> WEST_AABB;
+               default -> EAST_AABB;
+            };
+         }
+      } else {
+         return super.getOcclusionShape(state, view, pos);
+      }
+   }
    public RenderShape getRenderShape(BlockState pState) {
       return RenderShape.ENTITYBLOCK_ANIMATED;
    }
@@ -158,6 +177,9 @@ public class ChestBlock extends AbstractChestBlock<ChestBlockEntity> implements 
    }
 
    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.r1_4_2)) {
+         return (Shapes.block());
+      }
       if (pState.getValue(TYPE) == ChestType.SINGLE) {
          return AABB;
       } else {

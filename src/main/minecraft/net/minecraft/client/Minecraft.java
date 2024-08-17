@@ -74,6 +74,8 @@ import javax.annotation.Nullable;
 
 import com.velum.videotape.event.ClientEventHandler;
 import de.florianmichael.viafabricplus.ViaFabricPlus;
+import de.florianmichael.viafabricplus.event.PostGameLoadCallback;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import dev.vision.Vision;
 import dev.tr7zw.entityculling.EntityCullingMod;
 import net.minecraft.ChatFormatting;
@@ -623,6 +625,8 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
          });
       }, false));
       this.quickPlayLog = QuickPlayLog.of(pGameConfig.quickPlay.path());
+
+      PostGameLoadCallback.EVENT.invoker().postGameLoad();
    }
 
    private void onResourceLoadFinished(@Nullable Minecraft.GameLoadCookie pGameLoadCookie) {
@@ -2151,6 +2155,8 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
       Duration duration = Duration.between(instant, Instant.now());
       SocketAddress socketaddress = this.singleplayerServer.getConnection().startMemoryChannel();
       Connection connection = Connection.connectToLocalServer(socketaddress);
+      ProtocolTranslator.setTargetVersion(ProtocolTranslator.NATIVE_VERSION, true);
+      ProtocolTranslator.injectPreviousVersionReset(connection.channel);
       connection.initiateServerboundPlayConnection(socketaddress.toString(), 0, new ClientHandshakePacketListenerImpl(connection, this, (ServerData)null, (Screen)null, pNewWorld, duration, (p_231442_) -> {
       }));
       connection.send(new ServerboundHelloPacket(this.getUser().getName(), this.getUser().getProfileId()));

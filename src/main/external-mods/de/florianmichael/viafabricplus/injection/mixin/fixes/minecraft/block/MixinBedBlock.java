@@ -41,14 +41,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(BedBlock.class)
 public abstract class MixinBedBlock extends HorizontalDirectionalBlock {
 
-    @Unique
-    private static final VoxelShape viaFabricPlus$shape_r1_13_2 = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 9.0D, 16.0D);
+/*    @Unique
+    private static final VoxelShape viaFabricPlus$shape_r1_13_2 = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 9.0D, 16.0D);*/
 
     protected MixinBedBlock(Properties settings) {
         super(settings);
     }
 
-    @Unique
+/*    @Unique
     private boolean viaFabricPlus$requireOriginalShape;
 
     @Inject(method = "getShape", at = @At("HEAD"), cancellable = true)
@@ -73,6 +73,6 @@ public abstract class MixinBedBlock extends HorizontalDirectionalBlock {
         // MoreCulling is caching the culling shape and doesn't reload it, so we have to force vanilla's shape here.
         viaFabricPlus$requireOriginalShape = true;
         return super.getOcclusionShape(state, world, pos);
-    }
+    }*/
 
 }

@@ -20,16 +20,16 @@
 package de.florianmichael.viafabricplus.injection.mixin.base.perserverversion;
 
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import de.florianmichael.viafabricplus.access.IPerformanceLog;
 import net.minecraft.util.SampleLogger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(SampleLogger.class)
-public abstract class MixinPerformanceLog implements IPerformanceLog {
+public abstract class MixinPerformanceLog{
 
     @Unique
     private ProtocolVersion viaFabricPlus$forcedVersion;
+/*
 
     @Override
     public ProtocolVersion viaFabricPlus$getForcedVersion() {
@@ -40,5 +40,6 @@ public abstract class MixinPerformanceLog implements IPerformanceLog {
     public void viaFabricPlus$setForcedVersion(ProtocolVersion version) {
         this.viaFabricPlus$forcedVersion = version;
     }
+*/
 
 }

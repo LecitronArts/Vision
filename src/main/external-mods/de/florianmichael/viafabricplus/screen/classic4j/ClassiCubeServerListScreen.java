@@ -24,7 +24,6 @@ import de.florianmichael.classic4j.ClassiCubeHandler;
 import de.florianmichael.classic4j.api.LoginProcessHandler;
 import de.florianmichael.classic4j.model.classicube.server.CCServerInfo;
 import de.florianmichael.viafabricplus.ViaFabricPlus;
-import de.florianmichael.viafabricplus.access.IServerInfo;
 import de.florianmichael.viafabricplus.protocoltranslator.impl.provider.vialegacy.ViaFabricPlusClassicMPPassProvider;
 import de.florianmichael.viafabricplus.screen.VFPListEntry;
 import de.florianmichael.viafabricplus.screen.VFPScreen;
@@ -135,7 +134,7 @@ public class ClassiCubeServerListScreen extends VFPScreen {
             ViaFabricPlusClassicMPPassProvider.classicMpPassForNextJoin = classiCubeServerInfo.mpPass();
 
             if (AuthenticationSettings.global().automaticallySelectCPEInClassiCubeServerList.getValue()) {
-                ((IServerInfo) entry).viaFabricPlus$forceVersion(LegacyProtocolVersion.c0_30cpe);
+                ( entry).viaFabricPlus$forceVersion(LegacyProtocolVersion.c0_30cpe);
             }
 
             ConnectScreen.startConnecting(Minecraft.getInstance().screen, Minecraft.getInstance(), serverAddress, entry, false);

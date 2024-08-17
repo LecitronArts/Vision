@@ -3,6 +3,9 @@ package net.minecraft.world.entity.item;
 import java.util.Objects;
 import java.util.UUID;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -185,6 +188,9 @@ public class ItemEntity extends Entity implements TraceableEntity {
    }
 
    private void setUnderwaterMovement() {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
+         return;
+      }
       Vec3 vec3 = this.getDeltaMovement();
       this.setDeltaMovement(vec3.x * (double)0.99F, vec3.y + (double)(vec3.y < (double)0.06F ? 5.0E-4F : 0.0F), vec3.z * (double)0.99F);
    }

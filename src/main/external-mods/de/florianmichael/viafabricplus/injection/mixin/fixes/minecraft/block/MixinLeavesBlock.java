@@ -39,11 +39,11 @@ public abstract class MixinLeavesBlock extends Block {
         super(settings);
     }
 
-    @Inject(method = "getBlockSupportShape", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "getBlockSupportShape", at = @At("HEAD"), cancellable = true)
     private void changeSidesShape(BlockState state, BlockGetter world, BlockPos pos, CallbackInfoReturnable<VoxelShape> cir) {
         if (ProtocolTranslator.getTargetVersion().betweenInclusive(ProtocolVersion.v1_14, ProtocolVersion.v1_15_2)) {
             cir.setReturnValue(super.getBlockSupportShape(state, world, pos));
         }
-    }
+    }*/
 
 }

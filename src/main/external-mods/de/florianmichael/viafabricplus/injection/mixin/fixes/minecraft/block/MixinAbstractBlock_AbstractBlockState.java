@@ -47,10 +47,10 @@ public abstract class MixinAbstractBlock_AbstractBlockState {
     @Final
     private boolean requiresCorrectToolForDrops;
 
-    /**
+/*    *//**
      * @author RK_01
      * @reason Change break speed for shulker blocks in < 1.14
-     */
+     *//*
     @Overwrite
     public boolean requiresCorrectToolForDrops() {
         if (this.getBlock() instanceof ShulkerBoxBlock && ProtocolTranslator.getTargetVersion().olderThan(ProtocolVersion.v1_14)) {
@@ -58,9 +58,9 @@ public abstract class MixinAbstractBlock_AbstractBlockState {
         } else {
             return this.requiresCorrectToolForDrops;
         }
-    }
+    }*/
 
-    @Inject(method = "getDestroySpeed", at = @At("RETURN"), cancellable = true)
+   /* @Inject(method = "getDestroySpeed", at = @At("RETURN"), cancellable = true)
     private void changeHardness(BlockGetter world, BlockPos pos, CallbackInfoReturnable<Float> cir) {
         final Block block = this.getBlock();
 
@@ -83,6 +83,6 @@ public abstract class MixinAbstractBlock_AbstractBlockState {
                 cir.setReturnValue(10.0F);
             }
         }
-    }
+    }*/
 
 }

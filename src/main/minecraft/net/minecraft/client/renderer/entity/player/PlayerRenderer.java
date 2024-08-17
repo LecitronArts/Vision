@@ -2,6 +2,8 @@ package net.minecraft.client.renderer.entity.player;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.client.model.HumanoidArmorModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
@@ -23,6 +25,7 @@ import net.minecraft.client.renderer.entity.layers.ParrotOnShoulderLayer;
 import net.minecraft.client.renderer.entity.layers.PlayerItemInHandLayer;
 import net.minecraft.client.renderer.entity.layers.SpinAttackEffectLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.numbers.StyledFormat;
@@ -30,6 +33,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.PlayerModelPart;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.ItemStack;
@@ -42,6 +46,7 @@ import net.minecraft.world.scores.ReadOnlyScoreInfo;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 
 @OnlyIn(Dist.CLIENT)
 public class PlayerRenderer extends LivingEntityRenderer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
@@ -65,7 +70,22 @@ public class PlayerRenderer extends LivingEntityRenderer<AbstractClientPlayer, P
    }
 
    public Vec3 getRenderOffset(AbstractClientPlayer pEntity, float pPartialTicks) {
-      return pEntity.isCrouching() ? new Vec3(0.0D, -0.125D, 0.0D) : super.getRenderOffset(pEntity, pPartialTicks);
+      Vec3 returnValue = (ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_11_1) && pEntity.isCrouching()) ? new Vec3(0.0D, -0.125D, 0.0D) : super.getRenderOffset(pEntity, pPartialTicks);
+      if (pEntity.getPose() == Pose.SLEEPING) {
+         final Direction sleepingDir = pEntity.getBedOrientation();
+         if (sleepingDir != null) {
+            if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
+               return (returnValue.subtract(sleepingDir.getStepX() * 0.4, 0, sleepingDir.getStepZ() * 0.4));
+            }
+            if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_5tob1_5_2)) {
+               return (returnValue.subtract(sleepingDir.getStepX() * 0.1, 0, sleepingDir.getStepZ() * 0.1));
+            }
+            if (ProtocolTranslator.getTargetVersion().betweenInclusive(LegacyProtocolVersion.b1_6tob1_6_6, ProtocolVersion.v1_7_6)) {
+               return  (returnValue.subtract(0, 0.3F, 0));
+            }
+         }
+      }
+      return returnValue;
    }
 
    private void setModelProperties(AbstractClientPlayer pClientPlayer) {

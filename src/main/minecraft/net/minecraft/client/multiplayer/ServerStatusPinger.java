@@ -1,8 +1,11 @@
 package net.minecraft.client.multiplayer;
 
 import com.google.common.collect.Lists;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.authlib.GameProfile;
 import com.mojang.logging.LogUtils;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.fixes.ClientsideFixes;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelException;
@@ -18,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.ChatFormatting;
+import net.minecraft.SharedConstants;
 import net.minecraft.Util;
 import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.multiplayer.resolver.ResolvedServerAddress;
@@ -43,15 +47,35 @@ public class ServerStatusPinger {
    private static final Component CANT_CONNECT_MESSAGE = Component.translatable("multiplayer.status.cannot_connect").withColor(-65536);
    private final List<Connection> connections = Collections.synchronizedList(Lists.newArrayList());
 
+   private Connection setForcedVersion(InetSocketAddress address, boolean useEpoll, SampleLogger packetSizeLog, ServerData serverInfo) {
+
+      if (serverInfo.viaFabricPlus$forcedVersion() != null && !serverInfo.viaFabricPlus$passedDirectConnectScreen()) {
+         // We use the PerformanceLog field to store the forced version since it's always null when pinging a server
+         // So we can create a dummy instance, store the forced version in it and later destroy the instance again
+         // To avoid any side effects, we also support cases where a mod is also creating a PerformanceLog instance
+         if (packetSizeLog == null) {
+            packetSizeLog = new SampleLogger();
+         }
+
+         // Attach the forced version to the PerformanceLog instance
+         ( packetSizeLog).viaFabricPlus$setForcedVersion(serverInfo.viaFabricPlus$forcedVersion());
+         serverInfo.viaFabricPlus$passDirectConnectScreen(false);
+      }
+
+      return Connection.connectToServer(address, useEpoll, packetSizeLog);
+   }
    public void pingServer(final ServerData pServer, final Runnable pServerListUpdater) throws UnknownHostException {
-      final ServerAddress serveraddress = ServerAddress.parseString(pServer.ip);
+      final ServerAddress serveraddress =  ClientsideFixes.replaceDefaultPort(pServer.ip, pServer.viaFabricPlus$forcedVersion()) ;// ServerAddress.parseString(pServer.ip);
+
       Optional<InetSocketAddress> optional = ServerNameResolver.DEFAULT.resolveAddress(serveraddress).map(ResolvedServerAddress::asInetSocketAddress);
       if (optional.isEmpty()) {
          this.onPingFailed(ConnectScreen.UNKNOWN_HOST_MESSAGE, pServer);
       } else {
          final InetSocketAddress inetsocketaddress = optional.get();
          //redirect
-         final Connection connection = Connection.connectToServer(inetsocketaddress, false, (SampleLogger)null);
+
+         final Connection connection =  setForcedVersion(inetsocketaddress,false,(SampleLogger) null,pServer) ;// Connection.connectToServer(inetsocketaddress, false, (SampleLogger)null);
+
          this.connections.add(connection);
          pServer.motd = Component.translatable("multiplayer.status.pinging");
          pServer.ping = -1L;
@@ -62,6 +86,9 @@ public class ServerStatusPinger {
             private long pingStart;
 
             public void handleStatusResponse(ClientboundStatusResponsePacket p_105489_) {
+
+               ( pServer).viaFabricPlus$setTranslatingVersion(connection.viaFabricPlus$getTargetVersion());
+
                if (this.receivedPing) {
                   connection.disconnect(Component.translatable("multiplayer.status.unrequested"));
                } else {
@@ -105,6 +132,12 @@ public class ServerStatusPinger {
 
                   });
                   this.pingStart = Util.getMillis();
+                  final ProtocolVersion version = (connection).viaFabricPlus$getTargetVersion();
+
+                  // If the server is compatible with the client, we set the protocol version to the client version
+                  if (version != null && version.getVersion() == pServer.protocol) {
+                     pServer.protocol = SharedConstants.getProtocolVersion();
+                  }
                   connection.send(new ServerboundPingRequestPacket(this.pingStart));
                   this.success = true;
                }

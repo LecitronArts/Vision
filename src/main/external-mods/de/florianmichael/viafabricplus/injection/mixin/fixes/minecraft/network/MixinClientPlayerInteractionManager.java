@@ -28,7 +28,6 @@ import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ServerboundPac
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
 import de.florianmichael.viafabricplus.fixes.versioned.ActionResultException1_12_2;
 import de.florianmichael.viafabricplus.fixes.versioned.ClientPlayerInteractionManager1_18_2;
-import de.florianmichael.viafabricplus.access.IClientConnection;
 import de.florianmichael.viafabricplus.access.IClientPlayerInteractionManager;
 import de.florianmichael.viafabricplus.access.IScreenHandler;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
@@ -153,7 +152,7 @@ public abstract class MixinClientPlayerInteractionManager implements IClientPlay
                 slotItemBeforeModification = viaFabricPlus$oldItems.get(clickSlot.getSlotNum());
             }
 
-            final PacketWrapper clickWindowPacket = PacketWrapper.create(ServerboundPackets1_16_2.CLICK_WINDOW, ((IClientConnection) connection.getConnection()).viaFabricPlus$getUserConnection());
+            final PacketWrapper clickWindowPacket = PacketWrapper.create(ServerboundPackets1_16_2.CLICK_WINDOW, ( connection.getConnection()).viaFabricPlus$getUserConnection());
             clickWindowPacket.write(Type.UNSIGNED_BYTE, (short) clickSlot.getContainerId());
             clickWindowPacket.write(Type.SHORT, (short) clickSlot.getSlotNum());
             clickWindowPacket.write(Type.BYTE, (byte) clickSlot.getButtonNum());

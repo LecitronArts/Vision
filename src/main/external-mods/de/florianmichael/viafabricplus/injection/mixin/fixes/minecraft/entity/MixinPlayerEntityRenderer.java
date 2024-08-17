@@ -36,7 +36,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(PlayerRenderer.class)
 public abstract class MixinPlayerEntityRenderer {
 
-    @Inject(method = "getRenderOffset(Lnet/minecraft/client/player/AbstractClientPlayer;F)Lnet/minecraft/world/phys/Vec3;", at = @At("RETURN"), cancellable = true)
+/*    @Inject(method = "getRenderOffset(Lnet/minecraft/client/player/AbstractClientPlayer;F)Lnet/minecraft/world/phys/Vec3;", at = @At("RETURN"), cancellable = true)
     private void modifySleepingOffset(AbstractClientPlayer player, float delta, CallbackInfoReturnable<Vec3> cir) {
         if (player.getPose() == Pose.SLEEPING) {
             final Direction sleepingDir = player.getBedOrientation();
@@ -52,12 +52,12 @@ public abstract class MixinPlayerEntityRenderer {
                 }
             }
         }
-    }
+    }*/
 
-    @Redirect(method = "getRenderOffset(Lnet/minecraft/client/player/AbstractClientPlayer;F)Lnet/minecraft/world/phys/Vec3;",
+/*    @Redirect(method = "getRenderOffset(Lnet/minecraft/client/player/AbstractClientPlayer;F)Lnet/minecraft/world/phys/Vec3;",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/AbstractClientPlayer;isCrouching()Z"))
     private boolean disableSneakPositionOffset(AbstractClientPlayer player) {
         return ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_11_1) && player.isCrouching();
-    }
+    }*/
 
 }

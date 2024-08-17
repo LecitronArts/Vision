@@ -40,6 +40,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EndPortalFrameBlock.class)
 public abstract class MixinEndPortalFrameBlock extends Block {
+/*
 
     @Shadow
     @Final
@@ -54,12 +55,13 @@ public abstract class MixinEndPortalFrameBlock extends Block {
 
     @Unique
     private static final VoxelShape viaFabricPlus$frame_with_eye_shape_r1_12_2 = Shapes.or(FRAME_SHAPE, viaFabricPlus$eye_shape_r1_12_2);
+*/
 
     public MixinEndPortalFrameBlock(Properties settings) {
         super(settings);
     }
 
-    @Inject(method = "getShape", at = @At(value = "HEAD"), cancellable = true)
+ /*   @Inject(method = "getShape", at = @At(value = "HEAD"), cancellable = true)
     private void changeOutlineShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context, CallbackInfoReturnable<VoxelShape> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
             cir.setReturnValue(FRAME_SHAPE);
@@ -74,5 +76,5 @@ public abstract class MixinEndPortalFrameBlock extends Block {
             return super.getCollisionShape(state, world, pos, context);
         }
     }
-
+*/
 }

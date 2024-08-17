@@ -38,10 +38,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(BrewingStandBlock.class)
 public abstract class MixinBrewingStandBlock {
 
-    @Unique
+/*    @Unique
     private static final VoxelShape viaFabricPlus$shape_r1_12_2 = Shapes.or(
-            Block.box(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D) /* Base */,
-            Block.box(7.0D, 0.0D, 7.0D, 9.0D, 14.0D, 9.0D) /* Stick */
+            Block.box(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D) *//* Base *//*,
+            Block.box(7.0D, 0.0D, 7.0D, 9.0D, 14.0D, 9.0D) *//* Stick *//*
     );
 
     @Inject(method = "getShape", at = @At("HEAD"), cancellable = true)
@@ -49,6 +49,6 @@ public abstract class MixinBrewingStandBlock {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
             cir.setReturnValue(viaFabricPlus$shape_r1_12_2);
         }
-    }
+    }*/
 
 }

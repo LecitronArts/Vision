@@ -1,6 +1,8 @@
 package net.minecraft.world.level.block;
 
 import com.mojang.serialization.MapCodec;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
@@ -14,6 +16,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class CarpetBlock extends Block {
    public static final MapCodec<CarpetBlock> CODEC = simpleCodec(CarpetBlock::new);
    protected static final VoxelShape SHAPE = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 1.0D, 16.0D);
+   private static final VoxelShape viaFabricPlus$shape_r1_7_10 = Block.box(0.0D, -0.00001D /* 0.0D */, 0.0D, 16.0D, 0.0D, 16.0D);
 
    public MapCodec<? extends CarpetBlock> codec() {
       return CODEC;
@@ -33,5 +36,14 @@ public class CarpetBlock extends Block {
 
    public boolean canSurvive(BlockState p_152922_, LevelReader p_152923_, BlockPos p_152924_) {
       return !p_152923_.isEmptyBlock(p_152924_.below());
+   }
+
+   @Override
+   public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_7_6)) {
+         return viaFabricPlus$shape_r1_7_10;
+      } else {
+         return super.getCollisionShape(state, world, pos, context);
+      }
    }
 }

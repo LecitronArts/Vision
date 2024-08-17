@@ -21,6 +21,12 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.fixes.versioned.visual.EntityRidingOffsetsPre1_20_2;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
+import de.florianmichael.viafabricplus.settings.impl.VisualSettings;
 import net.minecraft.BlockUtil;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.player.LocalPlayer;
@@ -121,8 +127,13 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
+import net.raphimc.viabedrock.api.BedrockProtocolVersion;
+import net.raphimc.vialegacy.api.LegacyProtocolVersion;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
 public abstract class LivingEntity extends Entity implements Attackable {
    private static final Logger LOGGER = LogUtils.getLogger();
@@ -248,6 +259,9 @@ public abstract class LivingEntity extends Entity implements Attackable {
       this.setMaxUpStep(0.6F);
       NbtOps nbtops = NbtOps.INSTANCE;
       this.brain = this.makeBrain(new Dynamic<>(nbtops, nbtops.createMap(ImmutableMap.of(nbtops.createString("memories"), nbtops.emptyMap()))));
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_7_6)) {
+         this.setMaxUpStep(0.5F);
+      }
    }
 
    public Brain<?> getBrain() {
@@ -1486,6 +1500,17 @@ public abstract class LivingEntity extends Entity implements Attackable {
 
    public boolean onClimbable() {
       if (this.isSpectator()) {
+         if (ProtocolTranslator.getTargetVersion().olderThan(LegacyProtocolVersion.b1_5tob1_5_2) && !this.isSpectator()) {
+            final BlockPos blockPos = this.blockPosition().above();
+            final BlockState blockState = this.level().getBlockState(blockPos);
+            if (blockState.is(BlockTags.CLIMBABLE)) {
+               this.lastClimbablePos = Optional.of(blockPos);
+               return (true);
+            } else if (blockState.getBlock() instanceof TrapDoorBlock && this.trapdoorUsableAsLadder(blockPos, blockState)) {
+               this.lastClimbablePos = Optional.of(blockPos);
+               return (true);
+            }
+         }
          return false;
       } else {
          BlockPos blockpos = this.blockPosition();
@@ -1497,12 +1522,26 @@ public abstract class LivingEntity extends Entity implements Attackable {
             this.lastClimbablePos = Optional.of(blockpos);
             return true;
          } else {
+            if (ProtocolTranslator.getTargetVersion().olderThan(LegacyProtocolVersion.b1_5tob1_5_2) && !this.isSpectator()) {
+               final BlockPos blockPos = this.blockPosition().above();
+               final BlockState blockState = this.level().getBlockState(blockPos);
+               if (blockState.is(BlockTags.CLIMBABLE)) {
+                  this.lastClimbablePos = Optional.of(blockPos);
+                  return (true);
+               } else if (blockState.getBlock() instanceof TrapDoorBlock && this.trapdoorUsableAsLadder(blockPos, blockState)) {
+                  this.lastClimbablePos = Optional.of(blockPos);
+                  return (true);
+               }
+            }
             return false;
          }
       }
    }
 
    private boolean trapdoorUsableAsLadder(BlockPos pPos, BlockState pState) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+          return false;
+      }
       if (pState.getValue(TrapDoorBlock.OPEN)) {
          BlockState blockstate = this.level().getBlockState(pPos.below());
          if (blockstate.is(Blocks.LADDER) && blockstate.getValue(LadderBlock.FACING) == pState.getValue(TrapDoorBlock.FACING)) {
@@ -2033,7 +2072,18 @@ public abstract class LivingEntity extends Entity implements Attackable {
          FluidState fluidstate = this.level().getFluidState(this.blockPosition());
          if (this.isInWater() && this.isAffectedByFluids() && !this.canStandOnFluid(fluidstate)) {
             double d9 = this.getY();
-            float f4 = this.isSprinting() ? 0.9F : this.getWaterSlowDown();
+/*
+            @ModifyConstant(method = "travel", constant = @Constant(floatValue = 0.9F))
+            private float modifySwimFriction(float constant) {
+               if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
+                  return this.getWaterSlowDown();
+               } else {
+                  return constant;
+               }
+            } //via这边估计修重复了,放这留着看看再说吧。
+*/
+
+            float f4 = ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_12_2) && this.isSprinting() ? 0.9F : this.getWaterSlowDown();
             float f5 = 0.02F;
             float f6 = (float)EnchantmentHelper.getDepthStrider(this);
             if (f6 > 3.0F) {
@@ -2049,7 +2099,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
                f5 += (this.getSpeed() - f5) * f6 / 3.0F;
             }
 
-            if (this.hasEffect(MobEffects.DOLPHINS_GRACE)) {
+            if (this.hasEffect(MobEffects.DOLPHINS_GRACE)) {///
                f4 = 0.96F;
             }
 
@@ -2061,7 +2111,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
             }
             this.move(MoverType.SELF, this.getDeltaMovement());
             Vec3 vec36 = this.getDeltaMovement();
-            if (this.horizontalCollision && this.onClimbable()) {
+            if  (  ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_13_2) && this.horizontalCollision && this.onClimbable()) {
                vec36 = new Vec3(vec36.x, 0.2D, vec36.z);
             }
 
@@ -2075,7 +2125,13 @@ public abstract class LivingEntity extends Entity implements Attackable {
             double d8 = this.getY();
             this.moveRelative(0.02F, pTravelVector);
             this.move(MoverType.SELF, this.getDeltaMovement());
-            if (this.getFluidHeight(FluidTags.LAVA) <= this.getFluidJumpThreshold()) {
+            double viaFixLavaMovement;
+            if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_15_2)) {
+               viaFixLavaMovement = Double.MAX_VALUE;
+            } else {
+              viaFixLavaMovement = this.getFluidHeight(FluidTags.LAVA);
+            }
+            if (viaFixLavaMovement <= this.getFluidJumpThreshold()) {
                this.setDeltaMovement(this.getDeltaMovement().multiply(0.5D, (double)0.8F, 0.5D));
                Vec3 vec33 = this.getFluidFallingAdjustedMovement(d0, flag, this.getDeltaMovement());
                this.setDeltaMovement(vec33);
@@ -2091,6 +2147,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
             if (this.horizontalCollision && this.isFree(vec34.x, vec34.y + (double)0.6F - this.getY() + d8, vec34.z)) {
                this.setDeltaMovement(vec34.x, (double)0.3F, vec34.z);
             }
+
          } else if (this.isFallFlying()) {
             this.checkSlowFallDistance();
             Vec3 vec3 = this.getDeltaMovement();
@@ -2105,7 +2162,13 @@ public abstract class LivingEntity extends Entity implements Attackable {
             double d1 = Math.sqrt(vec31.x * vec31.x + vec31.z * vec31.z);
             double d3 = vec3.horizontalDistance();
             double d4 = vec31.length();
-            double d5 = Math.cos((double)f);
+            double viaFixCosTable;
+            if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_18)) {
+               viaFixCosTable = Mth.cos((float) f);
+            } else {
+               viaFixCosTable = Math.cos(f);
+            }
+            double d5 = viaFixCosTable;
             d5 = d5 * d5 * Math.min(1.0D, d4 / 0.4D);
             vec3 = this.getDeltaMovement().add(0.0D, d0 * (-1.0D + d5 * 0.75D), 0.0D);
             if (vec3.y < 0.0D && d1 > 0.0D) {
@@ -2137,15 +2200,22 @@ public abstract class LivingEntity extends Entity implements Attackable {
             if (this.onGround() && !this.level().isClientSide) {
                this.setSharedFlag(7, false);
             }
+
          } else {
             BlockPos blockpos = this.getBlockPosBelowThatAffectsMyMovement();
             float f2 = this.level().getBlockState(blockpos).getBlock().getFriction();
             float f3 = this.onGround() ? f2 * 0.91F : 0.91F;
             Vec3 vec35 = this.handleRelativeFrictionAndCalculateMovement(pTravelVector, f2);
             double d2 = vec35.y;
+            boolean viaFixChunk;
+            if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
+               viaFixChunk = this.level().hasChunkAt(blockpos) && this.level().getChunkSource().hasChunk(blockpos.getX() >> 4, blockpos.getZ() >> 4);
+            } else {
+               viaFixChunk = this.level().hasChunkAt(blockpos);
+            }
             if (this.hasEffect(MobEffects.LEVITATION)) {
                d2 += (0.05D * (double)(this.getEffect(MobEffects.LEVITATION).getAmplifier() + 1) - vec35.y) * 0.2D;
-            } else if (this.level().isClientSide && !this.level().hasChunkAt(blockpos)) {
+            } else if (this.level().isClientSide && !viaFixChunk) {
                if (this.getY() > (double)this.level().getMinBuildHeight()) {
                   d2 = -0.1D;
                } else {
@@ -2206,7 +2276,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
       this.setDeltaMovement(this.handleOnClimbable(this.getDeltaMovement()));
       this.move(MoverType.SELF, this.getDeltaMovement());
       Vec3 vec3 = this.getDeltaMovement();
-      if ((this.horizontalCollision || this.jumping) && (this.onClimbable() || this.getFeetBlockState().is(Blocks.POWDER_SNOW) && PowderSnowBlock.canEntityWalkOnPowderSnow(this))) {
+      if ((this.horizontalCollision ||  (ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_13_2) &&this.jumping)) && (this.onClimbable() || this.getFeetBlockState().is(Blocks.POWDER_SNOW) && PowderSnowBlock.canEntityWalkOnPowderSnow(this))) {
          vec3 = new Vec3(vec3.x, 0.2D, vec3.z);
       }
 
@@ -2214,9 +2284,12 @@ public abstract class LivingEntity extends Entity implements Attackable {
    }
 
    public Vec3 getFluidFallingAdjustedMovement(double pGravity, boolean pIsFalling, Vec3 pDeltaMovement) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2) && !this.isNoGravity()) {
+         return (new Vec3(pDeltaMovement.x, pDeltaMovement.y - 0.02, pDeltaMovement.z));
+      }
       if (!this.isNoGravity() && !this.isSprinting()) {
          double d0;
-         if (pIsFalling && Math.abs(pDeltaMovement.y - 0.005D) >= 0.003D && Math.abs(pDeltaMovement.y - pGravity / 16.0D) < 0.003D) {
+         if  (ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_13_2) && pIsFalling && Math.abs(pDeltaMovement.y - 0.005D) >= 0.003D && Math.abs(pDeltaMovement.y - pGravity / 16.0D) < 0.003D) {
             d0 = -0.003D;
          } else {
             d0 = pDeltaMovement.y - pGravity / 16.0D;
@@ -2320,7 +2393,13 @@ public abstract class LivingEntity extends Entity implements Attackable {
          f3 = 1.0F;
          f2 = (float)Math.sqrt((double)f) * 3.0F;
          float f4 = (float)Mth.atan2(d0, d1) * (180F / (float)Math.PI) - 90.0F;
-         float f5 = Mth.abs(Mth.wrapDegrees(this.getYRot()) - f4);
+         float viaSettings;
+         if (VisualSettings.global().sidewaysBackwardsRunning.isEnabled()) {
+              viaSettings = 0F;
+         } else {
+            viaSettings =  Mth.abs(Mth.wrapDegrees(this.getYRot()) - f4);
+         }
+         float f5 = viaSettings;
          if (95.0F < f5 && f5 < 265.0F) {
             f1 = f4 - 180.0F;
          } else {
@@ -2387,6 +2466,8 @@ public abstract class LivingEntity extends Entity implements Attackable {
       }
 
       this.refreshDirtyAttributes();
+
+
    }
 
    private void detectEquipmentUpdates() {
@@ -2509,11 +2590,23 @@ public abstract class LivingEntity extends Entity implements Attackable {
    }
 
    public void aiStep() {
+      if (ProtocolTranslator.getTargetVersion().olderThan(LegacyProtocolVersion.r1_0_0tor1_0_1)) {
+         this.noJumpDelay = 0;
+      }
+
       if (this.noJumpDelay > 0) {
          --this.noJumpDelay;
       }
 
-      if (this.isControlledByLocalInstance()) {
+      boolean viaFix;
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_3) || ProtocolTranslator.getTargetVersion().equals(BedrockProtocolVersion.bedrockLatest)) {
+         viaFix = this.getControllingPassenger() instanceof Player player ? player.isLocalPlayer() : !this.level().isClientSide;
+      } else {
+         viaFix = this.isControlledByLocalInstance();
+      }
+
+
+      if (viaFix) {
          this.lerpSteps = 0;
          this.syncPacketPositionCodec(this.getX(), this.getY(), this.getZ());
       }
@@ -2534,15 +2627,24 @@ public abstract class LivingEntity extends Entity implements Attackable {
       double d0 = vec3.x;
       double d1 = vec3.y;
       double d2 = vec3.z;
-      if (Math.abs(vec3.x) < 0.003D) {
+
+      double moJangNoMotherValue;
+
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+         moJangNoMotherValue = 0.005D;
+      } else {
+         moJangNoMotherValue = 0.003D;
+      }
+
+      if (Math.abs(vec3.x) < moJangNoMotherValue) {
          d0 = 0.0D;
       }
 
-      if (Math.abs(vec3.y) < 0.003D) {
+      if (Math.abs(vec3.y) < moJangNoMotherValue) {
          d1 = 0.0D;
       }
 
-      if (Math.abs(vec3.z) < 0.003D) {
+      if (Math.abs(vec3.z) < moJangNoMotherValue) {
          d2 = 0.0D;
       }
 
@@ -2563,9 +2665,13 @@ public abstract class LivingEntity extends Entity implements Attackable {
       if (this.jumping && this.isAffectedByFluids()) {
          double d3;
          if (this.isInLava()) {
+
             d3 = this.getFluidHeight(FluidTags.LAVA);
          } else {
-            d3 = this.getFluidHeight(FluidTags.WATER);
+            if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2) && this.getFluidHeight(FluidTags.WATER) > 0) {
+               d3 = 1;
+            } else
+               d3 = this.getFluidHeight(FluidTags.WATER);
          }
 
          boolean flag = this.isInWater() && d3 > 0.0D;
@@ -2594,7 +2700,10 @@ public abstract class LivingEntity extends Entity implements Attackable {
       AABB aabb = this.getBoundingBox();
       Vec3 vec31 = new Vec3((double)this.xxa, (double)this.yya, (double)this.zza);
       if (this.hasEffect(MobEffects.SLOW_FALLING) || this.hasEffect(MobEffects.LEVITATION)) {
-         this.resetFallDistance();
+         if (this.hasEffect(MobEffects.SLOW_FALLING) || ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_12_2)) {
+            this.resetFallDistance();
+         }
+         //this.resetFallDistance();
       }
 
       label104: {
@@ -2679,6 +2788,9 @@ public abstract class LivingEntity extends Entity implements Attackable {
    }
 
    protected void pushEntities() {
+      if (DebugSettings.global().preventEntityCramming.isEnabled()) {
+         return;
+      }
       if (this.level().isClientSide()) {
          this.level().getEntities(EntityTypeTest.forClass(Player.class), this.getBoundingBox(), EntitySelector.pushableBy(this)).forEach(this::doPush);
       } else {
@@ -3340,6 +3452,9 @@ public abstract class LivingEntity extends Entity implements Attackable {
    }
 
    public static EquipmentSlot getEquipmentSlotForItem(ItemStack pItem) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_9_3) && pItem.is(Items.SHIELD)) {
+         return (EquipmentSlot.MAINHAND);
+      }
       Equipable equipable = Equipable.get(pItem);
       return equipable != null ? equipable.getEquipmentSlot() : EquipmentSlot.MAINHAND;
    }
@@ -3416,10 +3531,19 @@ public abstract class LivingEntity extends Entity implements Attackable {
    }
 
    public Vec3 getPassengerRidingPosition(Entity pEntity) {
-      return (new Vec3(this.getPassengerAttachmentPoint(pEntity, this.getDimensions(this.getPose()), this.getScale()).rotateY(-this.yBodyRot * ((float)Math.PI / 180F)))).add(this.position());
+      Vector3f viaFix ;
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20)) {
+         viaFix = EntityRidingOffsetsPre1_20_2.getMountedHeightOffset(this, pEntity);
+      } else {
+         viaFix = this.getPassengerAttachmentPoint(pEntity, this.getDimensions(this.getPose()), this.getScale());
+      }
+      return (new Vec3(viaFix.rotateY(-this.yBodyRot * ((float)Math.PI / 180F)))).add(this.position());
    }
 
    public float getMyRidingOffset(Entity pEntity) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20)) {
+         return (float) EntityRidingOffsetsPre1_20_2.getHeightOffset(this);
+      }
       return this.ridingOffset(pEntity) * this.getScale();
    }
 

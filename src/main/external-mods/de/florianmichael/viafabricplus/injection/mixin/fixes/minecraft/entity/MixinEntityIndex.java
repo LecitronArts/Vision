@@ -42,10 +42,12 @@ public abstract class MixinEntityIndex<T extends EntityAccess> {
     @Final
     private Int2ObjectMap<T> byId;
 
+/*
     @Redirect(method = "add", at = @At(value = "INVOKE", target = "Ljava/util/Map;containsKey(Ljava/lang/Object;)Z", remap = false))
     private boolean allowDuplicateUuid(Map<UUID, T> instance, Object o) {
         return instance.containsKey(o) && ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_16_4);
     }
+*/
 
     @Inject(method = "count", at = @At("HEAD"), cancellable = true)
     private void returnRealSize(CallbackInfoReturnable<Integer> cir) {

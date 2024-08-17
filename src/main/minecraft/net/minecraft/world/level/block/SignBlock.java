@@ -4,6 +4,9 @@ import com.mojang.serialization.MapCodec;
 import java.util.Arrays;
 import java.util.UUID;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.CommonComponents;
@@ -13,9 +16,7 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.SignApplicator;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -71,6 +72,21 @@ public abstract class SignBlock extends BaseEntityBlock implements SimpleWaterlo
    }
 
    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
+      if (pLevel.isClientSide) {
+         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_14_4)) {
+            // <= 1.14.4 doesn't have any sign interactions.
+            return (InteractionResult.SUCCESS);
+         } else if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_4)) {
+            // Removes the isWaxed() condition and reverts the interaction changes from 1.19.4 -> 1.20 when signs
+            // got a front and back side.
+            final ItemStack itemStack = pPlayer.getItemInHand(pHand);
+            final Item item = itemStack.getItem();
+            final boolean isSuccess = (item instanceof DyeItem || itemStack.is(Items.GLOW_INK_SAC) || itemStack.is(Items.INK_SAC)) && pPlayer.mayBuild();
+
+            return (isSuccess ? InteractionResult.SUCCESS : InteractionResult.CONSUME);
+         }
+      }
+
       ItemStack itemstack = pPlayer.getItemInHand(pHand);
       Item item = itemstack.getItem();
       Item $$11 = itemstack.getItem();

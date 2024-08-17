@@ -30,9 +30,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(Animal.class)
 public abstract class MixinAnimalEntity {
 
-    @Redirect(method = "mobInteract", at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Level;isClientSide:Z"))
+/*    @Redirect(method = "mobInteract", at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Level;isClientSide:Z"))
     private boolean fixIsClientCheck(Level instance) {
         return instance.isClientSide && ProtocolTranslator.getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_15);
-    }
+    }*/
 
 }

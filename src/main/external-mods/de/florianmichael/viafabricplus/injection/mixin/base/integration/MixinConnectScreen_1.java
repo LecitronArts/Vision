@@ -23,7 +23,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import de.florianmichael.viafabricplus.ViaFabricPlus;
-import de.florianmichael.viafabricplus.access.IServerInfo;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import de.florianmichael.viafabricplus.protocoltranslator.impl.provider.vialegacy.ViaFabricPlusClassicMPPassProvider;
 import de.florianmichael.viafabricplus.protocoltranslator.util.ProtocolVersionDetector;
@@ -45,7 +44,7 @@ import net.minecraft.network.chat.Component;
 
 @Mixin(targets = "net.minecraft.client.gui.screens.ConnectScreen$1")
 public abstract class MixinConnectScreen_1 {
-
+/*
     @Shadow
     @Final
     ServerData val$pServerData;
@@ -87,6 +86,6 @@ public abstract class MixinConnectScreen_1 {
             if (account != null) return account.username();
         }
         return instance.getName();
-    }
+    }*/
 
 }

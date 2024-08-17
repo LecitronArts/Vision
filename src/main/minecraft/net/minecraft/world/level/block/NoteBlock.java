@@ -2,6 +2,9 @@ package net.minecraft.world.level.block;
 
 import com.mojang.serialization.MapCodec;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -89,6 +92,9 @@ public class NoteBlock extends Block {
    }
 
    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_4)) {
+         return (InteractionResult.SUCCESS);
+      }
       ItemStack itemstack = pPlayer.getItemInHand(pHand);
       if (itemstack.is(ItemTags.NOTE_BLOCK_TOP_INSTRUMENTS) && pHit.getDirection() == Direction.UP) {
          return InteractionResult.PASS;

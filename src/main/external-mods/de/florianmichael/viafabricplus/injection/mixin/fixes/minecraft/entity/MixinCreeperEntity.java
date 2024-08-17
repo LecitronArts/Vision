@@ -31,6 +31,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(Creeper.class)
 public abstract class MixinCreeperEntity {
 
+/*
     @Redirect(method = "mobInteract", at = @At(value = "FIELD", target = "Lnet/minecraft/sounds/SoundEvents;FIRECHARGE_USE:Lnet/minecraft/sounds/SoundEvent;"))
     private SoundEvent changeSound() {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_1)) {
@@ -39,5 +40,6 @@ public abstract class MixinCreeperEntity {
             return SoundEvents.FIRECHARGE_USE;
         }
     }
+*/
 
 }

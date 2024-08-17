@@ -119,11 +119,13 @@ public class LanguageSelectScreen extends OptionsSubScreen {
    }
 
    private void lazyLanguageLoader$$fixScroll() {
-      if (((Scrollable) packSelectionList).hasScrolled()) {
-         packSelectionList.setScrollAmount(packSelectionList.getScrollAmount());
-      } else {
-         if (packSelectionList.getSelected() != null) {
-            packSelectionList.centerScrollOn(packSelectionList.getSelected());
+      if(packSelectionList instanceof Scrollable) {
+         if (((Scrollable) packSelectionList).hasScrolled()) {
+            packSelectionList.setScrollAmount(packSelectionList.getScrollAmount());
+         } else {
+            if (packSelectionList.getSelected() != null) {
+               packSelectionList.centerScrollOn(packSelectionList.getSelected());
+            }
          }
       }
    }

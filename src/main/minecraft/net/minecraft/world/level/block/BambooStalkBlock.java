@@ -2,6 +2,9 @@ package net.minecraft.world.level.block;
 
 import com.mojang.serialization.MapCodec;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -77,6 +80,9 @@ public class BambooStalkBlock extends Block implements BonemealableBlock {
    }
 
    public boolean isCollisionShapeFullBlock(BlockState pState, BlockGetter pLevel, BlockPos pPos) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_17)) {
+          return (true);
+      }
       return false;
    }
 

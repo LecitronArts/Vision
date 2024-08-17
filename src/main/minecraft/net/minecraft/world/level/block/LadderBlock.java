@@ -2,6 +2,9 @@ package net.minecraft.world.level.block;
 
 import com.mojang.serialization.MapCodec;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -18,6 +21,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.spongepowered.asm.mixin.Unique;
 
 public class LadderBlock extends Block implements SimpleWaterloggedBlock {
    public static final MapCodec<LadderBlock> CODEC = simpleCodec(LadderBlock::new);
@@ -28,6 +32,17 @@ public class LadderBlock extends Block implements SimpleWaterloggedBlock {
    protected static final VoxelShape WEST_AABB = Block.box(13.0D, 0.0D, 0.0D, 16.0D, 16.0D, 16.0D);
    protected static final VoxelShape SOUTH_AABB = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16.0D, 3.0D);
    protected static final VoxelShape NORTH_AABB = Block.box(0.0D, 0.0D, 13.0D, 16.0D, 16.0D, 16.0D);
+   @Unique
+   private static final VoxelShape viaFabricPlus$east_shape_r1_8_x = Block.box(0.0D, 0.0D, 0.0D, 2.0D, 16.0D, 16.0D);
+
+   @Unique
+   private static final VoxelShape viaFabricPlus$west_shape_r1_8_x = Block.box(14.0D, 0.0D, 0.0D, 16.0D, 16.0D, 16.0D);
+
+   @Unique
+   private static final VoxelShape viaFabricPlus$south_shape_r1_8_x = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16.0D, 2.0D);
+
+   @Unique
+   private static final VoxelShape viaFabricPlus$north_shape_r1_8_x = Block.box(0.0D, 0.0D, 14.0D, 16.0D, 16.0D, 16.0D);
 
    public MapCodec<LadderBlock> codec() {
       return CODEC;
@@ -39,6 +54,22 @@ public class LadderBlock extends Block implements SimpleWaterloggedBlock {
    }
 
    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+         switch (pState.getValue(LadderBlock.FACING)) {
+            case NORTH -> {
+               return (viaFabricPlus$north_shape_r1_8_x);
+            }
+            case SOUTH -> {
+               return (viaFabricPlus$south_shape_r1_8_x);
+            }
+            case WEST -> {
+               return (viaFabricPlus$west_shape_r1_8_x);
+            }
+            default -> {
+               return (viaFabricPlus$east_shape_r1_8_x);
+            }
+         }
+      }
       switch ((Direction)pState.getValue(FACING)) {
          case NORTH:
             return NORTH_AABB;

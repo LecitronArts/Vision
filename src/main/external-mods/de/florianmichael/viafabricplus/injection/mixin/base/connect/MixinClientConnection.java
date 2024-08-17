@@ -25,8 +25,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import de.florianmichael.viafabricplus.access.IClientConnection;
-import de.florianmichael.viafabricplus.access.IPerformanceLog;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import de.florianmichael.viafabricplus.protocoltranslator.netty.ViaFabricPlusVLLegacyPipeline;
 import io.netty.bootstrap.AbstractBootstrap;
@@ -62,9 +60,9 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
 @Mixin(Connection.class)
-public abstract class MixinClientConnection extends SimpleChannelInboundHandler<Packet<?>> implements IClientConnection {
+public abstract class MixinClientConnection extends SimpleChannelInboundHandler<Packet<?>> /*implements IClientConnection*/ {
 
-    @Shadow
+/*    @Shadow
     public Channel channel;
 
     @Shadow
@@ -86,11 +84,11 @@ public abstract class MixinClientConnection extends SimpleChannelInboundHandler<
     @Inject(method = "setupCompression", at = @At("RETURN"))
     private void reorderCompression(int compressionThreshold, boolean rejectBad, CallbackInfo ci) {
         channel.pipeline().fireUserEventTriggered(CompressionReorderEvent.INSTANCE);
-    }
+    } // ok
 
     @Inject(method = "setEncryptionKey", at = @At("HEAD"), cancellable = true)
     private void storeDecryptionCipher(Cipher decryptionCipher, Cipher encryptionCipher, CallbackInfo ci) {
-        if (this.viaFabricPlus$serverVersion != null /* This happens when opening a lan server and people are joining */ && this.viaFabricPlus$serverVersion.olderThanOrEqualTo(LegacyProtocolVersion.r1_6_4)) {
+        if (this.viaFabricPlus$serverVersion != null *//* This happens when opening a lan server and people are joining *//* && this.viaFabricPlus$serverVersion.olderThanOrEqualTo(LegacyProtocolVersion.r1_6_4)) {
             // Minecraft's encryption code is bad for us, we need to reorder the pipeline
             ci.cancel();
 
@@ -107,7 +105,7 @@ public abstract class MixinClientConnection extends SimpleChannelInboundHandler<
             this.encrypted = true;
             this.channel.pipeline().addBefore(VLLegacyPipeline.VIALEGACY_PRE_NETTY_LENGTH_REMOVER_NAME, "encrypt", new CipherEncoder(encryptionCipher));
         }
-    }
+    } // ok
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
@@ -115,12 +113,12 @@ public abstract class MixinClientConnection extends SimpleChannelInboundHandler<
         if (BedrockProtocolVersion.bedrockLatest.equals(this.viaFabricPlus$serverVersion)) { // Call channelActive manually when the channel is registered
             this.channelActive(ctx);
         }
-    }
+    } // ok
 
     @WrapWithCondition(method = "channelActive", at = @At(value = "INVOKE", target = "Lio/netty/channel/SimpleChannelInboundHandler;channelActive(Lio/netty/channel/ChannelHandlerContext;)V", remap = false))
     private boolean dontCallChannelActiveTwice(SimpleChannelInboundHandler<Packet<?>> instance, ChannelHandlerContext channelHandlerContext) {
         return !BedrockProtocolVersion.bedrockLatest.equals(this.viaFabricPlus$serverVersion);
-    }
+    } // ok
 
     @Inject(method = "connectToServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/Connection;connect(Ljava/net/InetSocketAddress;ZLnet/minecraft/network/Connection;)Lio/netty/channel/ChannelFuture;", shift = At.Shift.BEFORE))
     private static void setTargetVersion(InetSocketAddress address, boolean useEpoll, SampleLogger packetSizeLog, CallbackInfoReturnable<Connection> cir, @Local Connection clientConnection) {
@@ -128,13 +126,13 @@ public abstract class MixinClientConnection extends SimpleChannelInboundHandler<
         if (packetSizeLog instanceof IPerformanceLog mixinPerformanceLog && mixinPerformanceLog.viaFabricPlus$getForcedVersion() != null) {
             ((IClientConnection) clientConnection).viaFabricPlus$setTargetVersion(mixinPerformanceLog.viaFabricPlus$getForcedVersion());
         }
-    }
+    } // ok
 
     @WrapWithCondition(method = "connectToServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/Connection;setBandwidthLogger(Lnet/minecraft/util/SampleLogger;)V"))
     private static boolean dontSetPerformanceLog(Connection instance, SampleLogger log) {
         // We need to restore vanilla behaviour since we use the PerformanceLog as a way to store the target version
         return !(log instanceof IPerformanceLog mixinPerformanceLog) || mixinPerformanceLog.viaFabricPlus$getForcedVersion() == null;
-    }
+    } // ok
 
     @Inject(method = "connect", at = @At("HEAD"))
     private static void setTargetVersion(InetSocketAddress address, boolean useEpoll, Connection connection, CallbackInfoReturnable<ChannelFuture> cir) {
@@ -147,7 +145,7 @@ public abstract class MixinClientConnection extends SimpleChannelInboundHandler<
         }
 
         ((IClientConnection) connection).viaFabricPlus$setTargetVersion(targetVersion);
-    }
+    } // ok
 
     @WrapOperation(method = "connect", at = @At(value = "INVOKE", target = "Lio/netty/bootstrap/Bootstrap;channel(Ljava/lang/Class;)Lio/netty/bootstrap/AbstractBootstrap;", remap = false))
     private static AbstractBootstrap<?, ?> useRakNetChannelFactory(Bootstrap instance, Class<? extends Channel> channelTypeClass, Operation<AbstractBootstrap<Bootstrap, Channel>> original, @Local(argsOnly = true) Connection clientConnection) {
@@ -156,7 +154,9 @@ public abstract class MixinClientConnection extends SimpleChannelInboundHandler<
         } else {
             return original.call(instance, channelTypeClass);
         }
-    }
+    } // ok ? 
+    // TODO: 8/17/2024
+
 
     @Redirect(method = "connect", at = @At(value = "INVOKE", target = "Lio/netty/bootstrap/Bootstrap;connect(Ljava/net/InetAddress;I)Lio/netty/channel/ChannelFuture;", remap = false))
     private static ChannelFuture useRakNetPingHandlers(Bootstrap instance, InetAddress inetHost, int inetPort, @Local(argsOnly = true) Connection clientConnection, @Local(argsOnly = true) boolean isConnecting) {
@@ -176,7 +176,7 @@ public abstract class MixinClientConnection extends SimpleChannelInboundHandler<
         } else {
             return instance.connect(inetHost, inetPort);
         }
-    }
+    } // okk???
 
     @Override
     public void viaFabricPlus$setupPreNettyDecryption() {
@@ -187,7 +187,7 @@ public abstract class MixinClientConnection extends SimpleChannelInboundHandler<
         this.encrypted = true;
         // Enabling the decryption side for 1.6.4 if the 1.7 -> 1.6 protocol tells us to do
         this.channel.pipeline().addBefore(VLLegacyPipeline.VIALEGACY_PRE_NETTY_LENGTH_PREPENDER_NAME, "decrypt", new CipherDecoder(this.viaFabricPlus$decryptionCipher));
-    }
+    } //
 
     @Override
     public UserConnection viaFabricPlus$getUserConnection() {
@@ -207,6 +207,6 @@ public abstract class MixinClientConnection extends SimpleChannelInboundHandler<
     @Override
     public void viaFabricPlus$setTargetVersion(final ProtocolVersion serverVersion) {
         this.viaFabricPlus$serverVersion = serverVersion;
-    }
+    }*/
 
 }

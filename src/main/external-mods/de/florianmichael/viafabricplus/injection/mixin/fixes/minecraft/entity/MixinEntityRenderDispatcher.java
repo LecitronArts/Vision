@@ -39,7 +39,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(EntityRenderDispatcher.class)
 public abstract class MixinEntityRenderDispatcher {
 
-    @Unique
+/*    @Unique
     private BoatRenderer1_8 viaFabricPlus$boatRenderer;
 
     @Inject(method = "onResourceManagerReload", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILHARD)
@@ -53,6 +53,6 @@ public abstract class MixinEntityRenderDispatcher {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8) && entity instanceof Boat) {
             ci.setReturnValue((EntityRenderer<? super T>) viaFabricPlus$boatRenderer);
         }
-    }
+    }*/
 
 }

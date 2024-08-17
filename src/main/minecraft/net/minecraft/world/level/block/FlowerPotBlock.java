@@ -4,6 +4,9 @@ import com.google.common.collect.Maps;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Map;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -69,6 +72,11 @@ public class FlowerPotBlock extends Block {
                itemstack.shrink(1);
             }
          } else {
+
+            if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_10) && potted != Blocks.AIR) {
+               return (InteractionResult.CONSUME);
+            }
+
             ItemStack itemstack1 = new ItemStack(this.potted);
             if (itemstack.isEmpty()) {
                pPlayer.setItemInHand(pHand, itemstack1);

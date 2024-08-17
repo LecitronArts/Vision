@@ -20,7 +20,6 @@
 package de.florianmichael.viafabricplus.injection.mixin.base.perserverversion;
 
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import de.florianmichael.viafabricplus.access.IServerInfo;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.nbt.CompoundTag;
 import org.spongepowered.asm.mixin.Mixin;
@@ -33,9 +32,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(ServerData.class)
-public abstract class MixinServerInfo implements IServerInfo {
+public abstract class MixinServerInfo  {
 
-    @Shadow
+/*    @Shadow
     public String name;
 
     @Unique
@@ -59,7 +58,7 @@ public abstract class MixinServerInfo implements IServerInfo {
         if (root.contains("viafabricplus_forcedversion")) {
             final ProtocolVersion version = ProtocolVersion.getClosest(root.getString("viafabricplus_forcedversion"));
             if (version != null) {
-                ((IServerInfo) serverInfo).viaFabricPlus$forceVersion(version);
+                ( serverInfo).viaFabricPlus$forceVersion(version);
             }
         }
     }
@@ -97,6 +96,6 @@ public abstract class MixinServerInfo implements IServerInfo {
     @Override
     public void viaFabricPlus$setTranslatingVersion(ProtocolVersion version) {
         viaFabricPlus$translatingVersion = version;
-    }
+    }*/
 
 }

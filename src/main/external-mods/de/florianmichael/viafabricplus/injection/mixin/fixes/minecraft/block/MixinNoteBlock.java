@@ -31,11 +31,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(NoteBlock.class)
 public abstract class MixinNoteBlock {
 
-    @Inject(method = "use", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "use", at = @At("HEAD"), cancellable = true)
     private void cancelMobHeadUsage(CallbackInfoReturnable<InteractionResult> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_4)) {
             cir.setReturnValue(InteractionResult.SUCCESS);
         }
-    }
+    }*/
 
 }

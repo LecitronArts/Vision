@@ -5,6 +5,10 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.injection.ViaFabricPlusMixinPlugin;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -42,6 +46,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.commons.lang3.ArrayUtils;
+import org.spongepowered.asm.mixin.Unique;
 
 public class BedBlock extends HorizontalDirectionalBlock implements EntityBlock {
    public static final MapCodec<BedBlock> CODEC = RecordCodecBuilder.mapCodec((p_309266_) -> {
@@ -61,7 +66,11 @@ public class BedBlock extends HorizontalDirectionalBlock implements EntityBlock 
    protected static final VoxelShape WEST_SHAPE = Shapes.or(BASE, LEG_NORTH_WEST, LEG_SOUTH_WEST);
    protected static final VoxelShape EAST_SHAPE = Shapes.or(BASE, LEG_NORTH_EAST, LEG_SOUTH_EAST);
    private final DyeColor color;
+   @Unique
+   private static final VoxelShape viaFabricPlus$shape_r1_13_2 = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 9.0D, 16.0D);
 
+   @Unique
+   private boolean viaFabricPlus$requireOriginalShape;
    public MapCodec<BedBlock> codec() {
       return CODEC;
    }
@@ -146,6 +155,9 @@ public class BedBlock extends HorizontalDirectionalBlock implements EntityBlock 
    }
 
    private void bounceUp(Entity pEntity) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_11_1)) {
+          return;
+      }
       Vec3 vec3 = pEntity.getDeltaMovement();
       if (vec3.y < 0.0D) {
          double d0 = pEntity instanceof LivingEntity ? 1.0D : 0.8D;
@@ -193,6 +205,11 @@ public class BedBlock extends HorizontalDirectionalBlock implements EntityBlock 
 
    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
       Direction direction = getConnectedDirection(pState).getOpposite();
+      if (ViaFabricPlusMixinPlugin.MORE_CULLING_PRESENT && viaFabricPlus$requireOriginalShape) {
+         viaFabricPlus$requireOriginalShape = false;
+      } else if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
+         return (viaFabricPlus$shape_r1_13_2);
+      }
       switch (direction) {
          case NORTH:
             return NORTH_SHAPE;
@@ -203,6 +220,13 @@ public class BedBlock extends HorizontalDirectionalBlock implements EntityBlock 
          default:
             return EAST_SHAPE;
       }
+   }
+   @Override
+   public VoxelShape getOcclusionShape(BlockState state, BlockGetter world, BlockPos pos) {
+      // Workaround for https://github.com/ViaVersion/ViaFabricPlus/issues/246
+      // MoreCulling is caching the culling shape and doesn't reload it, so we have to force vanilla's shape here.
+      viaFabricPlus$requireOriginalShape = true;
+      return super.getOcclusionShape(state, world, pos);
    }
 
    public static Direction getConnectedDirection(BlockState pState) {

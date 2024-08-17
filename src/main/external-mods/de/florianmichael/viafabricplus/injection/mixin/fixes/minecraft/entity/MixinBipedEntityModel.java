@@ -34,11 +34,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(HumanoidModel.class)
 public abstract class MixinBipedEntityModel<T extends LivingEntity> {
 
+/*
 	@Shadow @Final public ModelPart rightArm;
 
 	@Shadow @Final public ModelPart leftArm;
 
-	@Inject(method = "Lnet/minecraft/client/model/HumanoidModel;setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V", at = @At(value = "FIELD", target = "Lnet/minecraft/client/model/geom/ModelPart;zRot:F", ordinal = 1, shift = At.Shift.AFTER))
+	@Inject(method = "setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V", at = @At(value = "FIELD", target = "Lnet/minecraft/client/model/geom/ModelPart;zRot:F", ordinal = 1, shift = At.Shift.AFTER))
 	private void addOldWalkAnimation(T livingEntity, float f, float g, float h, float i, float j, CallbackInfo ci) {
 		if (VisualSettings.global().oldWalkingAnimation.isEnabled()) {
 			this.rightArm.xRot = Mth.cos(f * 0.6662F + 3.1415927F) * 2.0F * g;
@@ -48,5 +49,6 @@ public abstract class MixinBipedEntityModel<T extends LivingEntity> {
 			this.leftArm.zRot = (Mth.cos(f * 0.2812F) - 1.0F) * 1.0F * g;
 		}
 	}
+*/
 
 }

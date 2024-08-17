@@ -33,11 +33,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(BambooStalkBlock.class)
 public abstract class MixinBambooBlock {
 
+/*
     @Inject(method = "isCollisionShapeFullBlock", at = @At("HEAD"), cancellable = true)
     private void changeBlockBoundingBox(BlockState state, BlockGetter world, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_17)) {
             cir.setReturnValue(true);
         }
     }
+*/
 
 }

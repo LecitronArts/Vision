@@ -28,7 +28,6 @@ import de.florianmichael.viafabricplus.fixes.versioned.classic.CPEAdditions;
 import de.florianmichael.viafabricplus.fixes.versioned.classic.GridItemSelectionScreen;
 import de.florianmichael.viafabricplus.fixes.versioned.visual.ArmorHudEmulation1_8;
 import de.florianmichael.viafabricplus.fixes.versioned.visual.FootStepParticle1_12_2;
-import de.florianmichael.viafabricplus.access.IClientConnection;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import de.florianmichael.viafabricplus.settings.impl.BedrockSettings;
 import net.minecraft.client.Minecraft;
@@ -152,7 +151,7 @@ public class ClientsideFixes {
     public static int getChatLength() {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.c0_28toc0_30)) {
             final ClientPacketListener handler = Minecraft.getInstance().getConnection();
-            final ExtensionProtocolMetadataStorage extensionProtocol = ((IClientConnection) handler.getConnection()).viaFabricPlus$getUserConnection().get(ExtensionProtocolMetadataStorage.class);
+            final ExtensionProtocolMetadataStorage extensionProtocol = ( handler.getConnection()).viaFabricPlus$getUserConnection().get(ExtensionProtocolMetadataStorage.class);
 
             if (extensionProtocol != null && extensionProtocol.hasServerExtension(ClassicProtocolExtension.LONGER_MESSAGES)) {
                 return Short.MAX_VALUE * 2;

@@ -18,6 +18,8 @@ import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
+
+
 import net.minecraft.CrashReportCategory;
 import net.minecraft.Util;
 import net.minecraft.client.ClientBrandRetriever;
@@ -46,6 +48,8 @@ import net.minecraft.util.Crypt;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.raphimc.vialegacy.api.LegacyProtocolVersion;
+import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage.ProtocolMetadataStorage;
 import org.slf4j.Logger;
 
 @OnlyIn(Dist.CLIENT)
@@ -125,6 +129,15 @@ public class ClientHandshakePacketListenerImpl implements ClientLoginPacketListe
 
    @Nullable
    private Component authenticateServer(String pServerHash) {
+      final Connection mixinClientConnection =  connection;
+      if (mixinClientConnection.viaFabricPlus$getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.r1_6_4)) {
+         // We are in the 1.7 -> 1.6 protocol, so we need to skip the joinServer call
+         // if the server is in offline mode, due the packet changes <-> networking changes
+         // Minecraft's networking code is bad for us.
+         if (!mixinClientConnection.viaFabricPlus$getUserConnection().get(ProtocolMetadataStorage.class).authenticate) {
+            return null;
+         }
+      }
       try {
          this.getMinecraftSessionService().joinServer(this.minecraft.getUser().getProfileId(), this.minecraft.getUser().getAccessToken(), pServerHash);
          return null;

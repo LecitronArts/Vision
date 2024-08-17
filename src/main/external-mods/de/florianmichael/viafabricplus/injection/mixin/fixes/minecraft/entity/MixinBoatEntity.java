@@ -134,7 +134,7 @@ public abstract class MixinBoatEntity extends VehicleEntity {
         }
     }
 
-    @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
+ /*   @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     private void tick1_8(CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             ci.cancel();
@@ -287,25 +287,25 @@ public abstract class MixinBoatEntity extends VehicleEntity {
             }
         }
     }
-
-    @Inject(method = "positionRider", at = @At(value = "HEAD"), cancellable = true)
+*/
+/*    @Inject(method = "positionRider", at = @At(value = "HEAD"), cancellable = true)
     private void updatePassengerPosition1_8(Entity passenger, MoveFunction positionUpdater, CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             final Vec3 newPosition = new Vec3(EntityRidingOffsetsPre1_20_2.getMountedHeightOffset(this, passenger)).add(this.position());
             positionUpdater.accept(passenger, newPosition.x, newPosition.y + EntityRidingOffsetsPre1_20_2.getHeightOffset(passenger), newPosition.z);
             ci.cancel();
         }
-    }
+    }*/
 
-    @Inject(method = "onPassengerTurned", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "onPassengerTurned", at = @At("HEAD"), cancellable = true)
     private void onPassengerLookAround1_8(Entity passenger, CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             ci.cancel();
             super.onPassengerTurned(passenger);
         }
-    }
+    }*/
 
-    @Inject(method = "checkFallDamage", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "checkFallDamage", at = @At("HEAD"), cancellable = true)
     private void fall1_8(double heightDifference, boolean onGround, BlockState state, BlockPos landedPosition, CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.r1_6_4)) {
             ci.cancel();
@@ -313,7 +313,7 @@ public abstract class MixinBoatEntity extends VehicleEntity {
         } else if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             this.status = Boat.Status.ON_LAND;
         }
-    }
+    }*/
 
     @Inject(method = "canAddPassenger", at = @At("HEAD"), cancellable = true)
     private void canAddPassenger1_8(Entity passenger, CallbackInfoReturnable<Boolean> cir) {

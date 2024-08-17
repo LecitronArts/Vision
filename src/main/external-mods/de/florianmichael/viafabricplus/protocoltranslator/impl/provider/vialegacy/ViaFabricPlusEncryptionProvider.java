@@ -20,7 +20,6 @@
 package de.florianmichael.viafabricplus.protocoltranslator.impl.provider.vialegacy;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import de.florianmichael.viafabricplus.access.IClientConnection;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.providers.EncryptionProvider;
 
@@ -28,7 +27,7 @@ public class ViaFabricPlusEncryptionProvider extends EncryptionProvider {
 
     @Override
     public void enableDecryption(UserConnection user) {
-        ((IClientConnection) user.getChannel().attr(ProtocolTranslator.CLIENT_CONNECTION_ATTRIBUTE_KEY).get()).viaFabricPlus$setupPreNettyDecryption();
+        (user.getChannel().attr(ProtocolTranslator.CLIENT_CONNECTION_ATTRIBUTE_KEY).get()).viaFabricPlus$setupPreNettyDecryption();
     }
 
 }

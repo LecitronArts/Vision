@@ -64,7 +64,7 @@ public abstract class MixinWallBlock extends Block {
         super(settings);
     }
 
-    @Inject(method = "<init>", at = @At("RETURN"))
+  /*  @Inject(method = "<init>", at = @At("RETURN"))
     private void initShapes1_12_2(Properties settings, CallbackInfo ci) {
         this.viaFabricPlus$collision_shape_r1_12_2 = this.viaFabricPlus$createShapes1_12_2(24.0F, 24.0F);
         this.viaFabricPlus$outline_shape_r1_12_2 = this.viaFabricPlus$createShapes1_12_2(16.0F, 14.0F);
@@ -197,6 +197,6 @@ public abstract class MixinWallBlock extends Block {
 
             return i;
         });
-    }
+    }*/
 
 }

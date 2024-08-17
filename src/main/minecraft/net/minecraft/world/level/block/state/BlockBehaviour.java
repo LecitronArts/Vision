@@ -15,6 +15,10 @@ import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -49,14 +53,7 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.Mirror;
-import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.SupportType;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -79,6 +76,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 
 public abstract class BlockBehaviour implements FeatureElement {
    protected static final Direction[] UPDATE_SHAPE_ORDER = new Direction[]{Direction.WEST, Direction.EAST, Direction.NORTH, Direction.SOUTH, Direction.DOWN, Direction.UP};
@@ -396,6 +394,19 @@ public abstract class BlockBehaviour implements FeatureElement {
    /** @deprecated */
    @Deprecated
    public float getDestroyProgress(BlockState pState, Player pPlayer, BlockGetter pLevel, BlockPos pPos) {
+      if (DebugSettings.global().legacyMiningSpeeds.isEnabled()) {
+         final float hardness = pState.getDestroySpeed(pLevel, pPos);
+         if (hardness == -1.0F) {
+            return 0.0f;
+         } else {
+            if (!pPlayer.hasCorrectToolForDrops(pState)) {
+               return (1.0F / hardness / 100F);
+            } else {
+               return  (pPlayer.getDestroySpeed(pState) / hardness / 30F);
+            }
+         }
+      }
+      ///
       float f = pState.getDestroySpeed(pLevel, pPos);
       if (f == -1.0F) {
          return 0.0F;
@@ -656,6 +667,27 @@ public abstract class BlockBehaviour implements FeatureElement {
       }
 
       public float getDestroySpeed(BlockGetter pLevel, BlockPos pPos) {
+         final Block block = this.getBlock();
+
+         if (block.equals(Blocks.END_STONE_BRICKS) || block.equals(Blocks.END_STONE_BRICK_SLAB) || block.equals(Blocks.END_STONE_BRICK_STAIRS) || block.equals(Blocks.END_STONE_BRICK_WALL)) {
+            if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_14_4)) {
+               return (0.8F);
+            }
+         } else if (block.equals(Blocks.PISTON) || block.equals(Blocks.STICKY_PISTON) || block.equals(Blocks.PISTON_HEAD)) {
+            if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_15_2)) {
+               return (0.5F);
+            }
+         } else if (block instanceof InfestedBlock) {
+            if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
+               return (0.75F);
+            } else if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4)) {
+               return (0F);
+            }
+         } else if (block.equals(Blocks.OBSIDIAN)) {
+            if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_8tob1_8_1)) {
+               return (10.0F);
+            }
+         }
          return this.destroySpeed;
       }
 
@@ -918,8 +950,17 @@ public abstract class BlockBehaviour implements FeatureElement {
 
       protected abstract BlockState asState();
 
+
+      /**
+       * @author RK_01
+       * @reason Change break speed for shulker blocks in < 1.14
+       */
       public boolean requiresCorrectToolForDrops() {
-         return this.requiresCorrectToolForDrops;
+         if (this.getBlock() instanceof ShulkerBoxBlock && ProtocolTranslator.getTargetVersion().olderThan(ProtocolVersion.v1_14)) {
+            return true;
+         } else {
+            return this.requiresCorrectToolForDrops;
+         }
       }
 
       public boolean shouldSpawnTerrainParticles() {

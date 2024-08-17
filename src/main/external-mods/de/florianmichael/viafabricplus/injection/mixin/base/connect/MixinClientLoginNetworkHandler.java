@@ -19,7 +19,7 @@
 
 package de.florianmichael.viafabricplus.injection.mixin.base.connect;
 
-import de.florianmichael.viafabricplus.access.IClientConnection;
+
 import net.minecraft.client.multiplayer.ClientHandshakePacketListenerImpl;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
@@ -36,6 +36,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ClientHandshakePacketListenerImpl.class)
 public abstract class MixinClientLoginNetworkHandler {
 
+/*
     @Shadow
     @Final
     private Connection connection;
@@ -52,5 +53,6 @@ public abstract class MixinClientLoginNetworkHandler {
             }
         }
     }
+*/
 
 }

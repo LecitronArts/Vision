@@ -82,35 +82,40 @@ public abstract class MixinPlayerEntity extends LivingEntity {
         super(entityType, world);
     }
 
-    @Redirect(method = "getMaxHeadRotationRelativeToBody", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isBlocking()Z"))
+/*    @Redirect(method = "getMaxHeadRotationRelativeToBody", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isBlocking()Z"))
     private boolean dontModifyHeadRotationWhenBlocking(Player instance) {
         return ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_20_2) && instance.isBlocking();
-    }
+    }*/
 
-    @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;setSpeed(F)V"))
+/*    @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;setSpeed(F)V"))
     private void storeSprintingState(CallbackInfo ci) {
         viaFabricPlus$isSprinting = this.isSprinting();
-    }
+    }*/
 
-    @Redirect(method = "getFlyingSpeed", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isSprinting()Z"))
+/*    @Redirect(method = "getFlyingSpeed", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isSprinting()Z"))
     private boolean useLastSprintingState(Player instance) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_3)) {
             return viaFabricPlus$isSprinting;
         } else {
             return instance.isSprinting();
         }
-    }
+    }*/
 
+/*
     @WrapWithCondition(method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;swing(Lnet/minecraft/world/InteractionHand;)V"))
     private boolean dontSwingHand(Player instance, InteractionHand hand) {
         return ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_15_2);
     }
+*/
 
+/*
     @Redirect(method = "tryToStartFallFlying", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;hasEffect(Lnet/minecraft/world/effect/MobEffect;)Z"))
     private boolean allowElytraWhenLevitating(Player instance, MobEffect statusEffect) {
         return ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_15_2) && instance.hasEffect(statusEffect);
     }
+*/
 
+/*
     @Inject(method = "tryToStartFallFlying", at = @At("HEAD"), cancellable = true)
     private void replaceFallFlyingCondition(CallbackInfoReturnable<Boolean> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_14_4)) {
@@ -124,16 +129,18 @@ public abstract class MixinPlayerEntity extends LivingEntity {
             cir.setReturnValue(false);
         }
     }
+*/
 
-    @ModifyConstant(method = "getStandingEyeHeight", constant = @Constant(floatValue = 1.27f))
+/*    @ModifyConstant(method = "getStandingEyeHeight", constant = @Constant(floatValue = 1.27f))
     private float modifySneakEyeHeight(float prevEyeHeight) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
             return 1.54F;
         } else {
             return prevEyeHeight;
         }
-    }
+    }*/
 
+/*
     @Inject(method = "updatePlayerPose", at = @At("HEAD"), cancellable = true)
     private void onUpdatePose(CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
@@ -155,7 +162,9 @@ public abstract class MixinPlayerEntity extends LivingEntity {
             ci.cancel();
         }
     }
+*/
 
+/*
     @Inject(method = "getDimensions", at = @At("HEAD"), cancellable = true)
     private void modifyDimensions(Pose pose, CallbackInfoReturnable<EntityDimensions> cir) {
         if (pose == Pose.CROUCHING) {
@@ -166,30 +175,32 @@ public abstract class MixinPlayerEntity extends LivingEntity {
             }
         }
     }
+*/
 
-    @Redirect(method = "maybeBackOffFromEdge", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;maxUpStep()F"))
+/*    @Redirect(method = "maybeBackOffFromEdge", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;maxUpStep()F"))
     private float modifyStepHeight1_10(Player instance) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_10)) {
             return 1.0F;
         } else {
             return instance.maxUpStep();
         }
-    }
+    }*/
 
-    @Inject(method = "getAttackStrengthScale", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "getAttackStrengthScale", at = @At("HEAD"), cancellable = true)
     private void removeAttackCooldown(CallbackInfoReturnable<Float> ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             ci.setReturnValue(1F);
         }
-    }
+    }*/
 
-    @Inject(method = "getHurtSound", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "getHurtSound", at = @At("HEAD"), cancellable = true)
     private void replaceSound(DamageSource source, CallbackInfoReturnable<SoundEvent> cir) {
         if (VisualSettings.global().replaceHurtSoundWithOOFSound.isEnabled()) {
             cir.setReturnValue(viaFabricPlus$oof_hurt);
         }
-    }
+    }*/
 
+/*
     @Inject(method = "getDestroySpeed", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/effect/MobEffectUtil;hasDigSpeed(Lnet/minecraft/world/entity/LivingEntity;)Z", shift = At.Shift.BEFORE))
     private void changeSpeedCalculation(BlockState block, CallbackInfoReturnable<Float> cir, @Local LocalFloatRef f) {
         final int efficiency = EnchantmentHelper.getBlockEfficiency(this);
@@ -211,8 +222,9 @@ public abstract class MixinPlayerEntity extends LivingEntity {
             }
         }
     }
+*/
 
-    @Redirect(method = "getDestroySpeed", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;hasEffect(Lnet/minecraft/world/effect/MobEffect;)Z"))
+/*    @Redirect(method = "getDestroySpeed", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;hasEffect(Lnet/minecraft/world/effect/MobEffect;)Z"))
     private boolean changeSpeedCalculation(Player instance, MobEffect statusEffect, @Local LocalFloatRef f) {
         final boolean hasMiningFatigue = instance.hasEffect(statusEffect);
         if (hasMiningFatigue && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_7_6)) {
@@ -221,13 +233,13 @@ public abstract class MixinPlayerEntity extends LivingEntity {
             return false; // disable original code
         }
         return hasMiningFatigue;
-    }
+    }*/
 
-    @Inject(method = "getPickRange", at = @At("RETURN"), cancellable = true)
+/*    @Inject(method = "getPickRange", at = @At("RETURN"), cancellable = true)
     private static void modifyReachDistance(boolean creative, CallbackInfoReturnable<Float> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThan(LegacyProtocolVersion.r1_0_0tor1_0_1) && !creative) {
             cir.setReturnValue(4F);
         }
-    }
+    }*/
 
 }

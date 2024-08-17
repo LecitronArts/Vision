@@ -2,6 +2,9 @@ package net.minecraft.client.player;
 
 import com.mojang.authlib.GameProfile;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.PlayerInfo;
@@ -63,6 +66,9 @@ public abstract class AbstractClientPlayer extends Player {
 
    public boolean isCreative() {
       PlayerInfo playerinfo = this.getPlayerInfo();
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+         return (this.getAbilities().instabuild);
+      }
       return playerinfo != null && playerinfo.getGameMode() == GameType.CREATIVE;
    }
 

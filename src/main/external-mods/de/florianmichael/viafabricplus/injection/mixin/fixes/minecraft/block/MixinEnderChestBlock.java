@@ -47,20 +47,22 @@ public abstract class MixinEnderChestBlock extends BaseEntityBlock {
         super(settings);
     }
 
+/*
     @Inject(method = "getShape", at = @At("HEAD"), cancellable = true)
     private void changeOutlineShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context, CallbackInfoReturnable<VoxelShape> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.r1_4_2)) {
             cir.setReturnValue(Shapes.block());
         }
     }
+*/
 
-    @Override
+/*    @Override
     public VoxelShape getOcclusionShape(BlockState state, BlockGetter view, BlockPos pos) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.r1_4_2)) {
             return SHAPE;
         } else {
             return super.getOcclusionShape(state, view, pos);
         }
-    }
+    }*/
 
 }

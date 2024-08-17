@@ -40,9 +40,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(SnowLayerBlock.class)
 public abstract class MixinSnowBlock {
 
-    @Unique
+/*    @Unique
     private static final VoxelShape[] viaFabricPlus$layers_to_shape_r1_12_2 = new VoxelShape[]{
-            Block.box(0.0D, -0.00001 /* 0.0D */, 0.0D, 16.0D, 0.0D, 16.0D),
+            Block.box(0.0D, -0.00001 *//* 0.0D *//*, 0.0D, 16.0D, 0.0D, 16.0D),
             Block.box(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D),
             Block.box(0.0D, 0.0D, 0.0D, 16.0D, 4.0D, 16.0D),
             Block.box(0.0D, 0.0D, 0.0D, 16.0D, 6.0D, 16.0D),
@@ -62,6 +62,6 @@ public abstract class MixinSnowBlock {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
             cir.setReturnValue(viaFabricPlus$layers_to_shape_r1_12_2[state.getValue(LAYERS) - 1]);
         }
-    }
+    }*/
 
 }

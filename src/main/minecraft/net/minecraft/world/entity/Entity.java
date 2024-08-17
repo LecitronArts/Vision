@@ -7,6 +7,9 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.mojang.logging.LogUtils;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.fixes.versioned.visual.EntityRidingOffsetsPre1_20_2;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import dev.tr7zw.entityculling.versionless.EntityCullingVersionlessBase;
 import dev.tr7zw.entityculling.versionless.access.Cullable;
 import it.unimi.dsi.fastutil.objects.Object2DoubleArrayMap;
@@ -243,7 +246,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
    private boolean hasVisualFire;
    @Nullable
    private BlockState feetBlockState = null;
-
+   private boolean viaFabricPlus$isInLoadedChunkAndShouldTick;
    public Entity(EntityType<?> pEntityType, Level pLevel) {
       this.type = pEntityType;
       this.level = pLevel;
@@ -815,6 +818,21 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
    }
 
    protected BlockPos getOnPos(float pYOffset) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_4)) {
+         int i = Mth.floor(this.position.x);
+         int j = Mth.floor(this.position.y - (double) (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_18_2) && pYOffset == 1.0E-5F ? 0.2F : pYOffset));
+         int k = Mth.floor(this.position.z);
+         BlockPos blockPos = new BlockPos(i, j, k);
+         if (this.level.getBlockState(blockPos).isAir()) {
+            BlockPos downPos = blockPos.below();
+            BlockState blockState = this.level.getBlockState(downPos);
+            if (blockState.is(BlockTags.FENCES) || blockState.is(BlockTags.WALLS) || blockState.getBlock() instanceof FenceGateBlock) {
+               return (downPos);
+            }
+         }
+
+         return (blockPos);
+      }
       if (this.mainSupportingBlockPos.isPresent()) {
          BlockPos blockpos = this.mainSupportingBlockPos.get();
          if (!(pYOffset > 1.0E-5F)) {
@@ -981,8 +999,14 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
 
    protected void checkInsideBlocks() {
       AABB aabb = this.getBoundingBox();
-      BlockPos blockpos = BlockPos.containing(aabb.minX + 1.0E-7D, aabb.minY + 1.0E-7D, aabb.minZ + 1.0E-7D);
-      BlockPos blockpos1 = BlockPos.containing(aabb.maxX - 1.0E-7D, aabb.maxY - 1.0E-7D, aabb.maxZ - 1.0E-7D);
+      double viaFix ;
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_1)) {
+         viaFix = 1E-3;
+      } else {
+         viaFix = 1.0E-7D;
+      }
+      BlockPos blockpos = BlockPos.containing(aabb.minX + viaFix, aabb.minY + viaFix, aabb.minZ + viaFix);
+      BlockPos blockpos1 = BlockPos.containing(aabb.maxX - viaFix, aabb.maxY - viaFix, aabb.maxZ - viaFix);
       if (this.level().hasChunksAt(blockpos, blockpos1)) {
          BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
 
@@ -1878,6 +1902,9 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
    }
 
    public float getMyRidingOffset(Entity pEntity) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20)) {
+         return ((float) EntityRidingOffsetsPre1_20_2.getHeightOffset(this));
+      }
       return this.ridingOffset(pEntity);
    }
 
@@ -1886,7 +1913,13 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
    }
 
    public Vec3 getPassengerRidingPosition(Entity pEntity) {
-      return (new Vec3(this.getPassengerAttachmentPoint(pEntity, this.dimensions, 1.0F).rotateY(-this.yRot * ((float)Math.PI / 180F)))).add(this.position());
+      Vector3f viaFixVec3;
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20)) {
+         viaFixVec3 = EntityRidingOffsetsPre1_20_2.getMountedHeightOffset(this, pEntity);
+      } else {
+         viaFixVec3 = getPassengerAttachmentPoint(pEntity, dimensions, 1.0f);
+      }
+      return (new Vec3(viaFixVec3.rotateY(-this.yRot * ((float)Math.PI / 180F)))).add(this.position());
    }
 
    protected Vector3f getPassengerAttachmentPoint(Entity pEntity, EntityDimensions pDimensions, float pScale) {

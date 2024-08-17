@@ -40,11 +40,13 @@ public abstract class MixinCowEntity extends Animal {
         super(entityType, world);
     }
 
+/*
     @Inject(method = "mobInteract", at = @At("HEAD"), cancellable = true)
     private void disableMilkingInCreative(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_15_2) && player.getAbilities().instabuild) {
             cir.setReturnValue(super.mobInteract(player, hand));
         }
     }
+*/
 
 }

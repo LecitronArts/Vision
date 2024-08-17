@@ -4,19 +4,22 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.GlUtil;
 import com.mojang.datafixers.DataFixUtils;
+import com.viaversion.viaversion.api.connection.ProtocolInfo;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import de.florianmichael.viafabricplus.access.IChunkTracker;
+import de.florianmichael.viafabricplus.access.IRakSessionCodec;
+import de.florianmichael.viafabricplus.fixes.tracker.JoinGameDataTracker;
+import de.florianmichael.viafabricplus.injection.ViaFabricPlusMixinPlugin;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+import de.florianmichael.viafabricplus.settings.impl.GeneralSettings;
+import de.florianmichael.viafabricplus.util.ChatUtil;
 import dev.tr7zw.entityculling.EntityCullingModBase;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.longs.LongSets;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
-import java.util.Collection;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -79,6 +82,15 @@ import net.optifine.render.RenderCache;
 import net.optifine.util.GpuMemory;
 import net.optifine.util.MemoryMonitor;
 import net.optifine.util.NativeMemory;
+import net.raphimc.viabedrock.protocol.data.enums.bedrock.ServerAuthMovementMode;
+import net.raphimc.viabedrock.protocol.storage.ChunkTracker;
+import net.raphimc.viabedrock.protocol.storage.GameSessionStorage;
+import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.storage.ExtensionProtocolMetadataStorage;
+import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.storage.SeedStorage;
+import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.storage.EntityTracker;
+import org.cloudburstmc.netty.channel.raknet.RakClientChannel;
+import org.cloudburstmc.netty.handler.codec.raknet.common.RakSessionCodec;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 public class DebugScreenOverlay {
    private static final int COLOR_GREY = 14737632;
@@ -326,6 +338,8 @@ public class DebugScreenOverlay {
             break;
          }
       }
+
+      list.add(getViaInfo());
       if (EntityCullingModBase.instance.tickedEntities != 0
               || EntityCullingModBase.instance.skippedEntityTicks != 0) {
          lastTickedEntities = EntityCullingModBase.instance.tickedEntities;
@@ -353,6 +367,76 @@ public class DebugScreenOverlay {
       EntityCullingModBase.instance.skippedEntities = 0;
 
       return list;
+   }
+
+   public String getViaInfo() {
+      String returnInfo = "";
+
+      if (!GeneralSettings.global().showExtraInformationInDebugHud.getValue()) { // Only show if enabled
+         return "";
+      }
+      if (Minecraft.getInstance().isLocalServer() && Minecraft.getInstance().player != null) { // Don't show in singleplayer
+         return "";
+      }
+      final UserConnection userConnection = ProtocolTranslator.getPlayNetworkUserConnection();
+      if (userConnection == null) { // Only show if ViaVersion is active
+         return "";
+      }
+
+      final List<String> information = new ArrayList<>();
+      information.add("");
+
+      // Title
+      information.add(ChatUtil.PREFIX + ChatFormatting.RESET + " " + ViaFabricPlusMixinPlugin.VFP_VERSION);
+
+      // Connection
+      final ProtocolInfo info = userConnection.getProtocolInfo();
+      information.add("P: " + info.getPipeline().pipes().size() + " C: " + info.protocolVersion() + " S: " + info.serverProtocolVersion());
+
+      // 1.7.10
+      final EntityTracker entityTracker1_7_10 = userConnection.get(EntityTracker.class);
+      if (entityTracker1_7_10 != null) {
+         information.add("1.7 Entities: " + entityTracker1_7_10.getTrackedEntities().size() + ", Virtual holograms: " + entityTracker1_7_10.getVirtualHolograms().size());
+      }
+
+      // 1.1
+      final SeedStorage seedStorage = userConnection.get(SeedStorage.class);
+      if (seedStorage != null) {
+         information.add("World Seed: " + seedStorage.seed);
+      }
+
+      // c0.30 cpe
+      final ExtensionProtocolMetadataStorage extensionProtocolMetadataStorage = userConnection.get(ExtensionProtocolMetadataStorage.class);
+      if (extensionProtocolMetadataStorage != null) {
+         information.add("CPE extensions: " + extensionProtocolMetadataStorage.getExtensionCount());
+      }
+
+      // Bedrock
+      final JoinGameDataTracker joinGameDataTracker = userConnection.get(JoinGameDataTracker.class);
+      if (joinGameDataTracker != null) {
+         final ServerAuthMovementMode movementMode = userConnection.get(GameSessionStorage.class).getMovementMode();
+         information.add("Bedrock Level: " + joinGameDataTracker.getLevelId() + ", Enchantment Seed: " + joinGameDataTracker.getEnchantmentSeed() + ", Movement: " + movementMode.name());
+      }
+      if (joinGameDataTracker != null) {
+         information.add("World Seed: " + joinGameDataTracker.getSeed());
+      }
+      final ChunkTracker chunkTracker = userConnection.get(ChunkTracker.class);
+      if (chunkTracker != null) {
+         final int subChunkRequests = ((IChunkTracker) chunkTracker).viaFabricPlus$getSubChunkRequests();
+         final int pendingSubChunks = ((IChunkTracker) chunkTracker).viaFabricPlus$getPendingSubChunks();
+         final int chunks = ((IChunkTracker) chunkTracker).viaFabricPlus$getChunks();
+         returnInfo = returnInfo + ("Chunk Tracker: R: " + subChunkRequests + ", P: " + pendingSubChunks + ", C: " + chunks);
+      }
+      if (userConnection.getChannel() instanceof RakClientChannel rakClientChannel) {
+         final RakSessionCodec rakSessionCodec = rakClientChannel.parent().pipeline().get(RakSessionCodec.class);
+         if (rakSessionCodec != null) {
+            final int transmitQueue = ((IRakSessionCodec) rakSessionCodec).viaFabricPlus$getOutgoingPackets();
+            final int retransmitQueue = ((IRakSessionCodec) rakSessionCodec).viaFabricPlus$SentDatagrams();
+            returnInfo = returnInfo + "RTT: " + Math.round(rakSessionCodec.getRTT()) + " ms, P: " + rakSessionCodec.getPing() + " ms" + ", TQ: " + transmitQueue + ", RTQ: " + retransmitQueue;
+         }
+      }
+
+      return returnInfo + information;
    }
 
    protected List<String> getInfoLeft() {

@@ -1,6 +1,8 @@
 package net.minecraft.world.level.block;
 
 import com.mojang.serialization.MapCodec;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceKey;
@@ -20,10 +22,16 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.spongepowered.asm.mixin.Unique;
 
 public class EndPortalBlock extends BaseEntityBlock {
    public static final MapCodec<EndPortalBlock> CODEC = simpleCodec(EndPortalBlock::new);
    protected static final VoxelShape SHAPE = Block.box(0.0D, 6.0D, 0.0D, 16.0D, 12.0D, 16.0D);
+   @Unique
+   private static final VoxelShape viaFabricPlus$shape_r1_8_x = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 1.0D, 16.0D);
+
+   @Unique
+   private static final VoxelShape viaFabricPlus$shape_r1_16_5 = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 12.0D, 16.0D);
 
    public MapCodec<EndPortalBlock> codec() {
       return CODEC;
@@ -38,6 +46,11 @@ public class EndPortalBlock extends BaseEntityBlock {
    }
 
    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+         return (viaFabricPlus$shape_r1_8_x);
+      } else if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4)) {
+         return (viaFabricPlus$shape_r1_16_5);
+      }
       return SHAPE;
    }
 

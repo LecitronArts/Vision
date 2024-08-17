@@ -26,7 +26,6 @@ import com.viaversion.viaversion.api.minecraft.signature.storage.ChatSession1_19
 import com.viaversion.viaversion.api.minecraft.signature.storage.ChatSession1_19_1;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import de.florianmichael.viafabricplus.ViaFabricPlus;
-import de.florianmichael.viafabricplus.access.IClientConnection;
 import de.florianmichael.viafabricplus.access.ILegacyKeySignatureStorage;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.client.Minecraft;
@@ -80,7 +79,7 @@ public abstract class MixinConnectScreen_1 {
 
     @Inject(method = "run", at = @At(value = "INVOKE", target = "Lio/netty/channel/ChannelFuture;syncUninterruptibly()Lio/netty/channel/ChannelFuture;", remap = false, shift = At.Shift.AFTER))
     private void setupConnectionSessions(CallbackInfo ci, @Local Connection clientConnection) {
-        final UserConnection userConnection = ((IClientConnection) clientConnection).viaFabricPlus$getUserConnection();
+        final UserConnection userConnection = ( clientConnection).viaFabricPlus$getUserConnection();
 
         if (ProtocolTranslator.getTargetVersion().betweenInclusive(ProtocolVersion.v1_19, ProtocolVersion.v1_19_1)) {
             final ProfileKeyPair keyPair = Minecraft.getInstance().getProfileKeyPairManager().prepareKeyPair().join().orElse(null);

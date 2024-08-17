@@ -1,5 +1,8 @@
 package net.minecraft.client.gui.screens;
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.screen.base.PerServerVersionScreen;
+import de.florianmichael.viafabricplus.settings.impl.GeneralSettings;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -12,6 +15,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.spongepowered.asm.mixin.Unique;
 
 @OnlyIn(Dist.CLIENT)
 public class EditServerScreen extends Screen {
@@ -23,6 +27,13 @@ public class EditServerScreen extends Screen {
    private EditBox ipEdit;
    private EditBox nameEdit;
    private final Screen lastScreen;
+
+
+   // via
+   private String viaFabricPlus$nameField;
+
+   private String viaFabricPlus$addressField;
+
 
    public EditServerScreen(Screen pLastScreen, BooleanConsumer pCallback, ServerData pServerData) {
       super(Component.translatable("addServer.title"));
@@ -56,6 +67,33 @@ public class EditServerScreen extends Screen {
       }).bounds(this.width / 2 - 100, this.height / 4 + 120 + 18, 200, 20).build());
       this.setInitialFocus(this.nameEdit);
       this.updateAddButtonStatus();
+
+      final int buttonPosition = GeneralSettings.global().addServerScreenButtonOrientation.getIndex();
+      if (buttonPosition == 0) { // Off
+         return;
+      }
+
+      final ProtocolVersion forcedVersion = ( serverData).viaFabricPlus$forcedVersion();
+
+      // Restore input if the user cancels the version selection screen (or if the user is editing an existing server)
+      if (viaFabricPlus$nameField != null && viaFabricPlus$addressField != null) {
+         this.nameEdit.setValue(viaFabricPlus$nameField);
+         this.ipEdit.setValue(viaFabricPlus$addressField);
+
+         viaFabricPlus$nameField = null;
+         viaFabricPlus$addressField = null;
+      }
+
+      Button.Builder buttonBuilder = Button.builder(forcedVersion == null ? Component.translatable("base.viafabricplus.set_version") : Component.literal(forcedVersion.getName()), button -> {
+         // Store current input in case the user cancels the version selection
+         viaFabricPlus$nameField = nameEdit.getValue();
+         viaFabricPlus$addressField = ipEdit.getValue();
+
+         minecraft.setScreen(new PerServerVersionScreen(this, version -> ( serverData).viaFabricPlus$forceVersion(version)));
+      }).size(98, 20);
+
+      // Set the button's position according to the configured orientation and add the button to the screen
+      this.addRenderableWidget(GeneralSettings.withOrientation(buttonBuilder, buttonPosition, width, height).build());
    }
 
    public void resize(Minecraft pMinecraft, int pWidth, int pHeight) {

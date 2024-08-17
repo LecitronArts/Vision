@@ -24,7 +24,6 @@ import de.florianmichael.classic4j.ClassiCubeHandler;
 import de.florianmichael.classic4j.api.LoginProcessHandler;
 import de.florianmichael.classic4j.model.classicube.account.CCAccount;
 import de.florianmichael.viafabricplus.ViaFabricPlus;
-import de.florianmichael.viafabricplus.access.ITextFieldWidget;
 import de.florianmichael.viafabricplus.save.impl.AccountsSave;
 import de.florianmichael.viafabricplus.screen.VFPScreen;
 import net.minecraft.client.gui.GuiGraphics;
@@ -59,8 +58,8 @@ public class ClassiCubeLoginScreen extends VFPScreen {
         nameField.setMaxLength(Integer.MAX_VALUE);
         passwordField.setMaxLength(Integer.MAX_VALUE);
 
-        ((ITextFieldWidget) nameField).viaFabricPlus$unlockForbiddenCharacters();
-        ((ITextFieldWidget) passwordField).viaFabricPlus$unlockForbiddenCharacters();
+        ( nameField).viaFabricPlus$unlockForbiddenCharacters();
+        ( passwordField).viaFabricPlus$unlockForbiddenCharacters();
 
         final AccountsSave accountsSave = ViaFabricPlus.global().getSaveManager().getAccountsSave();
         if (accountsSave.getClassicubeAccount() != null) {

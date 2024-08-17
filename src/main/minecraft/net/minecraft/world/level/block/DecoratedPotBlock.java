@@ -4,6 +4,9 @@ import com.mojang.serialization.MapCodec;
 import java.util.List;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -83,6 +86,9 @@ public class DecoratedPotBlock extends BaseEntityBlock implements SimpleWaterlog
    }
 
    public InteractionResult use(BlockState p_312109_, Level p_312351_, BlockPos p_310007_, Player p_311727_, InteractionHand p_309947_, BlockHitResult p_311602_) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20_2)) {
+         return (InteractionResult.PASS);
+      }
       BlockEntity $$8 = p_312351_.getBlockEntity(p_310007_);
       if ($$8 instanceof DecoratedPotBlockEntity decoratedpotblockentity) {
          if (p_312351_.isClientSide) {

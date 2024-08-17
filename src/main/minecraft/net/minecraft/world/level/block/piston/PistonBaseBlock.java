@@ -7,6 +7,8 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.List;
 import java.util.Map;
+
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -38,6 +40,7 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 
 public class PistonBaseBlock extends DirectionalBlock {
    public static final MapCodec<PistonBaseBlock> CODEC = RecordCodecBuilder.mapCodec((p_310349_) -> {
@@ -69,6 +72,9 @@ public class PistonBaseBlock extends DirectionalBlock {
    }
 
    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.r1_1)) {
+         return (Shapes.block());
+      }
       if (pState.getValue(EXTENDED)) {
          switch ((Direction)pState.getValue(FACING)) {
             case DOWN:
@@ -96,7 +102,25 @@ public class PistonBaseBlock extends DirectionalBlock {
       }
 
    }
-
+   @Override
+   public VoxelShape getOcclusionShape(BlockState state, BlockGetter world, BlockPos pos) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.r1_1)) {
+         if (state.getValue(PistonBaseBlock.EXTENDED)) {
+            return switch (state.getValue(FACING)) {
+               case DOWN -> DOWN_AABB;
+               case UP -> UP_AABB;
+               case NORTH -> NORTH_AABB;
+               case SOUTH -> SOUTH_AABB;
+               case WEST -> WEST_AABB;
+               case EAST -> EAST_AABB;
+            };
+         } else {
+            return Shapes.block();
+         }
+      } else {
+         return super.getOcclusionShape(state, world, pos);
+      }
+   }
    public void neighborChanged(BlockState pState, Level pLevel, BlockPos pPos, Block pBlock, BlockPos pFromPos, boolean pIsMoving) {
       if (!pLevel.isClientSide) {
          this.checkIfExtend(pLevel, pPos, pState);

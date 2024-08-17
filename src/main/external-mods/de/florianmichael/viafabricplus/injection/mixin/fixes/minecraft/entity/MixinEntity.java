@@ -75,22 +75,23 @@ public abstract class MixinEntity implements IEntity {
     @Unique
     private boolean viaFabricPlus$isInLoadedChunkAndShouldTick;
 
-    @Inject(method = "getMyRidingOffset", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "getMyRidingOffset", at = @At("HEAD"), cancellable = true)
     private void getRidingOffset1_20_1(Entity vehicle, CallbackInfoReturnable<Float> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20)) {
             cir.setReturnValue((float) EntityRidingOffsetsPre1_20_2.getHeightOffset((Entity) (Object) this));
         }
-    }
+    }*/
 
-    @Redirect(method = "getPassengerRidingPosition", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;getPassengerAttachmentPoint(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/EntityDimensions;F)Lorg/joml/Vector3f;"))
+/*    @Redirect(method = "getPassengerRidingPosition", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;getPassengerAttachmentPoint(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/EntityDimensions;F)Lorg/joml/Vector3f;"))
     private Vector3f getPassengerRidingPos1_20_1(Entity instance, Entity passenger, EntityDimensions dimensions, float scaleFactor) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20)) {
             return EntityRidingOffsetsPre1_20_2.getMountedHeightOffset(instance, passenger);
         } else {
             return getPassengerAttachmentPoint(passenger, dimensions, scaleFactor);
         }
-    }
+    }*/
 
+/*
     @Inject(method = "getOnPos", at = @At("HEAD"), cancellable = true)
     private void modifyPosWithYOffset(float offset, CallbackInfoReturnable<BlockPos> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_4)) {
@@ -110,6 +111,7 @@ public abstract class MixinEntity implements IEntity {
             cir.setReturnValue(blockPos);
         }
     }
+*/
 
     @ModifyConstant(method = "checkInsideBlocks", constant = @Constant(doubleValue = 1.0E-7))
     private double fixBlockCollisionMargin(double constant) {

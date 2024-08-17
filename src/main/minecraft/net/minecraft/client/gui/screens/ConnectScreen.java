@@ -1,6 +1,13 @@
 package net.minecraft.client.gui.screens;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.logging.LogUtils;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.ViaFabricPlus;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+import de.florianmichael.viafabricplus.protocoltranslator.impl.provider.vialegacy.ViaFabricPlusClassicMPPassProvider;
+import de.florianmichael.viafabricplus.protocoltranslator.util.ProtocolVersionDetector;
+import de.florianmichael.viafabricplus.settings.impl.AuthenticationSettings;
 import io.netty.channel.ChannelFuture;
 import java.net.InetSocketAddress;
 import java.time.Duration;
@@ -47,6 +54,9 @@ public class ConnectScreen extends Screen {
    private Component status = Component.translatable("connect.connecting");
    private long lastNarration = -1L;
    final Component connectFailedTitle;
+
+   //via
+   private boolean viaFabricPlus$useClassiCubeAccount;
 
    private ConnectScreen(Screen pParent, Component pConnectFailedTitle) {
       super(GameNarrator.NO_TITLE);
@@ -114,7 +124,17 @@ public class ConnectScreen extends Screen {
                }
 
                ConnectScreen.this.connection.initiateServerboundPlayConnection(inetsocketaddress.getHostName(), inetsocketaddress.getPort(), new ClientHandshakePacketListenerImpl(ConnectScreen.this.connection, pMinecraft, pServerData, ConnectScreen.this.parent, false, (Duration)null, ConnectScreen.this::updateStatus));
-               ConnectScreen.this.connection.send(new ServerboundHelloPacket(pMinecraft.getUser().getName(), pMinecraft.getUser().getProfileId()));
+               //ConnectScreen.this.connection.send(new ServerboundHelloPacket(pMinecraft.getUser().getName(), pMinecraft.getUser().getProfileId()));
+
+               String name = "";
+               final var account = ViaFabricPlus.global().getSaveManager().getAccountsSave().getClassicubeAccount();
+               if (viaFabricPlus$useClassiCubeAccount && account != null) {
+                   name = account.username();
+               } else {
+                  name = pMinecraft.getUser().getName();
+               }
+
+               ConnectScreen.this.connection.send(new ServerboundHelloPacket(name, pMinecraft.getUser().getProfileId()));
             } catch (Exception exception2) {
                if (ConnectScreen.this.aborted) {
                   return;
@@ -129,14 +149,36 @@ public class ConnectScreen extends Screen {
                }
 
                ConnectScreen.LOGGER.error("Couldn't connect to server", (Throwable)exception2);
-               String s = inetsocketaddress == null ? exception.getMessage() : exception.getMessage().replaceAll(inetsocketaddress.getHostName() + ":" + inetsocketaddress.getPort(), "").replaceAll(inetsocketaddress.toString(), "");
+
+               String text = exception.getMessage() != null ? exception.getMessage() : "";
+
+               String s = inetsocketaddress == null ? text : text.replaceAll(inetsocketaddress.getHostName() + ":" + inetsocketaddress.getPort(), "").replaceAll(inetsocketaddress.toString(), "");
                pMinecraft.execute(() -> {
                   pMinecraft.setScreen(new DisconnectedScreen(ConnectScreen.this.parent, ConnectScreen.this.connectFailedTitle, Component.translatable("disconnect.genericReason", s)));
                });
             }
 
          }
+         private ChannelFuture setServerInfoAndHandleDisconnect(InetSocketAddress address, boolean useEpoll, Connection connection, Operation<ChannelFuture> original) {
 
+            ProtocolVersion targetVersion = ProtocolTranslator.getTargetVersion();
+            if (pServerData.viaFabricPlus$forcedVersion() != null && !pServerData.viaFabricPlus$passedDirectConnectScreen()) {
+               targetVersion = pServerData.viaFabricPlus$forcedVersion();
+               pServerData.viaFabricPlus$passDirectConnectScreen(false); // reset state
+            }
+            if (targetVersion == ProtocolTranslator.AUTO_DETECT_PROTOCOL) {
+               updateStatus(Component.translatable("base.viafabricplus.detecting_server_version"));
+               targetVersion = ProtocolVersionDetector.get(address, ProtocolTranslator.NATIVE_VERSION);
+            }
+            ProtocolTranslator.setTargetVersion(targetVersion, true);
+
+            viaFabricPlus$useClassiCubeAccount = AuthenticationSettings.global().setSessionNameToClassiCubeNameInServerList.getValue() && ViaFabricPlusClassicMPPassProvider.classicMpPassForNextJoin != null;
+
+            final ChannelFuture future = original.call(address, useEpoll, connection);
+            ProtocolTranslator.injectPreviousVersionReset(future.channel());
+
+            return future;
+         }
          private static ServerPackManager.PackPromptStatus convertPackStatus(ServerData.ServerPackStatus p_310302_) {
             ServerPackManager.PackPromptStatus serverpackmanager$packpromptstatus;
             switch (p_310302_) {

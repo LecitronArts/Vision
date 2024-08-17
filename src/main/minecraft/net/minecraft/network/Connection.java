@@ -7,23 +7,32 @@ import baritone.api.event.events.type.EventState;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Queues;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.logging.LogUtils;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+import de.florianmichael.viafabricplus.protocoltranslator.netty.ViaFabricPlusVLLegacyPipeline;
+import io.netty.bootstrap.AbstractBootstrap;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.epoll.Epoll;
+import io.netty.channel.epoll.EpollDatagramChannel;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.local.LocalChannel;
 import io.netty.channel.local.LocalServerChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.flow.FlowControlHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.TimeoutException;
 import io.netty.util.AttributeKey;
+
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Objects;
@@ -35,6 +44,7 @@ import javax.annotation.Nullable;
 import javax.crypto.Cipher;
 import net.minecraft.SharedConstants;
 import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
@@ -47,10 +57,18 @@ import net.minecraft.network.protocol.status.ClientStatusPacketListener;
 import net.minecraft.server.RunningOnDifferentThreadException;
 import net.minecraft.util.Mth;
 import net.minecraft.util.SampleLogger;
+import net.raphimc.viabedrock.api.BedrockProtocolVersion;
+import net.raphimc.vialegacy.api.LegacyProtocolVersion;
+import net.raphimc.vialoader.netty.CompressionReorderEvent;
+import net.raphimc.vialoader.netty.VLLegacyPipeline;
+import net.raphimc.vialoader.netty.VLPipeline;
+import net.raphimc.vialoader.netty.viabedrock.PingEncapsulationCodec;
 import org.apache.commons.lang3.Validate;
+import org.cloudburstmc.netty.channel.raknet.RakChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
+import org.spongepowered.asm.mixin.Unique;
 
 public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
    private static final float AVERAGE_PACKETS_SMOOTHING = 0.75F;
@@ -98,13 +116,23 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
    private volatile Component delayedDisconnect;
    @Nullable
    BandwidthDebugMonitor bandwidthDebugMonitor;
+   private UserConnection viaFabricPlus$userConnection;
+
+   private ProtocolVersion viaFabricPlus$serverVersion;
+
+   private Cipher viaFabricPlus$decryptionCipher;
 
    public Connection(PacketFlow pReceiving) {
       this.receiving = pReceiving;
    }
 
    public void channelActive(ChannelHandlerContext pContext) throws Exception {
-      super.channelActive(pContext);
+      // super.channelActive(pContext); before
+
+      if(!BedrockProtocolVersion.bedrockLatest.equals(this.viaFabricPlus$serverVersion)) {
+         super.channelActive(pContext);
+      }
+
       this.channel = pContext.channel();
       this.address = this.channel.remoteAddress();
       if (this.delayedDisconnect != null) {
@@ -451,8 +479,14 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
    public static Connection connectToServer(InetSocketAddress pAddress, boolean pUseEpollIfAvailable, @Nullable SampleLogger pBandwithLogger) {
       Connection connection = new Connection(PacketFlow.CLIENTBOUND);
       if (pBandwithLogger != null) {
-         connection.setBandwidthLogger(pBandwithLogger);
+         if((!(pBandwithLogger != null) || pBandwithLogger.viaFabricPlus$getForcedVersion() == null)) {
+            connection.setBandwidthLogger(pBandwithLogger);
+         } //
       }
+
+      if (pBandwithLogger != null && pBandwithLogger.viaFabricPlus$getForcedVersion() != null) {
+         (connection).viaFabricPlus$setTargetVersion(pBandwithLogger.viaFabricPlus$getForcedVersion());
+      } //
 
       ChannelFuture channelfuture = connect(pAddress, pUseEpollIfAvailable, connection);
       channelfuture.syncUninterruptibly();
@@ -462,6 +496,17 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
    public static ChannelFuture connect(InetSocketAddress pAddress, boolean pUseEpollIfAvailable, final Connection pConnection) {
       Class<? extends SocketChannel> oclass;
       EventLoopGroup eventloopgroup;
+
+      ProtocolVersion targetVersion = ( pConnection).viaFabricPlus$getTargetVersion();
+      if (targetVersion == null) { // No server specific override
+         targetVersion = ProtocolTranslator.getTargetVersion();
+      }
+      if (targetVersion == ProtocolTranslator.AUTO_DETECT_PROTOCOL) { // Auto-detect enabled (when pinging always use native version). Auto-detect is resolved in ConnectScreen mixin
+         targetVersion = ProtocolTranslator.NATIVE_VERSION;
+      }
+
+      ( pConnection).viaFabricPlus$setTargetVersion(targetVersion);
+
       if (Epoll.isAvailable() && pUseEpollIfAvailable) {
          oclass = EpollSocketChannel.class;
          eventloopgroup = NETWORK_EPOLL_WORKER_GROUP.get();
@@ -469,23 +514,87 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
          oclass = NioSocketChannel.class;
          eventloopgroup = NETWORK_WORKER_GROUP.get();
       }
-      return (new Bootstrap()).group(eventloopgroup).handler(new ChannelInitializer<Channel>() {
-         protected void initChannel(Channel p_129552_) {
-            Connection.setInitialProtocolAttributes(p_129552_);
 
-            try {
-               p_129552_.config().setOption(ChannelOption.TCP_NODELAY, true);
-            } catch (ChannelException channelexception) {
-            }
 
-            ChannelPipeline channelpipeline = p_129552_.pipeline().addLast("timeout", new ReadTimeoutHandler(30));
-            Connection.configureSerialization(channelpipeline, PacketFlow.CLIENTBOUND, pConnection.bandwidthDebugMonitor);
-            pConnection.configurePacketHandler(channelpipeline);
+      if (BedrockProtocolVersion.bedrockLatest.equals(( pConnection).viaFabricPlus$getTargetVersion())) {
+
+         if(!pUseEpollIfAvailable) {
+            return (new Bootstrap()).group(eventloopgroup).handler(new ChannelInitializer<Channel>() {
+               protected void initChannel(Channel p_129552_) {
+                  Connection.setInitialProtocolAttributes(p_129552_);
+
+                  try {
+                     p_129552_.config().setOption(ChannelOption.TCP_NODELAY, true);
+                  } catch (ChannelException channelexception) {
+                  }
+
+                  ChannelPipeline channelpipeline = p_129552_.pipeline().addLast("timeout", new ReadTimeoutHandler(30));
+                  Connection.configureSerialization(channelpipeline, PacketFlow.CLIENTBOUND, pConnection.bandwidthDebugMonitor);
+                  pConnection.configurePacketHandler(channelpipeline);
+                  ProtocolTranslator.injectViaPipeline(pConnection, pConnection.channel);
+               }
+            }).channel(oclass).channelFactory(RakChannelFactory.client(NioDatagramChannel.class)).register().syncUninterruptibly().channel().bind(new InetSocketAddress(0)).addListeners(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE, (ChannelFutureListener) f -> {
+               if (f.isSuccess()) {
+                  f.channel().pipeline().replace(
+                          VLPipeline.VIABEDROCK_FRAME_ENCAPSULATION_HANDLER_NAME,
+                          ViaFabricPlusVLLegacyPipeline.VIABEDROCK_PING_ENCAPSULATION_HANDLER_NAME,
+                          new PingEncapsulationCodec(new InetSocketAddress(pAddress.getAddress(), pAddress.getPort()))
+                  );
+                  f.channel().pipeline().remove(VLPipeline.VIABEDROCK_PACKET_ENCAPSULATION_HANDLER_NAME);
+                  f.channel().pipeline().remove("splitter");
+               }
+            }); // ????????? idk
          }
-      }).channel(oclass).connect(pAddress.getAddress(), pAddress.getPort());
+         return  (new Bootstrap()).group(eventloopgroup).handler(new ChannelInitializer<Channel>() {
+            protected void initChannel(Channel p_129552_) {
+               Connection.setInitialProtocolAttributes(p_129552_);
+
+               try {
+                  p_129552_.config().setOption(ChannelOption.TCP_NODELAY, true);
+               } catch (ChannelException channelexception) {
+               }
+
+               ChannelPipeline channelpipeline = p_129552_.pipeline().addLast("timeout", new ReadTimeoutHandler(30));
+               Connection.configureSerialization(channelpipeline, PacketFlow.CLIENTBOUND, pConnection.bandwidthDebugMonitor);
+               pConnection.configurePacketHandler(channelpipeline);
+            }
+         }).channel(oclass).channelFactory(oclass == EpollSocketChannel.class ? RakChannelFactory.client(EpollDatagramChannel.class) : RakChannelFactory.client(NioDatagramChannel.class)).connect(pAddress.getAddress(), pAddress.getPort());
+      } else {
+         return (new Bootstrap()).group(eventloopgroup).handler(new ChannelInitializer<Channel>() {
+            protected void initChannel(Channel p_129552_) {
+               Connection.setInitialProtocolAttributes(p_129552_);
+
+               try {
+                  p_129552_.config().setOption(ChannelOption.TCP_NODELAY, true);
+               } catch (ChannelException channelexception) {
+               }
+
+               ChannelPipeline channelpipeline = p_129552_.pipeline().addLast("timeout", new ReadTimeoutHandler(30));
+               Connection.configureSerialization(channelpipeline, PacketFlow.CLIENTBOUND, pConnection.bandwidthDebugMonitor);
+               pConnection.configurePacketHandler(channelpipeline);
+            }
+         }).channel(oclass).connect(pAddress.getAddress(), pAddress.getPort());
+      }
    }
 
-
+   private static ChannelFuture useRakNetPingHandlers(Bootstrap instance, InetAddress inetHost, int inetPort, @Local(argsOnly = true) Connection clientConnection, @Local(argsOnly = true) boolean isConnecting) {
+      if (BedrockProtocolVersion.bedrockLatest.equals(( clientConnection).viaFabricPlus$getTargetVersion()) && !isConnecting) {
+         // Bedrock edition / RakNet has different handlers for pinging a server
+         return instance.register().syncUninterruptibly().channel().bind(new InetSocketAddress(0)).addListeners(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE, (ChannelFutureListener) f -> {
+            if (f.isSuccess()) {
+               f.channel().pipeline().replace(
+                       VLPipeline.VIABEDROCK_FRAME_ENCAPSULATION_HANDLER_NAME,
+                       ViaFabricPlusVLLegacyPipeline.VIABEDROCK_PING_ENCAPSULATION_HANDLER_NAME,
+                       new PingEncapsulationCodec(new InetSocketAddress(inetHost, inetPort))
+               );
+               f.channel().pipeline().remove(VLPipeline.VIABEDROCK_PACKET_ENCAPSULATION_HANDLER_NAME);
+               f.channel().pipeline().remove("splitter");
+            }
+         });
+      } else {
+         return instance.connect(inetHost, inetPort);
+      }
+   }
 
    public static void configureSerialization(ChannelPipeline pPipeline, PacketFlow pFlow, @Nullable BandwidthDebugMonitor pBandwithMonitor) {
       PacketFlow packetflow = pFlow.getOpposite();
@@ -522,7 +631,29 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
       return connection;
    }
 
+/*   public void setEncryptionKey(Cipher pDecryptingCipher, Cipher pEncryptingCipher) {
+      this.encrypted = true;
+      this.channel.pipeline().addBefore("splitter", "decrypt", new CipherDecoder(pDecryptingCipher));
+      this.channel.pipeline().addBefore("prepender", "encrypt", new CipherEncoder(pEncryptingCipher));
+   }*/
    public void setEncryptionKey(Cipher pDecryptingCipher, Cipher pEncryptingCipher) {
+      if (this.viaFabricPlus$serverVersion != null/* This happens when opening a lan server and people are joining */ && this.viaFabricPlus$serverVersion.olderThanOrEqualTo(LegacyProtocolVersion.r1_6_4)) {
+         // Minecraft's encryption code is bad for us, we need to reorder the pipeline
+         // Minecraft 1.6.4 supports split encryption/decryption which means the server can only enable one side of the encryption
+         // So we only enable the encryption side and later enable the decryption side if the 1.7 -> 1.6 protocol
+         // tells us to do, therefore we need to store the cipher instance.
+         this.viaFabricPlus$decryptionCipher = pDecryptingCipher;
+
+         // Enabling the encryption side
+         if (pEncryptingCipher == null) {
+            throw new IllegalStateException("Encryption cipher is null");
+         }
+
+         this.encrypted = true;
+         this.channel.pipeline().addBefore(VLLegacyPipeline.VIALEGACY_PRE_NETTY_LENGTH_REMOVER_NAME, "encrypt", new CipherEncoder(pEncryptingCipher));
+         return;
+      }
+
       this.encrypted = true;
       this.channel.pipeline().addBefore("splitter", "decrypt", new CipherDecoder(pDecryptingCipher));
       this.channel.pipeline().addBefore("prepender", "encrypt", new CipherEncoder(pEncryptingCipher));
@@ -579,7 +710,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
             this.channel.pipeline().remove("compress");
          }
       }
-
+      channel.pipeline().fireUserEventTriggered(CompressionReorderEvent.INSTANCE); // via
    }
 
    public void handleDisconnection() {
@@ -600,7 +731,13 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
          }
       }
    }
-
+   @Override
+   public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+      super.channelRegistered(ctx);
+      if (BedrockProtocolVersion.bedrockLatest.equals(this.viaFabricPlus$serverVersion)) { // Call channelActive manually when the channel is registered
+         this.channelActive(ctx);
+      }
+   }
    public float getAverageReceivedPackets() {
       return this.averageReceivedPackets;
    }
@@ -611,5 +748,30 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
 
    public void setBandwidthLogger(SampleLogger pBandwithLogger) {
       this.bandwidthDebugMonitor = new BandwidthDebugMonitor(pBandwithLogger);
+   }
+
+   public void viaFabricPlus$setupPreNettyDecryption() {
+      if (this.viaFabricPlus$decryptionCipher == null) {
+         throw new IllegalStateException("Decryption cipher is null");
+      }
+
+      this.encrypted = true;
+      // Enabling the decryption side for 1.6.4 if the 1.7 -> 1.6 protocol tells us to do
+      this.channel.pipeline().addBefore(VLLegacyPipeline.VIALEGACY_PRE_NETTY_LENGTH_PREPENDER_NAME, "decrypt", new CipherDecoder(this.viaFabricPlus$decryptionCipher));
+   }
+   public UserConnection viaFabricPlus$getUserConnection() {
+      return this.viaFabricPlus$userConnection;
+   }
+
+   public void viaFabricPlus$setUserConnection(UserConnection userConnection) {
+      this.viaFabricPlus$userConnection = userConnection;
+   }
+
+   public ProtocolVersion viaFabricPlus$getTargetVersion() {
+      return this.viaFabricPlus$serverVersion;
+   }
+
+   public void viaFabricPlus$setTargetVersion(final ProtocolVersion serverVersion) {
+      this.viaFabricPlus$serverVersion = serverVersion;
    }
 }

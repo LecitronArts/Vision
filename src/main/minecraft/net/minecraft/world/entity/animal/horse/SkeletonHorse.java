@@ -1,6 +1,9 @@
 package net.minecraft.world.entity.animal.horse;
 
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -132,6 +135,9 @@ public class SkeletonHorse extends AbstractHorse {
    }
 
    protected float getWaterSlowDown() {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
+         return (super.getWaterSlowDown());
+      }
       return 0.96F;
    }
 

@@ -2,6 +2,8 @@ package net.minecraft.world.level.block;
 
 import com.mojang.serialization.MapCodec;
 import javax.annotation.Nullable;
+
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -36,7 +38,9 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 
 public class EnderChestBlock extends AbstractChestBlock<EnderChestBlockEntity> implements SimpleWaterloggedBlock {
    public static final MapCodec<EnderChestBlock> CODEC = simpleCodec(EnderChestBlock::new);
@@ -61,9 +65,19 @@ public class EnderChestBlock extends AbstractChestBlock<EnderChestBlockEntity> i
    }
 
    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.r1_4_2)) {
+         return (Shapes.block());
+      }
       return SHAPE;
    }
-
+   @Override
+   public VoxelShape getOcclusionShape(BlockState state, BlockGetter view, BlockPos pos) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.r1_4_2)) {
+         return SHAPE;
+      } else {
+         return super.getOcclusionShape(state, view, pos);
+      }
+   }
    public RenderShape getRenderShape(BlockState pState) {
       return RenderShape.ENTITYBLOCK_ANIMATED;
    }

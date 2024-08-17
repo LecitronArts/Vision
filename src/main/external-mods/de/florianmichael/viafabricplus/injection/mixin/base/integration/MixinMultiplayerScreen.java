@@ -21,7 +21,6 @@ package de.florianmichael.viafabricplus.injection.mixin.base.integration;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import de.florianmichael.viafabricplus.fixes.ClientsideFixes;
-import de.florianmichael.viafabricplus.access.IServerInfo;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import de.florianmichael.viafabricplus.screen.base.ProtocolSelectionScreen;
 import de.florianmichael.viafabricplus.settings.impl.GeneralSettings;
@@ -44,7 +43,7 @@ public abstract class MixinMultiplayerScreen extends Screen {
         super(title);
     }
 
-    @Inject(method = "init", at = @At("RETURN"))
+/*    @Inject(method = "init", at = @At("RETURN"))
     private void addProtocolSelectionButton(CallbackInfo ci) {
         final int buttonPosition = GeneralSettings.global().multiplayerScreenButtonOrientation.getIndex();
         if (buttonPosition == 0) { // Off
@@ -65,6 +64,6 @@ public abstract class MixinMultiplayerScreen extends Screen {
             // Otherwise the forced version is used
             return ClientsideFixes.replaceDefaultPort(address, ((IServerInfo) entry).viaFabricPlus$forcedVersion());
         }
-    }
+    }*/
 
 }

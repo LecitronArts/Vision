@@ -3,6 +3,8 @@ package net.minecraft.client.model;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import java.util.function.Function;
+
+import de.florianmichael.viafabricplus.settings.impl.VisualSettings;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
@@ -121,6 +123,7 @@ public class HumanoidModel<T extends LivingEntity> extends AgeableListModel<T> i
       this.leftArm.xRot = Mth.cos(pLimbSwing * 0.6662F) * 2.0F * pLimbSwingAmount * 0.5F / f;
       this.rightArm.zRot = 0.0F;
       this.leftArm.zRot = 0.0F;
+
       this.rightLeg.xRot = Mth.cos(pLimbSwing * 0.6662F) * 1.4F * pLimbSwingAmount / f;
       this.leftLeg.xRot = Mth.cos(pLimbSwing * 0.6662F + (float)Math.PI) * 1.4F * pLimbSwingAmount / f;
       this.rightLeg.yRot = 0.005F;
@@ -140,6 +143,15 @@ public class HumanoidModel<T extends LivingEntity> extends AgeableListModel<T> i
 
       this.rightArm.yRot = 0.0F;
       this.leftArm.yRot = 0.0F;
+
+      if (VisualSettings.global().oldWalkingAnimation.isEnabled()) {
+         this.rightArm.xRot = Mth.cos(f * 0.6662F + 3.1415927F) * 2.0F * pLimbSwing;
+         this.rightArm.zRot = (Mth.cos(f * 0.2312F) + 1.0F) * 1.0F * pLimbSwing;
+
+         this.leftArm.xRot = Mth.cos(f * 0.6662F) * 2.0F * pLimbSwing;
+         this.leftArm.zRot = (Mth.cos(f * 0.2812F) - 1.0F) * 1.0F * pLimbSwing;
+      }
+
       boolean flag2 = pEntity.getMainArm() == HumanoidArm.RIGHT;
       if (pEntity.isUsingItem()) {
          boolean flag3 = pEntity.getUsedItemHand() == InteractionHand.MAIN_HAND;

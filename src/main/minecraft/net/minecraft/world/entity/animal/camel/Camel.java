@@ -3,6 +3,9 @@ package net.minecraft.world.entity.animal.camel;
 import com.google.common.annotations.VisibleForTesting;
 import com.mojang.serialization.Dynamic;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -51,6 +54,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
+import org.spongepowered.asm.mixin.Unique;
 
 public class Camel extends AbstractHorse implements PlayerRideableJumping, Saddleable {
    public static final Ingredient TEMPTATION_ITEM = Ingredient.of(Items.CACTUS);
@@ -614,5 +618,35 @@ public class Camel extends AbstractHorse implements PlayerRideableJumping, Saddl
 
          super.tick();
       }
+   }
+
+   @Override
+   public void onPassengerTurned(Entity passenger) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20) && this.getControllingPassenger() != passenger) {
+         this.viaFabricPlus$clampPassengerYaw1_20_1(passenger);
+      }
+   }
+
+   @Override
+   protected void positionRider(Entity passenger, MoveFunction positionUpdater) {
+      super.positionRider(passenger, positionUpdater);
+
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20)) {
+         this.viaFabricPlus$clampPassengerYaw1_20_1(passenger);
+      }
+   }
+
+   @Unique
+   private void viaFabricPlus$clampPassengerYaw1_20_1(final Entity passenger) {
+      passenger.setYBodyRot(this.getYRot());
+      final float passengerYaw = passenger.getYRot();
+
+      final float deltaDegrees = Mth.wrapDegrees(passengerYaw - this.getYRot());
+      final float clampedDelta = Mth.clamp(deltaDegrees, -160.0F, 160.0F);
+      passenger.yRotO += clampedDelta - deltaDegrees;
+
+      final float newYaw = passengerYaw + clampedDelta - deltaDegrees;
+      passenger.setYRot(newYaw);
+      passenger.setYHeadRot(newYaw);
    }
 }

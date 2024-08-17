@@ -1,9 +1,13 @@
 package net.minecraft.world.level.block;
 
 import com.mojang.serialization.MapCodec;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.injection.ViaFabricPlusMixinPlugin;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -11,12 +15,16 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class CauldronBlock extends AbstractCauldronBlock {
    public static final MapCodec<CauldronBlock> CODEC = simpleCodec(CauldronBlock::new);
    private static final float RAIN_FILL_CHANCE = 0.05F;
    private static final float POWDER_SNOW_FILL_CHANCE = 0.1F;
-
+   private boolean viaFabricPlus$requireOriginalShape;
    public MapCodec<CauldronBlock> codec() {
       return CODEC;
    }
@@ -28,7 +36,28 @@ public class CauldronBlock extends AbstractCauldronBlock {
    public boolean isFull(BlockState pState) {
       return false;
    }
+   private static final VoxelShape viaFabricPlus$shape_r1_12_2 = Shapes.join(
+           Shapes.block(),
+           Block.box(2.0D, 5.0D, 2.0D, 14.0D, 16.0D, 14.0D),
+           BooleanOp.ONLY_FIRST
+   );
+   @Override
+   public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+      if (ViaFabricPlusMixinPlugin.MORE_CULLING_PRESENT && viaFabricPlus$requireOriginalShape) {
+         viaFabricPlus$requireOriginalShape = false;
+      } else if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
+         return viaFabricPlus$shape_r1_12_2;
+      }
+      return super.getShape(state, world, pos, context);
+   }
 
+   @Override
+   public VoxelShape getOcclusionShape(BlockState state, BlockGetter world, BlockPos pos) {
+      // Workaround for https://github.com/ViaVersion/ViaFabricPlus/issues/246
+      // MoreCulling is caching the culling shape and doesn't reload it, so we have to force vanilla's shape here.
+      viaFabricPlus$requireOriginalShape = true;
+      return super.getOcclusionShape(state, world, pos);
+   }
    protected static boolean shouldHandlePrecipitation(Level pLevel, Biome.Precipitation pPrecipitation) {
       if (pPrecipitation == Biome.Precipitation.RAIN) {
          return pLevel.getRandom().nextFloat() < 0.05F;

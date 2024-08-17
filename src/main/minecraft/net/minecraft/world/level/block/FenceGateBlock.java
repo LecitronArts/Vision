@@ -3,6 +3,8 @@ package net.minecraft.world.level.block;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.function.BiConsumer;
+
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
@@ -29,6 +31,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.raphimc.vialegacy.api.LegacyProtocolVersion;
+import org.spongepowered.asm.mixin.Unique;
 
 public class FenceGateBlock extends HorizontalDirectionalBlock {
    public static final MapCodec<FenceGateBlock> CODEC = RecordCodecBuilder.mapCodec((p_312817_) -> {
@@ -36,6 +40,9 @@ public class FenceGateBlock extends HorizontalDirectionalBlock {
          return p_311297_.type;
       }), propertiesCodec()).apply(p_312817_, FenceGateBlock::new);
    });
+
+   private static final VoxelShape viaFabricPlus$x_and_z_axis_collision_shape_b1_8_1 = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 24.0D, 16.0D);
+
    public static final BooleanProperty OPEN = BlockStateProperties.OPEN;
    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
    public static final BooleanProperty IN_WALL = BlockStateProperties.IN_WALL;
@@ -64,6 +71,9 @@ public class FenceGateBlock extends HorizontalDirectionalBlock {
    }
 
    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+      if (!pState.getValue(FenceGateBlock.IN_WALL) && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_8tob1_8_1)) {
+         return (Shapes.block());
+      }
       if (pState.getValue(IN_WALL)) {
          return pState.getValue(FACING).getAxis() == Direction.Axis.X ? X_SHAPE_LOW : Z_SHAPE_LOW;
       } else {
@@ -90,6 +100,9 @@ public class FenceGateBlock extends HorizontalDirectionalBlock {
    }
 
    public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+      if (!pState.getValue(FenceGateBlock.OPEN) && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_8tob1_8_1)) {
+          return (viaFabricPlus$x_and_z_axis_collision_shape_b1_8_1);
+      }
       if (pState.getValue(OPEN)) {
          return Shapes.empty();
       } else {

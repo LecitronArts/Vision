@@ -57,7 +57,7 @@ public final class WorldPackets {
                     blockPalette.setIdByIndex(i, protocol.getMappingData().getNewBlockStateId(id));
                 }
             }
-        });
+        });//
 
         protocol.registerServerbound(ServerboundPackets1_19.SET_BEACON_EFFECT, wrapper -> {
             // Primary effect

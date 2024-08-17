@@ -13,6 +13,10 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+import de.florianmichael.viafabricplus.settings.impl.VisualSettings;
 import net.minecraft.Util;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
@@ -108,7 +112,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.Team;
+import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 import org.slf4j.Logger;
+import org.spongepowered.asm.mixin.Unique;
 
 public abstract class Player extends LivingEntity {
    private static final Logger LOGGER = LogUtils.getLogger();
@@ -164,6 +170,12 @@ public abstract class Player extends LivingEntity {
    @Nullable
    public FishingHook fishing;
    protected float hurtDir;
+
+   private static final EntityDimensions viaFabricPlus$sneaking_dimensions_v1_13_2 = EntityDimensions.scalable(0.6F, 1.65F);
+
+   private static final SoundEvent viaFabricPlus$oof_hurt = SoundEvent.createVariableRangeEvent(new ResourceLocation("viafabricplus", "oof.hurt"));
+
+   public boolean viaFabricPlus$isSprinting;
 
    public Player(Level pLevel, BlockPos pPos, float pYRot, GameProfile pGameProfile) {
       super(EntityType.PLAYER, pLevel);
@@ -276,7 +288,7 @@ public abstract class Player extends LivingEntity {
    }
 
    protected float getMaxHeadRotationRelativeToBody() {
-      return this.isBlocking() ? 15.0F : super.getMaxHeadRotationRelativeToBody();
+      return (  ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_20_2) &&  this.isBlocking() )? 15.0F : super.getMaxHeadRotationRelativeToBody();
    }
 
    public boolean isSecondaryUseActive() {
@@ -352,6 +364,25 @@ public abstract class Player extends LivingEntity {
    }
 
    protected void updatePlayerPose() {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
+         final Pose pose;
+         if (this.isFallFlying()) {
+            pose = Pose.FALL_FLYING;
+         } else if (this.isSleeping()) {
+            pose = Pose.SLEEPING;
+         } else if (this.isSwimming()) {
+            pose = Pose.SWIMMING;
+         } else if (this.isAutoSpinAttack()) {
+            pose = Pose.SPIN_ATTACK;
+         } else if (this.isShiftKeyDown() && !this.abilities.flying) {
+            pose = Pose.CROUCHING;
+         } else {
+            pose = Pose.STANDING;
+         }
+         this.setPose(pose);
+         return;
+      }
+
       if (this.canPlayerFitWithinBlocksAndEntitiesWhen(Pose.SWIMMING)) {
          Pose pose;
          if (this.isFallFlying()) {
@@ -489,6 +520,7 @@ public abstract class Player extends LivingEntity {
       this.inventory.tick();
       this.oBob = this.bob;
       super.aiStep();
+      viaFabricPlus$isSprinting = this.isSprinting();
       this.setSpeed((float)this.getAttributeValue(Attributes.MOVEMENT_SPEED));
       float f;
       if (this.onGround() && !this.isDeadOrDying() && !this.isSwimming()) {
@@ -612,6 +644,9 @@ public abstract class Player extends LivingEntity {
    }
 
    protected SoundEvent getHurtSound(DamageSource pDamageSource) {
+      if (VisualSettings.global().replaceHurtSoundWithOOFSound.isEnabled()) {
+         return (viaFabricPlus$oof_hurt);
+      }
       return pDamageSource.type().effects().sound();
    }
 
@@ -629,7 +664,7 @@ public abstract class Player extends LivingEntity {
       if (pDroppedItem.isEmpty()) {
          return null;
       } else {
-         if (this.level().isClientSide) {
+         if (this.level().isClientSide && ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_15_2)) {
             this.swing(InteractionHand.MAIN_HAND);
          }
 
@@ -669,11 +704,41 @@ public abstract class Player extends LivingEntity {
          }
       }
 
+      final int efficiency = EnchantmentHelper.getBlockEfficiency(this);
+      if (!(efficiency <= 0)) {
+         final float speed = this.inventory.getDestroySpeed(pState);
+         final int effLevel = efficiency * efficiency + 1;
+         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.r1_4_4tor1_4_5) && this.hasCorrectToolForDrops(pState)) {
+            f = (speed + effLevel);
+         } else if (speed > 1F || ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.r1_4_6tor1_4_7)) {
+            if (!this.getMainHandItem().isEmpty()) {
+               if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_7_6)) {
+                  if (speed <= 1.0 && !this.hasCorrectToolForDrops(pState)) {
+                     f = (speed + effLevel * 0.08F);
+                  } else {
+                     f = (speed + effLevel);
+                  }
+               }
+            }
+         }
+      }
+
       if (MobEffectUtil.hasDigSpeed(this)) {
          f *= 1.0F + (float)(MobEffectUtil.getDigSpeedAmplification(this) + 1) * 0.2F;
       }
 
-      if (this.hasEffect(MobEffects.DIG_SLOWDOWN)) {
+      boolean viaFixEffect;
+
+      final boolean hasMiningFatigue = this.hasEffect(MobEffects.DIG_SLOWDOWN);
+      if (hasMiningFatigue && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_7_6)) {
+         f = (f * (1.0F - (this.getEffect(MobEffects.DIG_SLOWDOWN).getAmplifier() + 1) * 0.2F));
+         if (f< 0) f = (0);
+         viaFixEffect = false; // disable original code
+      } else {
+         viaFixEffect = hasMiningFatigue;
+      }
+
+      if (viaFixEffect) {
          float f1;
          switch (this.getEffect(MobEffects.DIG_SLOWDOWN).getAmplifier()) {
             case 0:
@@ -1002,7 +1067,14 @@ public abstract class Player extends LivingEntity {
          double d1 = pVec.z;
          double d2 = 0.05D;
 
-         while(d0 != 0.0D && this.level().noCollision(this, this.getBoundingBox().move(d0, (double)(-this.maxUpStep()), 0.0D))) {
+         double viaFix ;
+         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_10)) {
+            viaFix = 1.0F;
+         } else {
+            viaFix = this.maxUpStep();
+         }
+
+         while(d0 != 0.0D && this.level().noCollision(this, this.getBoundingBox().move(d0, (double)(-viaFix), 0.0D))) {
             if (d0 < 0.05D && d0 >= -0.05D) {
                d0 = 0.0D;
             } else if (d0 > 0.0D) {
@@ -1012,7 +1084,7 @@ public abstract class Player extends LivingEntity {
             }
          }
 
-         while(d1 != 0.0D && this.level().noCollision(this, this.getBoundingBox().move(0.0D, (double)(-this.maxUpStep()), d1))) {
+         while(d1 != 0.0D && this.level().noCollision(this, this.getBoundingBox().move(0.0D, (double)(-viaFix), d1))) {
             if (d1 < 0.05D && d1 >= -0.05D) {
                d1 = 0.0D;
             } else if (d1 > 0.0D) {
@@ -1022,7 +1094,7 @@ public abstract class Player extends LivingEntity {
             }
          }
 
-         while(d0 != 0.0D && d1 != 0.0D && this.level().noCollision(this, this.getBoundingBox().move(d0, (double)(-this.maxUpStep()), d1))) {
+         while(d0 != 0.0D && d1 != 0.0D && this.level().noCollision(this, this.getBoundingBox().move(d0, (double)(-viaFix), d1))) {
             if (d0 < 0.05D && d0 >= -0.05D) {
                d0 = 0.0D;
             } else if (d0 > 0.0D) {
@@ -1415,7 +1487,16 @@ public abstract class Player extends LivingEntity {
    }
 
    public boolean tryToStartFallFlying() {
-      if (!this.onGround() && !this.isFallFlying() && !this.isInWater() && !this.hasEffect(MobEffects.LEVITATION)) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_14_4)) {
+         if (!this.onGround() && this.getDeltaMovement().y < 0D && !this.isFallFlying()) {
+            final ItemStack itemStack = this.getItemBySlot(EquipmentSlot.CHEST);
+            if (itemStack.is(Items.ELYTRA) && ElytraItem.isFlyEnabled(itemStack)) {
+               return (true);
+            }
+         }
+         return (false);
+      }
+      if (!this.onGround() && !this.isFallFlying() && !this.isInWater() && !(this.hasEffect(MobEffects.LEVITATION) && ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_15_2))) {
          ItemStack itemstack = this.getItemBySlot(EquipmentSlot.CHEST);
          if (itemstack.is(Items.ELYTRA) && ElytraItem.isFlyEnabled(itemstack)) {
             this.startFallFlying();
@@ -1729,13 +1810,18 @@ public abstract class Player extends LivingEntity {
    }
 
    public float getStandingEyeHeight(Pose pPose, EntityDimensions pSize) {
+
       switch (pPose) {
          case SWIMMING:
          case FALL_FLYING:
          case SPIN_ATTACK:
             return 0.4F;
          case CROUCHING:
-            return 1.27F;
+            if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
+               return 1.54F;
+            } else {
+               return  1.27f;
+            }
          default:
             return 1.62F;
       }
@@ -1803,6 +1889,9 @@ public abstract class Player extends LivingEntity {
    }
 
    public float getAttackStrengthScale(float pAdjustTicks) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+         return (1F);
+      }
       return Mth.clamp(((float)this.attackStrengthTicker + pAdjustTicks) / this.getCurrentItemAttackStrengthDelay(), 0.0F, 1.0F);
    }
 
@@ -1832,6 +1921,13 @@ public abstract class Player extends LivingEntity {
    }
 
    public EntityDimensions getDimensions(Pose pPose) {
+      if (pPose == Pose.CROUCHING) {
+         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+            return (Player.STANDING_DIMENSIONS);
+         } else if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
+            return (viaFabricPlus$sneaking_dimensions_v1_13_2);
+         }
+      }
       return POSES.getOrDefault(pPose, STANDING_DIMENSIONS);
    }
 
@@ -1941,10 +2037,16 @@ public abstract class Player extends LivingEntity {
    }
 
    protected float getFlyingSpeed() {
-      if (this.abilities.flying && !this.isPassenger()) {
-         return this.isSprinting() ? this.abilities.getFlyingSpeed() * 2.0F : this.abilities.getFlyingSpeed();
+      boolean viaFixSprint;
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_3)) {
+         viaFixSprint = viaFabricPlus$isSprinting;
       } else {
-         return this.isSprinting() ? 0.025999999F : 0.02F;
+         viaFixSprint = this.isSprinting();
+      }
+      if (this.abilities.flying && !this.isPassenger()) {
+         return viaFixSprint ? this.abilities.getFlyingSpeed() * 2.0F : this.abilities.getFlyingSpeed();
+      } else {
+         return viaFixSprint ? 0.025999999F : 0.02F;
       }
    }
 
@@ -1955,6 +2057,9 @@ public abstract class Player extends LivingEntity {
    }
 
    public static float getPickRange(boolean pCreative) {
+      if (ProtocolTranslator.getTargetVersion().olderThan(LegacyProtocolVersion.r1_0_0tor1_0_1) && !pCreative) {
+         return (4F);
+      }
       return pCreative ? 5.0F : 4.5F;
    }
 

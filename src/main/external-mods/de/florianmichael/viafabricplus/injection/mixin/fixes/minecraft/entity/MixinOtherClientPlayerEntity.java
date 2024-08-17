@@ -37,11 +37,13 @@ public abstract class MixinOtherClientPlayerEntity extends AbstractClientPlayer 
         super(world, profile);
     }
 
+/*
     @Inject(method = "updatePlayerPose", at = @At("HEAD"))
     private void onUpdatePose(CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
             super.updatePlayerPose();
         }
     }
+*/
 
 }

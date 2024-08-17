@@ -37,7 +37,7 @@ public abstract class MixinCamelEntity extends AbstractHorse {
         super(entityType, world);
     }
 
-    @Override
+/*    @Override
     public void onPassengerTurned(Entity passenger) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20) && this.getControllingPassenger() != passenger) {
             this.viaFabricPlus$clampPassengerYaw1_20_1(passenger);
@@ -65,6 +65,6 @@ public abstract class MixinCamelEntity extends AbstractHorse {
         final float newYaw = passengerYaw + clampedDelta - deltaDegrees;
         passenger.setYRot(newYaw);
         passenger.setYHeadRot(newYaw);
-    }
+    }*/
 
 }

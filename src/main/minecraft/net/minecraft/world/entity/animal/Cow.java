@@ -1,6 +1,9 @@
 package net.minecraft.world.entity.animal;
 
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
@@ -74,6 +77,12 @@ public class Cow extends Animal {
    }
 
    public InteractionResult mobInteract(Player pPlayer, InteractionHand pHand) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_15_2) && pPlayer.getAbilities().instabuild) {
+         return (super.mobInteract(pPlayer, pHand));
+      }
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_15_2) && pPlayer.getAbilities().instabuild) {
+         return (super.mobInteract(pPlayer, pHand));
+      }
       ItemStack itemstack = pPlayer.getItemInHand(pHand);
       if (itemstack.is(Items.BUCKET) && !this.isBaby()) {
          pPlayer.playSound(SoundEvents.COW_MILK, 1.0F, 1.0F);

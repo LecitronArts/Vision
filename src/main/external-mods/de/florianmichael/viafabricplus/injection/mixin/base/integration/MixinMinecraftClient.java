@@ -36,7 +36,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraftClient {
 
-    @Inject(method = "<init>", at = @At("RETURN"))
+/*    @Inject(method = "<init>", at = @At("RETURN"))
     private void callPostGameLoadEvent(GameConfig args, CallbackInfo ci) {
         PostGameLoadCallback.EVENT.invoker().postGameLoad();
     }
@@ -45,6 +45,6 @@ public abstract class MixinMinecraftClient {
     private void disableProtocolTranslator(LevelStorageSource.LevelStorageAccess session, PackRepository dataPackManager, WorldStem saveLoader, boolean newWorld, CallbackInfo ci, @Local Connection clientConnection) {
         ProtocolTranslator.setTargetVersion(ProtocolTranslator.NATIVE_VERSION, true);
         ProtocolTranslator.injectPreviousVersionReset(clientConnection.channel);
-    }
+    }*/
 
 }

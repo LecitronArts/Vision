@@ -1,5 +1,7 @@
 package net.minecraft.client.gui.screens;
 
+import de.florianmichael.viafabricplus.screen.base.ProtocolSelectionScreen;
+import de.florianmichael.viafabricplus.settings.impl.GeneralSettings;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -53,6 +55,14 @@ public class DirectJoinServerScreen extends Screen {
       }).bounds(this.width / 2 - 100, this.height / 4 + 120 + 12, 200, 20).build());
       this.setInitialFocus(this.ipEdit);
       this.updateSelectButtonStatus();
+      final int buttonPosition = GeneralSettings.global().directConnectScreenButtonOrientation.getIndex();
+      if (buttonPosition == 0) { // Off
+         return;
+      }
+      Button.Builder builder = Button.builder(Component.literal("ViaFabricPlus"), button -> ProtocolSelectionScreen.INSTANCE.open(this)).size(98, 20);
+
+      // Set the button's position according to the configured orientation and add the button to the screen
+      this.addRenderableWidget(GeneralSettings.withOrientation(builder, buttonPosition, width, height).build());
    }
 
    public void resize(Minecraft pMinecraft, int pWidth, int pHeight) {

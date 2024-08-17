@@ -8,6 +8,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.fixes.versioned.visual.BoatRenderer1_8;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
 import net.minecraft.ReportedException;
@@ -42,6 +46,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.RenderShape;
@@ -84,6 +89,7 @@ public class EntityRenderDispatcher implements ResourceManagerReloadListener, IE
    private EntityRenderer entityRenderer = null;
    private Entity renderedEntity = null;
    private EntityRendererProvider.Context context = null;
+   private BoatRenderer1_8 viaFabricPlus$boatRenderer;
 
    public <E extends Entity> int getPackedLightCoords(E pEntity, float pPartialTicks) {
       int i = this.getRenderer(pEntity).getPackedLightCoords(pEntity, pPartialTicks);
@@ -120,6 +126,9 @@ public class EntityRenderDispatcher implements ResourceManagerReloadListener, IE
    }
 
    public <T extends Entity> EntityRenderer<? super T> getRenderer(T pEntity) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8) && pEntity instanceof Boat) {
+         return ((EntityRenderer<? super T>) viaFabricPlus$boatRenderer);
+      }
       if (pEntity instanceof AbstractClientPlayer abstractclientplayer) {
          PlayerSkin.Model playerskin$model = abstractclientplayer.getSkin().model();
          EntityRenderer<? extends Player> entityrenderer = this.playerRenderers.get(playerskin$model);
@@ -442,7 +451,7 @@ public class EntityRenderDispatcher implements ResourceManagerReloadListener, IE
       if (Reflector.ForgeEventFactoryClient_gatherLayers.exists()) {
          Reflector.ForgeEventFactoryClient_gatherLayers.call(this.renderers, this.playerRenderers, entityrendererprovider$context);
       }
-
+      viaFabricPlus$boatRenderer = new BoatRenderer1_8(context);
    }
 
    private static void registerPlayerItems(Map<PlayerSkin.Model, EntityRenderer<? extends Player>> renderPlayerMap) {

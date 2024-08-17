@@ -23,7 +23,6 @@ import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import de.florianmichael.viafabricplus.access.IServerInfo;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import de.florianmichael.viafabricplus.settings.impl.GeneralSettings;
 import de.florianmichael.viafabricplus.settings.impl.VisualSettings;
@@ -64,9 +63,9 @@ public abstract class MixinMultiplayerServerListWidget_ServerEntry {
     @Unique
     private boolean viaFabricPlus$disableServerPinging = false;
 
-    @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Ljava/util/concurrent/ThreadPoolExecutor;submit(Ljava/lang/Runnable;)Ljava/util/concurrent/Future;"))
+/*    @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Ljava/util/concurrent/ThreadPoolExecutor;submit(Ljava/lang/Runnable;)Ljava/util/concurrent/Future;"))
     private boolean disableServerPinging(ThreadPoolExecutor instance, Runnable runnable) {
-        ProtocolVersion version = ((IServerInfo) serverData).viaFabricPlus$forcedVersion();
+        ProtocolVersion version = ( serverData).viaFabricPlus$forcedVersion();
         if (version == null) version = ProtocolTranslator.getTargetVersion();
 
         viaFabricPlus$disableServerPinging = VisualSettings.global().disableServerPinging.isEnabled(version);
@@ -92,49 +91,51 @@ public abstract class MixinMultiplayerServerListWidget_ServerEntry {
         } else {
             return instance.split(text, width);
         }
-    }
+    }*/
 
-    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I"), index = 2)
+/*    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I"), index = 2)
     private int disableServerPinging(int x) {
         if (viaFabricPlus$disableServerPinging) { // Move server label to the right (as we remove the pingLegacyServer bar)
-            x += 15 /* pingLegacyServer bar width */ - 3 /* magical offset */;
+            x += 15 *//* pingLegacyServer bar width *//* - 3 *//* magical offset *//*;
         }
         return x;
-    }
+    }*/
 
-    @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIII)V", ordinal = 0))
+/*    @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIII)V", ordinal = 0))
     private boolean disableServerPinging(GuiGraphics instance, ResourceLocation texture, int x, int y, int width, int height) {
         return !viaFabricPlus$disableServerPinging; // Remove pingLegacyServer bar
-    }
+    }*/
 
+/*
     @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/multiplayer/JoinMultiplayerScreen;setToolTip(Ljava/util/List;)V", ordinal = 1))
     private boolean disableServerPinging(JoinMultiplayerScreen instance, List<Component> tooltip) {
         return !viaFabricPlus$disableServerPinging; // Remove pingLegacyServer bar tooltip
     }
+*/
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/FaviconTexture;textureLocation()Lnet/minecraft/resources/ResourceLocation;"))
+/*    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/FaviconTexture;textureLocation()Lnet/minecraft/resources/ResourceLocation;"))
     private ResourceLocation disableServerPinging(FaviconTexture instance) {
         if (viaFabricPlus$disableServerPinging) { // Remove server icon
             return FaviconTexture.MISSING_LOCATION;
         } else {
             return this.icon.textureLocation();
         }
-    }
+    }*/
 
-    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/multiplayer/JoinMultiplayerScreen;setToolTip(Ljava/util/List;)V", ordinal = 0))
+/*    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/multiplayer/JoinMultiplayerScreen;setToolTip(Ljava/util/List;)V", ordinal = 0))
     private void drawTranslatingState(JoinMultiplayerScreen instance, List<Component> tooltip, Operation<Void> original) {
         if (viaFabricPlus$disableServerPinging) { // Remove player list tooltip
             return;
         }
         final List<Component> tooltipCopy = new ArrayList<>(tooltip);
         if (GeneralSettings.global().showAdvertisedServerVersion.getValue()) {
-            final ProtocolVersion version = ((IServerInfo) serverData).viaFabricPlus$translatingVersion();
+            final ProtocolVersion version = ( serverData).viaFabricPlus$translatingVersion();
             if (version != null) {
                 tooltipCopy.add(Component.translatable("base.viafabricplus.via_translates_to", version.getName() + " (" + version.getOriginalVersion() + ")"));
                 tooltipCopy.add(Component.translatable("base.viafabricplus.server_version", serverData.version.getString() + " (" + serverData.protocol + ")"));
             }
         }
         original.call(instance, tooltipCopy);
-    }
+    }*/
 
 }

@@ -2,6 +2,9 @@ package net.minecraft.world.level.block;
 
 import com.mojang.serialization.MapCodec;
 import java.util.function.BiFunction;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,6 +26,8 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class PinkPetalsBlock extends BushBlock implements BonemealableBlock {
+   private static final VoxelShape viaFabricPlus$shape_r1_20_1 = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 3.0D, 16.0D);
+
    public static final MapCodec<PinkPetalsBlock> CODEC = simpleCodec(PinkPetalsBlock::new);
    public static final int MIN_FLOWERS = 1;
    public static final int MAX_FLOWERS = 4;
@@ -62,6 +67,9 @@ public class PinkPetalsBlock extends BushBlock implements BonemealableBlock {
    }
 
    public VoxelShape getShape(BlockState p_273399_, BlockGetter p_273568_, BlockPos p_273314_, CollisionContext p_273274_) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20)) {
+         return (viaFabricPlus$shape_r1_20_1);
+      }
       return SHAPE_BY_PROPERTIES.apply(p_273399_.getValue(FACING), p_273399_.getValue(AMOUNT));
    }
 

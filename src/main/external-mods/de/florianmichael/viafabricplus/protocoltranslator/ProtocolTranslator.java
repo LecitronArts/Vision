@@ -32,7 +32,6 @@ import com.viaversion.viaversion.connection.UserConnectionImpl;
 import com.viaversion.viaversion.protocol.ProtocolPipelineImpl;
 import de.florianmichael.viafabricplus.event.ChangeProtocolVersionCallback;
 import de.florianmichael.viafabricplus.event.PostViaVersionLoadCallback;
-import de.florianmichael.viafabricplus.access.IClientConnection;
 import de.florianmichael.viafabricplus.protocoltranslator.impl.command.ViaFabricPlusVLCommandHandler;
 import de.florianmichael.viafabricplus.protocoltranslator.impl.platform.ViaFabricPlusViaLegacyPlatformImpl;
 import de.florianmichael.viafabricplus.protocoltranslator.impl.platform.ViaFabricPlusViaVersionPlatformImpl;
@@ -121,8 +120,7 @@ public class ProtocolTranslator {
      * @param connection the Minecraft connection
      */
     public static void injectViaPipeline(final Connection connection, final Channel channel) {
-        final IClientConnection mixinClientConnection = (IClientConnection) connection;
-        final ProtocolVersion serverVersion = mixinClientConnection.viaFabricPlus$getTargetVersion();
+        final ProtocolVersion serverVersion = connection.viaFabricPlus$getTargetVersion();
 
         if (serverVersion != ProtocolTranslator.NATIVE_VERSION) {
             channel.attr(ProtocolTranslator.CLIENT_CONNECTION_ATTRIBUTE_KEY).set(connection);
@@ -137,7 +135,7 @@ public class ProtocolTranslator {
 
             final UserConnection user = new UserConnectionImpl(channel, true);
             new ProtocolPipelineImpl(user);
-            mixinClientConnection.viaFabricPlus$setUserConnection(user);
+            connection.viaFabricPlus$setUserConnection(user);
 
             channel.pipeline().addLast(new ViaFabricPlusVLLegacyPipeline(user, serverVersion));
         }
@@ -232,7 +230,7 @@ public class ProtocolTranslator {
             throw new IllegalStateException("The player is not connected to a server");
         }
 
-        return ((IClientConnection) handler.getConnection()).viaFabricPlus$getUserConnection();
+        return ( handler.getConnection()).viaFabricPlus$getUserConnection();
     }
 
     /**

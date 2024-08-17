@@ -38,23 +38,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(EndPortalBlock.class)
 public abstract class MixinEndPortalBlock extends BaseEntityBlock {
 
+/*
     @Unique
     private static final VoxelShape viaFabricPlus$shape_r1_8_x = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 1.0D, 16.0D);
 
     @Unique
     private static final VoxelShape viaFabricPlus$shape_r1_16_5 = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 12.0D, 16.0D);
+*/
 
     protected MixinEndPortalBlock(Properties settings) {
         super(settings);
     }
 
-    @Inject(method = "getShape", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "getShape", at = @At("HEAD"), cancellable = true)
     private void changeOutlineShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context, CallbackInfoReturnable<VoxelShape> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             cir.setReturnValue(viaFabricPlus$shape_r1_8_x);
         } else if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4)) {
             cir.setReturnValue(viaFabricPlus$shape_r1_16_5);
         }
-    }
+    }*/
 
 }

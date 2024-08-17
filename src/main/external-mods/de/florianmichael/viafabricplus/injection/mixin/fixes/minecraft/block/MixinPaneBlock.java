@@ -45,7 +45,7 @@ public abstract class MixinPaneBlock extends CrossCollisionBlock {
     protected MixinPaneBlock(float radius1, float radius2, float boundingHeight1, float boundingHeight2, float collisionHeight, Properties settings) {
         super(radius1, radius2, boundingHeight1, boundingHeight2, collisionHeight, settings);
     }
-
+/*
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initShapes1_8(Properties settings, CallbackInfo ci) {
         final float f = 7.0F;
@@ -103,6 +103,6 @@ public abstract class MixinPaneBlock extends CrossCollisionBlock {
         } else {
             return super.getCollisionShape(state, world, pos, context);
         }
-    }
+    }*/
 
 }

@@ -36,7 +36,7 @@ public abstract class MixinDirectConnectScreen extends Screen {
     public MixinDirectConnectScreen(Component title) {
         super(title);
     }
-
+/*
     @Inject(method = "init", at = @At("RETURN"))
     private void addProtocolSelectionButton(CallbackInfo ci) {
         final int buttonPosition = GeneralSettings.global().directConnectScreenButtonOrientation.getIndex();
@@ -47,6 +47,6 @@ public abstract class MixinDirectConnectScreen extends Screen {
 
         // Set the button's position according to the configured orientation and add the button to the screen
         this.addRenderableWidget(GeneralSettings.withOrientation(builder, buttonPosition, width, height).build());
-    }
+    }*/
 
 }

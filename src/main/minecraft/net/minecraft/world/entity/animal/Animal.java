@@ -3,6 +3,9 @@ package net.minecraft.world.entity.animal;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -125,7 +128,7 @@ public abstract class Animal extends AgeableMob {
       ItemStack itemstack = pPlayer.getItemInHand(pHand);
       if (this.isFood(itemstack)) {
          int i = this.getAge();
-         if (!this.level().isClientSide && i == 0 && this.canFallInLove()) {
+         if (!this.level().isClientSide && i == 0 && this.canFallInLove() && ProtocolTranslator.getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_15)) {
             this.usePlayerItem(pPlayer, pHand, itemstack);
             this.setInLove(pPlayer);
             return InteractionResult.SUCCESS;
@@ -134,10 +137,10 @@ public abstract class Animal extends AgeableMob {
          if (this.isBaby()) {
             this.usePlayerItem(pPlayer, pHand, itemstack);
             this.ageUp(getSpeedUpSecondsWhenFeeding(-i), true);
-            return InteractionResult.sidedSuccess(this.level().isClientSide);
+            return InteractionResult.sidedSuccess(this.level().isClientSide && ProtocolTranslator.getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_15));
          }
 
-         if (this.level().isClientSide) {
+         if (this.level().isClientSide && ProtocolTranslator.getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_15)) {
             return InteractionResult.CONSUME;
          }
       }

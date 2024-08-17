@@ -80,38 +80,39 @@ public abstract class MixinLivingEntity extends Entity {
         super(type, world);
     }
 
-    @Inject(method = "getMyRidingOffset", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "getMyRidingOffset", at = @At("HEAD"), cancellable = true)
     private void getRidingOffset1_20_1(Entity vehicle, CallbackInfoReturnable<Float> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20)) {
             cir.setReturnValue((float) EntityRidingOffsetsPre1_20_2.getHeightOffset(this));
         }
-    }
+    }*/
 
-    @Redirect(method = "getPassengerRidingPosition", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getPassengerAttachmentPoint(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/EntityDimensions;F)Lorg/joml/Vector3f;"))
+/*    @Redirect(method = "getPassengerRidingPosition", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getPassengerAttachmentPoint(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/EntityDimensions;F)Lorg/joml/Vector3f;"))
     private Vector3f getPassengerRidingPos1_20_1(LivingEntity instance, Entity entity, EntityDimensions entityDimensions, float v) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20)) {
             return EntityRidingOffsetsPre1_20_2.getMountedHeightOffset(instance, entity);
         } else {
             return getPassengerAttachmentPoint(entity, entityDimensions, v);
         }
-    }
+    }*/
 
-    @Redirect(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isControlledByLocalInstance()Z"))
+/*    @Redirect(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isControlledByLocalInstance()Z"))
     private boolean allowPlayerToBeMovedByEntityPackets(LivingEntity instance) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_3) || ProtocolTranslator.getTargetVersion().equals(BedrockProtocolVersion.bedrockLatest)) {
             return instance.getControllingPassenger() instanceof Player player ? player.isLocalPlayer() : !instance.level().isClientSide;
         } else {
             return instance.isControlledByLocalInstance();
         }
-    }
+    }*/
 
-    @Inject(method = "pushEntities", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "pushEntities", at = @At("HEAD"), cancellable = true)
     private void preventEntityPush(CallbackInfo ci) {
         if (DebugSettings.global().preventEntityCramming.isEnabled()) {
             ci.cancel();
         }
-    }
+    }*/
 
+/*
     @Redirect(method = "travel", at = @At(value = "INVOKE", target = "Ljava/lang/Math;cos(D)D", remap = false))
     private double fixCosTable(double a) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_18)) {
@@ -120,54 +121,62 @@ public abstract class MixinLivingEntity extends Entity {
             return Math.cos(a);
         }
     }
+*/
 
-    @Redirect(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getFluidHeight(Lnet/minecraft/tags/TagKey;)D"))
+/*    @Redirect(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getFluidHeight(Lnet/minecraft/tags/TagKey;)D"))
     private double dontApplyLavaMovement(LivingEntity instance, TagKey<Fluid> tagKey) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_15_2)) {
             return Double.MAX_VALUE;
         } else {
             return instance.getFluidHeight(tagKey);
         }
-    }
+    }*/
 
-    @Redirect(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;hasChunkAt(Lnet/minecraft/core/BlockPos;)Z"))
+/*    @Redirect(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;hasChunkAt(Lnet/minecraft/core/BlockPos;)Z"))
     private boolean modify1_13LoadedCheck(Level instance, BlockPos blockPos) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
             return this.level().hasChunkAt(blockPos) && instance.getChunkSource().hasChunk(blockPos.getX() >> 4, blockPos.getZ() >> 4);
         } else {
             return this.level().hasChunkAt(blockPos);
         }
-    }
+    }*/
 
+/*
     @Redirect(method = "handleRelativeFrictionAndCalculateMovement", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;jumping:Z"))
     private boolean disableJumpOnLadder(LivingEntity self) {
         return ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_13_2) && jumping;
     }
+*/
 
-    @Redirect(method = "travel",
+/*    @Redirect(method = "travel",
             slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/world/effect/MobEffects;DOLPHINS_GRACE:Lnet/minecraft/world/effect/MobEffect;")),
             at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;horizontalCollision:Z", ordinal = 0))
     private boolean disableClimbing(LivingEntity instance) {
         return ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_13_2) && instance.horizontalCollision;
-    }
+    }*/
 
+/*
     @ModifyVariable(method = "getFluidFallingAdjustedMovement", ordinal = 0, at = @At("HEAD"), argsOnly = true)
     private boolean modifyMovingDown(boolean movingDown) {
         return ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_13_2) && movingDown;
     }
+*/
 
-    @Redirect(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;resetFallDistance()V"))
+/*    @Redirect(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;resetFallDistance()V"))
     private void dontResetLevitationFallDistance(LivingEntity instance) {
         if (this.hasEffect(MobEffects.SLOW_FALLING) || ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_12_2)) {
             instance.resetFallDistance();
         }
-    }
+    }*/
 
+/*
     @Redirect(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isSprinting()Z", ordinal = 0))
     private boolean modifySwimSprintSpeed(LivingEntity instance) {
         return ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_12_2) && instance.isSprinting();
     }
+*/
 
+/*
     @Redirect(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getFluidHeight(Lnet/minecraft/tags/TagKey;)D"))
     private double redirectFluidHeight(LivingEntity instance, TagKey<Fluid> tagKey) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2) && tagKey == FluidTags.WATER) {
@@ -175,14 +184,16 @@ public abstract class MixinLivingEntity extends Entity {
         }
         return instance.getFluidHeight(tagKey);
     }
+*/
 
-    @Inject(method = "getFluidFallingAdjustedMovement", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "getFluidFallingAdjustedMovement", at = @At("HEAD"), cancellable = true)
     private void modifySwimSprintFallSpeed(double gravity, boolean movingDown, Vec3 velocity, CallbackInfoReturnable<Vec3> ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2) && !this.isNoGravity()) {
             ci.setReturnValue(new Vec3(velocity.x, velocity.y - 0.02, velocity.z));
         }
-    }
+    }*/
 
+/*
     @ModifyConstant(method = "travel", constant = @Constant(floatValue = 0.9F))
     private float modifySwimFriction(float constant) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
@@ -191,54 +202,57 @@ public abstract class MixinLivingEntity extends Entity {
             return constant;
         }
     }
+*/
 
-    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;abs(F)F"))
+/*    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;abs(F)F"))
     private float alwaysRotateWhenWalkingBackwards(float value) {
         if (VisualSettings.global().sidewaysBackwardsRunning.isEnabled()) {
             return 0F;
         } else {
             return Mth.abs(value);
         }
-    }
+    }*/
 
-    @Inject(method = "getEquipmentSlotForItem", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "getEquipmentSlotForItem", at = @At("HEAD"), cancellable = true)
     private static void removeShieldSlotPreference(ItemStack stack, CallbackInfoReturnable<EquipmentSlot> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_9_3) && stack.is(Items.SHIELD)) {
             cir.setReturnValue(EquipmentSlot.MAINHAND);
         }
-    }
+    }*/
 
-    @ModifyConstant(method = "aiStep", constant = @Constant(doubleValue = 0.003D))
+/*    @ModifyConstant(method = "aiStep", constant = @Constant(doubleValue = 0.003D))
     private double modifyVelocityZero(final double constant) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             return 0.005D;
         } else {
             return constant;
         }
-    }
+    }*/
 
-    @Inject(method = "trapdoorUsableAsLadder", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "trapdoorUsableAsLadder", at = @At("HEAD"), cancellable = true)
     private void disableCrawling(CallbackInfoReturnable<Boolean> ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             ci.setReturnValue(false);
         }
-    }
+    }*/
 
-    @Inject(method = "<init>", at = @At("RETURN"))
+/*    @Inject(method = "<init>", at = @At("RETURN"))
     private void modify1_7StepHeight(EntityType<? extends LivingEntity> type, Level world, CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_7_6)) {
             this.setMaxUpStep(0.5F);
         }
-    }
+    }*/
 
+/*
     @Inject(method = "aiStep", at = @At("HEAD"))
     private void removeJumpDelay1_0(CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().olderThan(LegacyProtocolVersion.r1_0_0tor1_0_1)) {
             this.noJumpDelay = 0;
         }
     }
+*/
 
-    @Inject(method = "onClimbable", at = @At("RETURN"), cancellable = true)
+/*    @Inject(method = "onClimbable", at = @At("RETURN"), cancellable = true)
     private void allowGappedLadderClimb(CallbackInfoReturnable<Boolean> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThan(LegacyProtocolVersion.b1_5tob1_5_2) && !cir.getReturnValueZ() && !this.isSpectator()) {
             final BlockPos blockPos = this.blockPosition().above();
@@ -251,6 +265,6 @@ public abstract class MixinLivingEntity extends Entity {
                 cir.setReturnValue(true);
             }
         }
-    }
+    }*/
 
 }

@@ -1,10 +1,13 @@
 package net.minecraft.world.level.block;
 
 import com.mojang.serialization.MapCodec;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -33,6 +36,9 @@ public class SoulSandBlock extends Block {
    }
 
    public VoxelShape getBlockSupportShape(BlockState pState, BlockGetter pReader, BlockPos pPos) {
+      if (ProtocolTranslator.getTargetVersion().betweenInclusive(ProtocolVersion.v1_13, ProtocolVersion.v1_15_2)) {
+         return (Shapes.empty());
+      }
       return Shapes.block();
    }
 
@@ -62,5 +68,17 @@ public class SoulSandBlock extends Block {
 
    public float getShadeBrightness(BlockState pState, BlockGetter pLevel, BlockPos pPos) {
       return 0.2F;
+   }
+
+   @Override
+   public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_14_4)) {
+         entity.setDeltaMovement(entity.getDeltaMovement().multiply(0.4D, 1, 0.4D));
+      }
+   }
+
+   @Override
+   public float getSpeedFactor() {
+      return ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_14_4) ? 1F : super.getSpeedFactor();
    }
 }

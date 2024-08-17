@@ -31,11 +31,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Squid.class)
 public abstract class MixinSquidEntity {
 
+/*
     @Inject(method = "canBeLeashed", at = @At("HEAD"), cancellable = true)
     private void cancelLeashing(Player player, CallbackInfoReturnable<Boolean> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4)) {
             cir.setReturnValue(false);
         }
     }
+*/
 
 }

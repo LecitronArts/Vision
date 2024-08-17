@@ -20,7 +20,6 @@
 package de.florianmichael.viafabricplus.fixes.data;
 
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import de.florianmichael.viafabricplus.access.IClientConnection;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -1371,7 +1370,7 @@ public class ItemRegistryDiff {
                 // Don't drop any items if the connection is not established yet
                 return true;
             }
-            final ExtensionProtocolMetadataStorage extensionProtocol = ((IClientConnection) handler.getConnection()).viaFabricPlus$getUserConnection().get(ExtensionProtocolMetadataStorage.class);
+            final ExtensionProtocolMetadataStorage extensionProtocol = ( handler.getConnection()).viaFabricPlus$getUserConnection().get(ExtensionProtocolMetadataStorage.class);
             if (extensionProtocol == null) { // Should never happen
                 return false;
             }

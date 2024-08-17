@@ -2,6 +2,7 @@ package dev.vision;
 
 import baritone.BaritoneProvider;
 import de.florianmichael.viafabricplus.ViaFabricPlus;
+import de.florianmichael.viafabricplus.event.LoadCallback;
 import dev.tr7zw.entityculling.EntityCullingMod;
 import meteordevelopment.orbit.EventBus;
 import meteordevelopment.orbit.IEventBus;
@@ -28,6 +29,9 @@ public class Vision {
         try {
             EntityCullingMod.INSTANCE.init();
             AccountsX.INSTANCE.init();
+            LoadCallback.EVENT.invoker().onLoad(LoadCallback.State.PRE);
+            ViaFabricPlus.global().init();
+            LoadCallback.EVENT.invoker().onLoad(LoadCallback.State.POST);
             //ViaFabricPlus.global().init();
             //BARITONE = new BaritoneProvider(); already registered by it self.
         } catch (IOException e) {

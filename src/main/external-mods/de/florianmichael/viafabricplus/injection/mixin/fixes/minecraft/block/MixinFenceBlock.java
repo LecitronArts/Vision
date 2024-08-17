@@ -55,7 +55,7 @@ public abstract class MixinFenceBlock extends CrossCollisionBlock {
         super(radius1, radius2, boundingHeight1, boundingHeight2, collisionHeight, settings);
     }
 
-    @Inject(method = "use", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "use", at = @At("HEAD"), cancellable = true)
     private void alwaysSuccess(CallbackInfoReturnable<InteractionResult> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_10)) {
             cir.setReturnValue(InteractionResult.SUCCESS);
@@ -127,6 +127,6 @@ public abstract class MixinFenceBlock extends CrossCollisionBlock {
         }
 
         return voxelShapes;
-    }
+    }*/
 
 }

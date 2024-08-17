@@ -47,7 +47,7 @@ public abstract class MixinFarmlandBlock extends Block {
         super(settings);
     }
 
-    @Inject(method = "getShape", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "getShape", at = @At("HEAD"), cancellable = true)
     private void changeOutlineShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context, CallbackInfoReturnable<VoxelShape> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_9_3)) {
             cir.setReturnValue(Shapes.block());
@@ -61,6 +61,6 @@ public abstract class MixinFarmlandBlock extends Block {
         } else {
             return super.getOcclusionShape(state, view, pos);
         }
-    }
+    }*/
 
 }

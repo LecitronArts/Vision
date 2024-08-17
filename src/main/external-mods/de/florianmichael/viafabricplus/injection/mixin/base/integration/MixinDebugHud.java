@@ -51,7 +51,7 @@ import java.util.List;
 @Mixin(DebugScreenOverlay.class)
 public abstract class MixinDebugHud {
 
-    @Inject(method = "getGameInformation", at = @At("RETURN"))
+/*    @Inject(method = "getGameInformation", at = @At("RETURN"))
     public void addViaFabricPlusInformation(CallbackInfoReturnable<List<String>> cir) {
         if (!GeneralSettings.global().showExtraInformationInDebugHud.getValue()) { // Only show if enabled
             return;
@@ -118,6 +118,6 @@ public abstract class MixinDebugHud {
         }
 
         cir.getReturnValue().addAll(information);
-    }
+    }*/
 
 }

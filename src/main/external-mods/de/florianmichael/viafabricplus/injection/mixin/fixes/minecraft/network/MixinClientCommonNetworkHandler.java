@@ -22,7 +22,6 @@ package de.florianmichael.viafabricplus.injection.mixin.fixes.minecraft.network;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage.InventoryAcknowledgements;
 import de.florianmichael.viafabricplus.fixes.ClientsideFixes;
-import de.florianmichael.viafabricplus.access.IClientConnection;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
@@ -84,7 +83,7 @@ public abstract class MixinClientCommonNetworkHandler {
     @Inject(method = "handlePing", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/PacketUtils;ensureRunningOnSameThread(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;Lnet/minecraft/util/thread/BlockableEventLoop;)V", shift = At.Shift.AFTER), cancellable = true)
     private void onPing(ClientboundPingPacket packet, CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4)) {
-            final InventoryAcknowledgements acks = ((IClientConnection) this.connection).viaFabricPlus$getUserConnection().get(InventoryAcknowledgements.class);
+            final InventoryAcknowledgements acks = (this.connection).viaFabricPlus$getUserConnection().get(InventoryAcknowledgements.class);
             if (acks.removeId(packet.getId())) {
                 final short inventoryId = (short) ((packet.getId() >> 16) & 0xFF);
 

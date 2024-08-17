@@ -18,6 +18,7 @@
 package net.raphimc.vialegacy;
 
 import com.viaversion.viaversion.util.Config;
+import de.florianmichael.viafabricplus.settings.impl.GeneralSettings;
 
 import java.io.File;
 import java.net.URL;
@@ -85,12 +86,12 @@ public class ViaLegacyConfig extends Config implements net.raphimc.vialegacy.pla
 
     @Override
     public boolean isLegacySkullLoading() {
-        return this.legacySkullLoading;
+        return GeneralSettings.global().loadSkinsAndSkullsInLegacyVersions.getValue();
     }
 
     @Override
     public boolean isLegacySkinLoading() {
-        return this.legacySkinLoading;
+        return GeneralSettings.global().loadSkinsAndSkullsInLegacyVersions.getValue();
     }
 
     @Override

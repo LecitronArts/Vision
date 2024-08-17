@@ -33,7 +33,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(BlockBehaviour.class)
 public abstract class MixinAbstractBlock {
 
-    @Inject(method = "getDestroyProgress", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "getDestroyProgress", at = @At("HEAD"), cancellable = true)
     private void changeMiningSpeedCalculation(BlockState state, Player player, BlockGetter world, BlockPos pos, CallbackInfoReturnable<Float> cir) {
         if (DebugSettings.global().legacyMiningSpeeds.isEnabled()) {
             final float hardness = state.getDestroySpeed(world, pos);
@@ -47,6 +47,6 @@ public abstract class MixinAbstractBlock {
                 }
             }
         }
-    }
+    }*/
 
 }

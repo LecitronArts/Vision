@@ -20,8 +20,6 @@
 package de.florianmichael.viafabricplus.injection.mixin.base.integration;
 
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import de.florianmichael.viafabricplus.access.IClientConnection;
-import de.florianmichael.viafabricplus.access.IServerInfo;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.network.Connection;
@@ -37,24 +35,24 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(targets = "net.minecraft.client.multiplayer.ServerStatusPinger$1")
 public abstract class MixinMultiplayerServerListPinger_1 implements ClientStatusPacketListener {
 
-    @Final
+/*    @Final
     @Shadow
     ServerData val$data;
 
     @Shadow
     @Final
-    Connection val$connection;
+    Connection val$connection;*/
 
-    @Inject(method = "handleStatusResponse", at = @At("HEAD"))
+/*    @Inject(method = "handleStatusResponse", at = @At("HEAD"))
     private void trackTranslatingState(ClientboundStatusResponsePacket packet, CallbackInfo ci) {
         // If ViaVersion is translating the current connection, we track the target version, and it's state in the server info
         // So we can later draw this information when hovering over the pingLegacyServer bar in the server list
         if (val$connection instanceof IClientConnection mixinClientConnection) {
-            ((IServerInfo) val$data).viaFabricPlus$setTranslatingVersion(mixinClientConnection.viaFabricPlus$getTargetVersion());
+            ( val$data).viaFabricPlus$setTranslatingVersion(mixinClientConnection.viaFabricPlus$getTargetVersion());
         }
-    }
+    }*/
 
-    @Inject(method = "handleStatusResponse", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/Connection;send(Lnet/minecraft/network/protocol/Packet;)V", shift = At.Shift.AFTER))
+/*    @Inject(method = "handleStatusResponse", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/Connection;send(Lnet/minecraft/network/protocol/Packet;)V", shift = At.Shift.AFTER))
     private void fixVersionComparison(CallbackInfo ci) {
         final ProtocolVersion version = ((IClientConnection) this.val$connection).viaFabricPlus$getTargetVersion();
 
@@ -62,6 +60,6 @@ public abstract class MixinMultiplayerServerListPinger_1 implements ClientStatus
         if (version != null && version.getVersion() == this.val$data.protocol) {
             this.val$data.protocol = SharedConstants.getProtocolVersion();
         }
-    }
+    }*/
 
 }

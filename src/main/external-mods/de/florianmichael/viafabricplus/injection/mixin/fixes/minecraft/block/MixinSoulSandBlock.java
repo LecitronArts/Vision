@@ -42,7 +42,7 @@ public abstract class MixinSoulSandBlock extends Block {
         super(settings);
     }
 
-    @Inject(method = "getBlockSupportShape", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "getBlockSupportShape", at = @At("HEAD"), cancellable = true)
     private void changeSidesShape(BlockState state, BlockGetter world, BlockPos pos, CallbackInfoReturnable<VoxelShape> cir) {
         if (ProtocolTranslator.getTargetVersion().betweenInclusive(ProtocolVersion.v1_13, ProtocolVersion.v1_15_2)) {
             cir.setReturnValue(Shapes.empty());
@@ -59,6 +59,6 @@ public abstract class MixinSoulSandBlock extends Block {
     @Override
     public float getSpeedFactor() {
         return ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_14_4) ? 1F : super.getSpeedFactor();
-    }
+    }*/
 
 }

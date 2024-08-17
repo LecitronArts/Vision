@@ -2,6 +2,9 @@ package net.minecraft.world.level.block;
 
 import com.mojang.serialization.MapCodec;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.stats.Stats;
@@ -34,6 +37,10 @@ public class BrewingStandBlock extends BaseEntityBlock {
    public static final MapCodec<BrewingStandBlock> CODEC = simpleCodec(BrewingStandBlock::new);
    public static final BooleanProperty[] HAS_BOTTLE = new BooleanProperty[]{BlockStateProperties.HAS_BOTTLE_0, BlockStateProperties.HAS_BOTTLE_1, BlockStateProperties.HAS_BOTTLE_2};
    protected static final VoxelShape SHAPE = Shapes.or(Block.box(1.0D, 0.0D, 1.0D, 15.0D, 2.0D, 15.0D), Block.box(7.0D, 0.0D, 7.0D, 9.0D, 14.0D, 9.0D));
+   private static final VoxelShape viaFabricPlus$shape_r1_12_2 = Shapes.or(
+           Block.box(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D) /* Base */,
+           Block.box(7.0D, 0.0D, 7.0D, 9.0D, 14.0D, 9.0D) /* Stick */
+   );
 
    public MapCodec<BrewingStandBlock> codec() {
       return CODEC;
@@ -58,6 +65,9 @@ public class BrewingStandBlock extends BaseEntityBlock {
    }
 
    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
+         return (viaFabricPlus$shape_r1_12_2);
+      }
       return SHAPE;
    }
 

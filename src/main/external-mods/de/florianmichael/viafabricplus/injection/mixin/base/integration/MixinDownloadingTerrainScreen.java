@@ -39,8 +39,7 @@ public abstract class MixinDownloadingTerrainScreen extends Screen {
     public MixinDownloadingTerrainScreen(Component title) {
         super(title);
     }
-
-    @Inject(method = "render", at = @At("RETURN"))
+/*    @Inject(method = "render", at = @At("RETURN"))
     private void renderClassicProgress(GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (GeneralSettings.global().showClassicLoadingProgressInConnectScreen.getValue()) {
             // Check if ViaVersion is translating
@@ -64,6 +63,6 @@ public abstract class MixinDownloadingTerrainScreen extends Screen {
                     -1
             );
         }
-    }
+    }*/
 
 }

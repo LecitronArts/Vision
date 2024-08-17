@@ -21,6 +21,9 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.UUID;
 import javax.annotation.Nullable;
+
+import de.florianmichael.viafabricplus.ViaFabricPlus;
+import de.florianmichael.viafabricplus.event.LoadCallback;
 import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -172,6 +175,10 @@ public class Main {
 
       User user = new User(optionspec12.value(optionset), uuid, optionspec16.value(optionset), emptyStringToEmptyOptional(s6), emptyStringToEmptyOptional(s7), user$type);
       GameConfig gameconfig = new GameConfig(new GameConfig.UserData(user, propertymap, propertymap1, proxy), new DisplayData(i, j, optionalint, optionalint1, flag), new GameConfig.FolderData(file1, file3, file2, s5), new GameConfig.GameData(flag1, s3, s4, flag2, flag3), new GameConfig.QuickPlayData(s8, s9, s10, s11));
+
+      //VVVVVIIIIIIIIAAAAAAAAAA
+
+
       Util.startTimerHackThread();
       Thread thread = new Thread("Client Shutdown Thread") {
          public void run() {

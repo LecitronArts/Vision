@@ -43,7 +43,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(AnvilBlock.class)
 public abstract class MixinAnvilBlock extends FallingBlock {
 
-    @Unique
+/*    @Unique
     private static final VoxelShape viaFabricPlus$x_axis_shape_r1_12_2 = Block.box(0.0D, 0.0D, 2.0D, 16.0D, 16.0D, 14.0D);
 
     @Unique
@@ -51,13 +51,13 @@ public abstract class MixinAnvilBlock extends FallingBlock {
 
     @Shadow
     @Final
-    public static DirectionProperty FACING;
+    public static DirectionProperty FACING;*/
 
     public MixinAnvilBlock(Properties settings) {
         super(settings);
     }
 
-    @Unique
+/*    @Unique
     private boolean viaFabricPlus$requireOriginalShape;
 
     @Inject(method = "getShape", at = @At("HEAD"), cancellable = true)
@@ -75,6 +75,6 @@ public abstract class MixinAnvilBlock extends FallingBlock {
         // MoreCulling is caching the culling shape and doesn't reload it, so we have to force vanilla's shape here.
         viaFabricPlus$requireOriginalShape = true;
         return super.getOcclusionShape(state, world, pos);
-    }
+    }*/
 
 }

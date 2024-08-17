@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import de.florianmichael.viafabricplus.fixes.versioned.visual.BoatModel1_8;
 import net.minecraft.client.model.AllayModel;
 import net.minecraft.client.model.ArmorStandArmorModel;
 import net.minecraft.client.model.ArmorStandModel;
@@ -134,6 +136,7 @@ public class LayerDefinitions {
       LayerDefinition layerdefinition16 = SkeletonModel.createBodyLayer();
       LayerDefinition layerdefinition17 = LayerDefinition.create(VillagerModel.createBodyModel(), 64, 64);
       LayerDefinition layerdefinition18 = SpiderModel.createSpiderBodyLayer();
+      builder.put(BoatModel1_8.MODEL_LAYER, BoatModel1_8.getTexturedModelData()); // viaviaviaviaivaiviaviavi
       builder.put(ModelLayers.ALLAY, AllayModel.createBodyLayer());
       builder.put(ModelLayers.ARMOR_STAND, ArmorStandModel.createBodyLayer());
       builder.put(ModelLayers.ARMOR_STAND_INNER_ARMOR, ArmorStandArmorModel.createBodyLayer(INNER_ARMOR_DEFORMATION));

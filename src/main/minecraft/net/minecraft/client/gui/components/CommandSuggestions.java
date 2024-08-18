@@ -29,6 +29,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -46,6 +49,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.lwjgl.glfw.GLFW;
 
 @OnlyIn(Dist.CLIENT)
 public class CommandSuggestions {
@@ -104,6 +108,17 @@ public class CommandSuggestions {
 
    public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
       boolean flag = this.suggestions != null;
+      if (this.viaFabricPlus$cancelTabComplete()) {
+         if (pKeyCode == GLFW.GLFW_KEY_TAB && this.suggestions == null) {
+            this.updateCommandInfo();
+         } else if (this.suggestions != null) {
+            if (this.suggestions.keyPressed(pKeyCode, pScanCode, pModifiers)) {
+               return (true);
+            }
+            this.input.setSuggestion(null);
+            this.suggestions = null;
+         }
+      }
       if (flag && this.suggestions.keyPressed(pKeyCode, pScanCode, pModifiers)) {
          return true;
       } else if (this.screen.getFocused() != this.input || pKeyCode != 258 || this.allowHiding && !flag) {
@@ -341,6 +356,9 @@ public class CommandSuggestions {
    }
 
    private FormattedCharSequence formatChat(String p_93915_, int p_93916_) {
+      if (this.viaFabricPlus$cancelTabComplete()) {
+         return (FormattedCharSequence.forward(p_93915_, Style.EMPTY));
+      }
       return this.currentParse != null ? formatText(this.currentParse, p_93915_, p_93916_) : FormattedCharSequence.forward(p_93915_, Style.EMPTY);
    }
 
@@ -389,6 +407,9 @@ public class CommandSuggestions {
    }
 
    public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY) {
+      if (this.viaFabricPlus$cancelTabComplete()) {
+         this.commandUsage.clear();
+      }
       if (!this.renderSuggestions(pGuiGraphics, pMouseX, pMouseY)) {
          this.renderUsage(pGuiGraphics);
       }
@@ -595,5 +616,9 @@ public class CommandSuggestions {
          Message message = suggestion.getTooltip();
          return message != null ? Component.translatable("narration.suggestion.tooltip", this.current + 1, this.suggestionList.size(), suggestion.getText(), Component.translationArg(message)) : Component.translatable("narration.suggestion", this.current + 1, this.suggestionList.size(), suggestion.getText());
       }
+   }
+
+   private boolean viaFabricPlus$cancelTabComplete() {
+      return ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2) && this.input.getValue().startsWith("/");
    }
 }

@@ -66,7 +66,7 @@ public abstract class MixinMiningToolItem extends TieredItem {
         super(material, settings);
     }
 
-    @Inject(method = "<init>", at = @At("RETURN"))
+/*    @Inject(method = "<init>", at = @At("RETURN"))
     private void init1_8Fields(float attackDamage, float attackSpeed, Tier material, TagKey<Block> effectiveBlocks, Properties settings, CallbackInfo ci) {
         final float materialAttackDamage = material.getAttackDamageBonus();
         if ((Item) this instanceof PickaxeItem) {
@@ -83,24 +83,24 @@ public abstract class MixinMiningToolItem extends TieredItem {
         final ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
         builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Tool modifier", this.viaFabricPlus$attackDamage_r1_8, AttributeModifier.Operation.ADDITION));
         this.viaFabricPlus$AttributeModifiers_r1_8 = builder.build();
-    }
+    }*/
 
-    @Redirect(method = "getAttackDamage", at = @At(value = "FIELD", target = "Lnet/minecraft/world/item/DiggerItem;attackDamageBaseline:F"))
+/*    @Redirect(method = "getAttackDamage", at = @At(value = "FIELD", target = "Lnet/minecraft/world/item/DiggerItem;attackDamageBaseline:F"))
     private float changeAttackDamage(DiggerItem instance) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             return this.viaFabricPlus$attackDamage_r1_8;
         } else {
             return this.attackDamageBaseline;
         }
-    }
+    }*/
 
-    @Redirect(method = "getDefaultAttributeModifiers", at = @At(value = "FIELD", target = "Lnet/minecraft/world/item/DiggerItem;defaultModifiers:Lcom/google/common/collect/Multimap;"))
+/*    @Redirect(method = "getDefaultAttributeModifiers", at = @At(value = "FIELD", target = "Lnet/minecraft/world/item/DiggerItem;defaultModifiers:Lcom/google/common/collect/Multimap;"))
     private Multimap<Attribute, AttributeModifier> changeAttributeModifiers(DiggerItem instance) {
         if (DebugSettings.global().replaceAttributeModifiers.isEnabled()) {
             return this.viaFabricPlus$AttributeModifiers_r1_8;
         } else {
             return this.defaultModifiers;
         }
-    }
+    }*/
 
 }

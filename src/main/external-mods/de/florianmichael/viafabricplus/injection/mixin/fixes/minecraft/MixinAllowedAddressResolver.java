@@ -42,11 +42,13 @@ public abstract class MixinAllowedAddressResolver {
     @Final
     private ServerAddressResolver resolver;
 
+/*
     @Inject(method = "resolveAddress", at = @At("HEAD"), cancellable = true)
     private void oldResolveBehaviour(ServerAddress address, CallbackInfoReturnable<Optional<ResolvedServerAddress>> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4) || ProtocolTranslator.getTargetVersion().equals(BedrockProtocolVersion.bedrockLatest)) {
             cir.setReturnValue(this.resolver.resolve(address));
         }
     }
+*/
 
 }

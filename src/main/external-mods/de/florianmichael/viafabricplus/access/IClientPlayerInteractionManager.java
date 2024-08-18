@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.florianmichael.viafabricplus.access;
+/*package de.florianmichael.viafabricplus.access;
 
 import de.florianmichael.viafabricplus.fixes.versioned.ClientPlayerInteractionManager1_18_2;
 
@@ -25,4 +25,4 @@ public interface IClientPlayerInteractionManager {
 
     ClientPlayerInteractionManager1_18_2 viaFabricPlus$get1_18_2InteractionManager();
 
-}
+}*/

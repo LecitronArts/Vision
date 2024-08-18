@@ -45,7 +45,7 @@ public abstract class MixinItemGroups {
     private static void buildAllTabContents(CreativeModeTab.ItemDisplayParameters displayContext) {
     }
 
-    @Unique
+/*    @Unique
     private static ProtocolVersion viaFabricPlus$version;
 
     @Unique
@@ -62,6 +62,6 @@ public abstract class MixinItemGroups {
 
             cir.setReturnValue(true);
         }
-    }
+    }*/
 
 }

@@ -91,14 +91,16 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
     }
 
     private void sendChunksSentGameEvent(final PacketWrapper wrapper) throws Exception {
-        wrapper.send(Protocol1_20_3To1_20_2.class);
+        return;
+
+/*        wrapper.send(Protocol1_20_3To1_20_2.class);
         wrapper.cancel();
 
         // Make sure the loading screen is closed, continues old client behavior
         final PacketWrapper gameEventPacket = wrapper.create(ClientboundPackets1_20_3.GAME_EVENT);
         gameEventPacket.write(Type.UNSIGNED_BYTE, (short) 13);
         gameEventPacket.write(Type.FLOAT, 0F);
-        gameEventPacket.send(Protocol1_20_3To1_20_2.class);
+        gameEventPacket.send(Protocol1_20_3To1_20_2.class);*/
     }
 
     @Override

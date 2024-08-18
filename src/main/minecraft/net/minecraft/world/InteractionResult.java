@@ -1,5 +1,8 @@
 package net.minecraft.world;
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+
 public enum InteractionResult {
    SUCCESS,
    CONSUME,
@@ -12,6 +15,9 @@ public enum InteractionResult {
    }
 
    public boolean shouldSwing() {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_14_4)) {
+         return (this.consumesAction());
+      }
       return this == SUCCESS;
    }
 

@@ -33,6 +33,8 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import de.florianmichael.viafabricplus.fixes.versioned.visual.FootStepParticle1_12_2;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class MappingDataBase implements MappingData {
@@ -178,6 +180,9 @@ public class MappingDataBase implements MappingData {
 
     @Override
     public int getNewParticleId(final int id) {
+        if (id == FootStepParticle1_12_2.ID) {
+            return (id);
+        }
         return checkValidity(id, particleMappings.getNewId(id), "particles");
     }
 

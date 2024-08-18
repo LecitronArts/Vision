@@ -21,9 +21,13 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 
 public class InventoryTracker1_16 implements StorableObject {
     private boolean inventoryOpen;
-
+    /**
+     * @author RK_01
+     * @reason Fix ViaVersion cancelling swing packets even when no inventory is open
+     */
     public boolean isInventoryOpen() {
-        return inventoryOpen;
+        return false;
+/*        return inventoryOpen;*/
     }
 
     public void setInventoryOpen(boolean inventoryOpen) {

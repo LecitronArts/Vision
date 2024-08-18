@@ -11,6 +11,10 @@ import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+import de.florianmichael.viafabricplus.settings.impl.GeneralSettings;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
@@ -37,6 +41,7 @@ import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LightBlock;
 import net.minecraft.world.level.block.SuspiciousEffectHolder;
+import org.spongepowered.asm.mixin.Unique;
 
 public class CreativeModeTabs {
    private static final ResourceKey<CreativeModeTab> BUILDING_BLOCKS = createKey("building_blocks");
@@ -58,7 +63,8 @@ public class CreativeModeTabs {
    }).thenComparing(PaintingVariant::getWidth));
    @Nullable
    private static CreativeModeTab.ItemDisplayParameters CACHED_PARAMETERS;
-
+   private static ProtocolVersion viaFabricPlus$version;
+   private static int viaFabricPlus$state;
    private static ResourceKey<CreativeModeTab> createKey(String pName) {
       return ResourceKey.create(Registries.CREATIVE_MODE_TAB, new ResourceLocation(pName));
    }
@@ -1770,6 +1776,15 @@ public class CreativeModeTabs {
    }
 
    public static boolean tryRebuildTabContents(FeatureFlagSet pEnabledFeatures, boolean pHasPermissions, HolderLookup.Provider pHolders) {
+      if (viaFabricPlus$version != ProtocolTranslator.getTargetVersion() || viaFabricPlus$state != GeneralSettings.global().removeNotAvailableItemsFromCreativeTab.getIndex()) {
+         viaFabricPlus$version = ProtocolTranslator.getTargetVersion();
+         viaFabricPlus$state = GeneralSettings.global().removeNotAvailableItemsFromCreativeTab.getIndex();
+
+         CACHED_PARAMETERS = new CreativeModeTab.ItemDisplayParameters(pEnabledFeatures, pHasPermissions, pHolders);
+         buildAllTabContents(CACHED_PARAMETERS);
+
+         return  (true);
+      }
       if (CACHED_PARAMETERS != null && !CACHED_PARAMETERS.needsUpdate(pEnabledFeatures, pHasPermissions, pHolders)) {
          return false;
       } else {

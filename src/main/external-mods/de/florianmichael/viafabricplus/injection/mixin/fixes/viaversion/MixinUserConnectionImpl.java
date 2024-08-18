@@ -37,11 +37,13 @@ public abstract class MixinUserConnectionImpl {
     @Final
     private Channel channel;
 
+/*
     @Inject(method = "sendRawPacket(Lio/netty/buffer/ByteBuf;Z)V", at = @At("HEAD"), cancellable = true)
     private void handleNoPacketSendChannel(ByteBuf packet, boolean currentThread, CallbackInfo ci) {
         if (this.channel instanceof NoPacketSendChannel) {
             ci.cancel();
         }
     }
+*/
 
 }

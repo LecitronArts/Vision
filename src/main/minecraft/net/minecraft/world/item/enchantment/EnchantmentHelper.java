@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -46,7 +49,15 @@ public class EnchantmentHelper {
    }
 
    public static int getEnchantmentLevel(CompoundTag pCompoundTag) {
-      return Mth.clamp(pCompoundTag.getInt("lvl"), 0, 255);
+      int pMin = 0;
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_14_4)) {
+         pMin = Short.MIN_VALUE;
+      }
+      int pMax = 255;
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_14_4)) {
+         pMax = Short.MAX_VALUE;
+      }
+      return Mth.clamp(pCompoundTag.getInt("lvl"), pMin, pMax);
    }
 
    @Nullable

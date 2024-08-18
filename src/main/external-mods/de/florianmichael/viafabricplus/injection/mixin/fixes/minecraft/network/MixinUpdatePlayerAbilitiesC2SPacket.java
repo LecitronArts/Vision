@@ -34,7 +34,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ServerboundPlayerAbilitiesPacket.class)
 public abstract class MixinUpdatePlayerAbilitiesC2SPacket {
 
-    @Unique
+/*    @Unique
     private Abilities viaFabricPlus$abilities;
 
     @Inject(method = "<init>(Lnet/minecraft/world/entity/player/Abilities;)V", at = @At("RETURN"))
@@ -51,6 +51,6 @@ public abstract class MixinUpdatePlayerAbilitiesC2SPacket {
         }
 
         return instance.writeByte(value);
-    }
+    }*/
 
 }

@@ -28,9 +28,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(value = NamedCompoundTagType.class, remap = false)
 public abstract class MixinNamedCompoundTagType {
 
-    @Redirect(method = "read(Lio/netty/buffer/ByteBuf;Z)Lcom/viaversion/viaversion/libs/opennbt/tag/builtin/CompoundTag;", at = @At(value = "INVOKE", target = "Lcom/viaversion/viaversion/libs/opennbt/tag/limiter/TagLimiter;create(II)Lcom/viaversion/viaversion/libs/opennbt/tag/limiter/TagLimiter;"))
+/*    @Redirect(method = "read(Lio/netty/buffer/ByteBuf;Z)Lcom/viaversion/viaversion/libs/opennbt/tag/builtin/CompoundTag;", at = @At(value = "INVOKE", target = "Lcom/viaversion/viaversion/libs/opennbt/tag/limiter/TagLimiter;create(II)Lcom/viaversion/viaversion/libs/opennbt/tag/limiter/TagLimiter;"))
     private static TagLimiter removeNBTSizeLimit(int maxBytes, int maxLevels) {
         return TagLimiter.noop();
-    }
+    }*/
 
 }

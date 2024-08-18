@@ -29,7 +29,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(value = ClassicProtocolExtension.class, remap = false)
 public abstract class MixinClassicProtocolExtension {
 
-    @Inject(method = "supportsVersion", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "supportsVersion", at = @At("HEAD"), cancellable = true)
     private void allowExtensions_supportsVersion(int version, CallbackInfoReturnable<Boolean> cir) {
         if (CPEAdditions.ALLOWED_EXTENSIONS.contains((ClassicProtocolExtension) (Object) this)) {
             cir.setReturnValue(true);
@@ -48,6 +48,6 @@ public abstract class MixinClassicProtocolExtension {
         if (CPEAdditions.ALLOWED_EXTENSIONS.contains((ClassicProtocolExtension) (Object) this)) {
             cir.setReturnValue(1);
         }
-    }
+    }*/
 
 }

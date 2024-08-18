@@ -3,15 +3,19 @@ package net.minecraft.client.gui.screens;
 import java.util.function.BooleanSupplier;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import de.florianmichael.viafabricplus.settings.impl.GeneralSettings;
 import de.florianmichael.viafabricplus.util.ChatUtil;
 import net.minecraft.client.GameNarrator;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.ServerboundKeepAlivePacket;
 import net.optifine.CustomLoadingScreen;
 import net.optifine.CustomLoadingScreens;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.storage.ClassicProgressStorage;
+import org.spongepowered.asm.mixin.Unique;
 
 public class ReceivingLevelScreen extends Screen {
    private static final Component DOWNLOADING_TERRAIN_TEXT = Component.translatable("multiplayer.downloadingTerrain");
@@ -19,7 +23,14 @@ public class ReceivingLevelScreen extends Screen {
    private final long createdAt;
    private final BooleanSupplier levelReceived;
    private CustomLoadingScreen customLoadingScreen = CustomLoadingScreens.getCustomLoadingScreen();
+   @Unique
+   private int viaFabricPlus$tickCounter;
 
+   @Unique
+   private boolean viaFabricPlus$ready;
+
+   @Unique
+   private boolean viaFabricPlus$closeOnNextTick = false;
    public ReceivingLevelScreen(BooleanSupplier pLevelReceived) {
       super(GameNarrator.NO_TITLE);
       this.levelReceived = pLevelReceived;
@@ -71,6 +82,43 @@ public class ReceivingLevelScreen extends Screen {
    }
 
    public void tick() {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20_2)) {
+
+
+         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_18)) {
+            if (this.viaFabricPlus$ready) {
+               this.onClose();
+            }
+
+            if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_1)) {
+               this.viaFabricPlus$tickCounter++;
+               if (this.viaFabricPlus$tickCounter % 20 == 0) {
+                  this.minecraft.getConnection().send(new ServerboundKeepAlivePacket(0));
+               }
+            }
+         } else {
+            if (System.currentTimeMillis() > this.createdAt + 30000L) {
+               this.onClose();
+            } else {
+               if (this.viaFabricPlus$closeOnNextTick) {
+                  if (this.minecraft.player == null) return;
+
+                  final BlockPos blockPos = this.minecraft.player.blockPosition();
+                  final boolean isOutOfHeightLimit = this.minecraft.level != null && this.minecraft.level.isOutsideBuildHeight(blockPos.getY());
+                  if (isOutOfHeightLimit || this.minecraft.levelRenderer.isSectionCompiled(blockPos) || this.minecraft.player.isSpectator() || !this.minecraft.player.isAlive()) {
+                     this.onClose();
+                  }
+               } else {
+                  if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_1)) {
+                     this.viaFabricPlus$closeOnNextTick = this.viaFabricPlus$ready || System.currentTimeMillis() > this.createdAt + 2000;
+                  } else {
+                     this.viaFabricPlus$closeOnNextTick = this.viaFabricPlus$ready;
+                  }
+               }
+            }
+         }
+         return;
+      }
       if (this.levelReceived.getAsBoolean() || System.currentTimeMillis() > this.createdAt + 30000L) {
          this.onClose();
       }
@@ -84,5 +132,8 @@ public class ReceivingLevelScreen extends Screen {
 
    public boolean isPauseScreen() {
       return false;
+   }
+   public void viaFabricPlus$setReady() {
+      this.viaFabricPlus$ready = true;
    }
 }

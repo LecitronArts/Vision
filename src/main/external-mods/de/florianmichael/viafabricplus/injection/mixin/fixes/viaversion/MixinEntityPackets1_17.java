@@ -34,6 +34,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(value = EntityPackets.class, remap = false)
 public abstract class MixinEntityPackets1_17 {
 
+/*
     @Redirect(method = "registerPackets", at = @At(value = "INVOKE", target = "Lcom/viaversion/viaversion/protocols/protocol1_17to1_16_4/Protocol1_17To1_16_4;registerClientbound(Lcom/viaversion/viaversion/api/protocol/packet/ClientboundPacketType;Lcom/viaversion/viaversion/api/protocol/remapper/PacketHandler;)V"))
     private void handleClassicWorldHeight(Protocol1_17To1_16_4 instance, ClientboundPacketType packetType, PacketHandler packetHandler) {
         if (packetType == ClientboundPackets1_16_2.JOIN_GAME) packetHandler = WorldHeightSupport.handleJoinGame(packetHandler);
@@ -41,5 +42,6 @@ public abstract class MixinEntityPackets1_17 {
 
         ((Protocol) instance).registerClientbound(packetType, packetHandler);
     }
+*/
 
 }

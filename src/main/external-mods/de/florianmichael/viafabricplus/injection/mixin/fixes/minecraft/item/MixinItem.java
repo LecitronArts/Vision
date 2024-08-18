@@ -42,9 +42,9 @@ public abstract class MixinItem {
     private int maxDamage;
 
     @Shadow
-    public abstract boolean isFood();
+    public abstract boolean isEdible();
 
-    @Redirect(method = {"getMaxDamage", "canBeDepleted", "getBarWidth", "getBarColor"}, at = @At(value = "FIELD", target = "Lnet/minecraft/world/item/Item;maxDamage:I"))
+/*    @Redirect(method = {"getMaxDamage", "canBeDepleted", "getBarWidth", "getBarColor"}, at = @At(value = "FIELD", target = "Lnet/minecraft/world/item/Item;maxDamage:I"))
     private int changeCrossbowDamage(Item instance) {
         if (instance instanceof ArmorItem armor && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_8tob1_8_1)) {
             // Counterpart in MixinArmorMaterials
@@ -54,22 +54,24 @@ public abstract class MixinItem {
         } else {
             return maxDamage;
         }
-    }
+    }*/
 
+/*
     @Inject(method = "getMaxStackSize", at = @At("HEAD"), cancellable = true)
     private void dontStackFood(CallbackInfoReturnable<Integer> cir) {
-        if (this.isFood() && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_7tob1_7_3)) {
+        if (this.isEdible() && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_7tob1_7_3)) {
             cir.setReturnValue(1);
         }
     }
+*/
 
-    @ModifyExpressionValue(method = {"use", "finishUsingItem", "getUseAnimation", "getUseDuration"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/Item;isEdible()Z"))
+/*    @ModifyExpressionValue(method = {"use", "finishUsingItem", "getUseAnimation", "getUseDuration"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/Item;isEdible()Z"))
     private boolean makeFoodInstantConsumable(boolean original) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_7tob1_7_3)) {
             return false;
         } else {
             return original;
         }
-    }
+    }*/
 
 }

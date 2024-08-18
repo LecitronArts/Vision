@@ -3,12 +3,15 @@ package net.minecraft.world.item;
 import com.mojang.serialization.Codec;
 import java.util.EnumMap;
 import java.util.function.Supplier;
+
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.Util;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.LazyLoadedValue;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 
 public enum ArmorMaterials implements StringRepresentable, ArmorMaterial {
    LEATHER("leather", 5, Util.make(new EnumMap<>(ArmorItem.Type.class), (p_266652_) -> {
@@ -96,7 +99,24 @@ public enum ArmorMaterials implements StringRepresentable, ArmorMaterial {
    }
 
    public int getDurabilityForType(ArmorItem.Type pType) {
-      return HEALTH_FUNCTION_FOR_TYPE.get(pType) * this.durabilityMultiplier;
+      int viaFixDurability;
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_8tob1_8_1)) {
+         if (this == ArmorMaterials.LEATHER) {
+            viaFixDurability = 3;
+         } else if (this == ArmorMaterials.CHAIN || this == ArmorMaterials.GOLD) {
+            viaFixDurability = 6;
+         } else if (this == ArmorMaterials.IRON) {
+            viaFixDurability = 12;
+         } else if (this == ArmorMaterials.DIAMOND) {
+            viaFixDurability = 24;
+         } else {
+            viaFixDurability = this.durabilityMultiplier;
+         }
+      } else {
+         viaFixDurability = this.durabilityMultiplier;
+      }
+
+      return HEALTH_FUNCTION_FOR_TYPE.get(pType) * viaFixDurability;
    }
 
    public int getDefenseForType(ArmorItem.Type pType) {

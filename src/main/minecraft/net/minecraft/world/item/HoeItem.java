@@ -1,11 +1,16 @@
 package net.minecraft.world.item;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.mojang.datafixers.util.Pair;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
@@ -29,7 +34,22 @@ public class HoeItem extends DiggerItem {
    protected HoeItem(Tier pTier, int pAttackDamageModifier, float pAttackSpeedModifier, Item.Properties pProperties) {
       super((float)pAttackDamageModifier, pAttackSpeedModifier, pTier, BlockTags.MINEABLE_WITH_HOE, pProperties);
    }
-
+   private static final Set<Block> viaFabricPlus$effective_blocks_r1_16_5 = ImmutableSet.of(
+           Blocks.NETHER_WART_BLOCK,
+           Blocks.WARPED_WART_BLOCK,
+           Blocks.HAY_BLOCK,
+           Blocks.DRIED_KELP_BLOCK,
+           Blocks.TARGET,
+           Blocks.SHROOMLIGHT,
+           Blocks.SPONGE,
+           Blocks.WET_SPONGE,
+           Blocks.JUNGLE_LEAVES,
+           Blocks.OAK_LEAVES,
+           Blocks.SPRUCE_LEAVES,
+           Blocks.DARK_OAK_LEAVES,
+           Blocks.ACACIA_LEAVES,
+           Blocks.BIRCH_LEAVES
+   );
    public InteractionResult useOn(UseOnContext pContext) {
       Level level = pContext.getLevel();
       BlockPos blockpos = pContext.getClickedPos();
@@ -75,5 +95,21 @@ public class HoeItem extends DiggerItem {
 
    public static boolean onlyIfAirAbove(UseOnContext p_150857_) {
       return p_150857_.getClickedFace() != Direction.DOWN && p_150857_.getLevel().getBlockState(p_150857_.getClickedPos().above()).isAir();
+   }
+
+   @Override
+   public boolean isCorrectToolForDrops(BlockState state) {
+      return ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_16_4) && super.isCorrectToolForDrops(state);
+   }
+
+   @Override
+   public float getDestroySpeed(ItemStack stack, BlockState state) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_15_2)) {
+         return 1.0F;
+      } else if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4)) {
+         return viaFabricPlus$effective_blocks_r1_16_5.contains(state.getBlock()) ? this.speed : 1.0F;
+      } else {
+         return super.getDestroySpeed(stack, state);
+      }
    }
 }

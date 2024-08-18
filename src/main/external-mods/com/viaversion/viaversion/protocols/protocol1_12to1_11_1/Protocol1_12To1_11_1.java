@@ -155,7 +155,7 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
                     clientChunks.setEnvironment(dimensionId);
 
                     // Reset recipes
-                    if (user.getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_13)) {
+                    if (/*user.getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_13)*/ false) {
                         wrapper.create(ClientboundPackets1_13.DECLARE_RECIPES, packetWrapper -> packetWrapper.write(Type.VAR_INT, 0))
                                 .scheduleSend(Protocol1_13To1_12_2.class);
                     }

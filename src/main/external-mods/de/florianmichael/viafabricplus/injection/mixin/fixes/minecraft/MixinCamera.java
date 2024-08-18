@@ -42,14 +42,14 @@ public abstract class MixinCamera {
     @Shadow
     private Entity entity;
 
-    @Inject(method = "setup", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setPosition(DDD)V", shift = At.Shift.BEFORE))
+/*    @Inject(method = "setup", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setPosition(DDD)V", shift = At.Shift.BEFORE))
     private void onUpdateHeight(BlockGetter area, Entity focusedEntity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo ci) {
         if (!DebugSettings.global().replaceSneaking.isEnabled() && DebugSettings.global().sneakInstantly.isEnabled()) {
             eyeHeight = eyeHeightOld = focusedEntity.getEyeHeight();
         }
-    }
+    }*/
 
-    @Inject(method = "tick", at = @At(value = "HEAD"), cancellable = true)
+/*    @Inject(method = "tick", at = @At(value = "HEAD"), cancellable = true)
     private void onUpdateEyeHeight(CallbackInfo ci) {
         if (this.entity == null) return;
 
@@ -71,6 +71,6 @@ public abstract class MixinCamera {
                 eyeHeight = entity.getEyeHeight();
             }
         }
-    }
+    }*/
 
 }

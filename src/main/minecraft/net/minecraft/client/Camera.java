@@ -1,12 +1,15 @@
 package net.minecraft.client;
 
 import java.util.Arrays;
+
+import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.Blocks;
@@ -44,6 +47,9 @@ public class Camera {
       this.detached = pDetached;
       this.partialTickTime = pPartialTick;
       this.setRotation(pEntity.getViewYRot(pPartialTick), pEntity.getViewXRot(pPartialTick));
+      if (!DebugSettings.global().replaceSneaking.isEnabled() && DebugSettings.global().sneakInstantly.isEnabled()) {
+         eyeHeight = eyeHeightOld = pEntity.getEyeHeight();
+      }
       this.setPosition(Mth.lerp((double)pPartialTick, pEntity.xo, pEntity.getX()), Mth.lerp((double)pPartialTick, pEntity.yo, pEntity.getY()) + (double)Mth.lerp(pPartialTick, this.eyeHeightOld, this.eyeHeight), Mth.lerp((double)pPartialTick, pEntity.zo, pEntity.getZ()));
       if (pDetached) {
          if (pThirdPersonReverse) {
@@ -61,6 +67,24 @@ public class Camera {
 
    public void tick() {
       if (this.entity != null) {
+         if (DebugSettings.global().replaceSneaking.isEnabled()) {
+            this.eyeHeightOld = this.eyeHeight;
+
+            if (this.entity instanceof Player player && !player.isSleeping()) {
+               if (player.isShiftKeyDown()) {
+                  eyeHeight = 1.54F;
+               } else if (!DebugSettings.global().longSneaking.isEnabled()) {
+                  eyeHeight = 1.62F;
+               } else if (eyeHeight < 1.62F) {
+                  float delta = 1.62F - eyeHeight;
+                  delta *= 0.4F;
+                  eyeHeight = 1.62F - delta;
+               }
+            } else {
+               eyeHeight = entity.getEyeHeight();
+            }
+            return;
+         }
          this.eyeHeightOld = this.eyeHeight;
          this.eyeHeight += (this.entity.getEyeHeight() - this.eyeHeight) * 0.5F;
       }

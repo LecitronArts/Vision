@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.IntTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -124,6 +125,11 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_16_
 
             wrapper.cancel();
         });
+
+        this.protocol.registerServerbound(ServerboundPackets1_17.CLICK_WINDOW, ServerboundPackets1_16_2.CLICK_WINDOW, wrapper -> {
+            Via.getPlatform().getLogger().severe("Tried to remap >=1.17 CLICK_WINDOW packet which is impossible without breaking the content! Find the cause and fix it!");
+            wrapper.cancel();
+        }, true);
     }
 
     @Override

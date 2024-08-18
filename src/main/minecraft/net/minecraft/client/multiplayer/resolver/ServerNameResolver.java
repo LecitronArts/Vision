@@ -2,8 +2,12 @@ package net.minecraft.client.multiplayer.resolver;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.util.Optional;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.raphimc.viabedrock.api.BedrockProtocolVersion;
 
 @OnlyIn(Dist.CLIENT)
 public class ServerNameResolver {
@@ -20,6 +24,9 @@ public class ServerNameResolver {
    }
 
    public Optional<ResolvedServerAddress> resolveAddress(ServerAddress pServerAddress) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4) /*|| ProtocolTranslator.getTargetVersion().equals(BedrockProtocolVersion.bedrockLatest)*/) {
+         return (this.resolver.resolve(pServerAddress));
+      }
       Optional<ResolvedServerAddress> optional = this.resolver.resolve(pServerAddress);
       if ((!optional.isPresent() || this.addressCheck.isAllowed(optional.get())) && this.addressCheck.isAllowed(pServerAddress)) {
          Optional<ServerAddress> optional1 = this.redirectHandler.lookupRedirect(pServerAddress);

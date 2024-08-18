@@ -34,6 +34,7 @@ public abstract class MixinArmorMaterials {
     @Shadow
     @Final
     private int durabilityMultiplier;
+/*
 
     @Redirect(method = "getDurabilityForType", at = @At(value = "FIELD", target = "Lnet/minecraft/world/item/ArmorMaterials;durabilityMultiplier:I"))
     private int changeDurabilityMultiplier(ArmorMaterials instance) {
@@ -50,5 +51,6 @@ public abstract class MixinArmorMaterials {
         }
         return this.durabilityMultiplier;
     }
+*/
 
 }

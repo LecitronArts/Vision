@@ -18,6 +18,7 @@
 package net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.storage;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
+import de.florianmichael.viafabricplus.event.LoadClassicProtocolExtensionCallback;
 import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.data.ClassicProtocolExtension;
 
 import java.util.EnumMap;
@@ -57,6 +58,7 @@ public class ExtensionProtocolMetadataStorage implements StorableObject {
 
     public void addServerExtension(final ClassicProtocolExtension extension, final int version) {
         this.serverExtensions.put(extension, version);
+        LoadClassicProtocolExtensionCallback.EVENT.invoker().onLoadClassicProtocolExtension(extension);
     }
 
     public boolean hasServerExtension(final ClassicProtocolExtension extension, final int... versions) {
@@ -69,5 +71,7 @@ public class ExtensionProtocolMetadataStorage implements StorableObject {
         }
         return false;
     }
-
+    public EnumMap<ClassicProtocolExtension, Integer> viaFabricPlus$getServerExtensions() {
+        return this.serverExtensions;
+    }
 }

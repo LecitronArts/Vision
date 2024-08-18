@@ -30,11 +30,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = ItemCooldowns.class)
 public abstract class MixinItemCooldownManager {
 
-    @Inject(method = "addCooldown", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "addCooldown", at = @At("HEAD"), cancellable = true)
     private void dontSetCooldown(Item item, int duration, CallbackInfo ci) {
         if (DebugSettings.global().removeCooldowns.isEnabled()) {
             ci.cancel();
         }
-    }
+    }*/
 
 }

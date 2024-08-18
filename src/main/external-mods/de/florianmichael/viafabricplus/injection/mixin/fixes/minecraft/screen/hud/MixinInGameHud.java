@@ -41,7 +41,7 @@ public abstract class MixinInGameHud {
 
     // Removing newer elements
 
-    @Inject(method = {"renderJumpMeter", "renderVehicleHealth"}, at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = {"renderJumpMeter", "renderVehicleHealth"}, at = @At("HEAD"), cancellable = true)
     private void removeMountJumpBar(CallbackInfo ci) {
         if (VisualSettings.global().removeNewerHudElements.isEnabled()) {
             ci.cancel();
@@ -53,12 +53,11 @@ public abstract class MixinInGameHud {
         if (VisualSettings.global().removeNewerHudElements.isEnabled()) {
             cir.setReturnValue(1);
         }
-    }
+    }*/
 
     // Moving down all remaining elements
-
-    @ModifyExpressionValue(method = "renderPlayerHealth", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/Gui;screenHeight:I", opcode = Opcodes.GETFIELD),
-            require = 0)
+    // TODO: 8/18/2024 时间紧急这些先放一放
+    @ModifyExpressionValue(method = "renderPlayerHealth", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/Gui;screenHeight:I", opcode = Opcodes.GETFIELD), require = 0)
     private int moveHealthDown(int originalValue) {
         if (VisualSettings.global().removeNewerHudElements.isEnabled()) {
             return originalValue + 6;
@@ -102,5 +101,4 @@ public abstract class MixinInGameHud {
             return oldY;
         }
     }
-
 }

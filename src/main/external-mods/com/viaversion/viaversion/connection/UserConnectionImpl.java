@@ -33,6 +33,7 @@ import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
 import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.PipelineUtil;
+import de.florianmichael.viafabricplus.protocoltranslator.util.NoPacketSendChannel;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -161,6 +162,9 @@ public class UserConnectionImpl implements UserConnection {
     }
 
     private void sendRawPacket(final ByteBuf packet, boolean currentThread) {
+        if (this.channel instanceof NoPacketSendChannel) {
+            return;
+        }
         Runnable act;
         if (clientSide) {
             // We'll just assume that Via decoder isn't wrapping the original decoder

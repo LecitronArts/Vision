@@ -12,6 +12,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.UnaryOperator;
 import javax.annotation.Nullable;
+
+import de.florianmichael.viafabricplus.settings.impl.VisualSettings;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.AttackIndicatorStatus;
@@ -572,6 +574,9 @@ public class Gui {
    }
 
    public void renderJumpMeter(PlayerRideableJumping pRideable, GuiGraphics pGuiGraphics, int pX) {
+      if (VisualSettings.global().removeNewerHudElements.isEnabled()) {
+         return;
+      }
       this.minecraft.getProfiler().push("jumpBar");
       float f = this.minecraft.player.getJumpRidingScale();
       int i = 182;
@@ -770,6 +775,9 @@ public class Gui {
    }
 
    private int getVehicleMaxHearts(@Nullable LivingEntity pVehicle) {
+      if (VisualSettings.global().removeNewerHudElements.isEnabled()) {
+         return (1);
+      }
       if (pVehicle != null && pVehicle.showVehicleHealth()) {
          float f = pVehicle.getMaxHealth();
          int i = (int)(f + 0.5F) / 2;
@@ -958,6 +966,9 @@ public class Gui {
    }
 
    private void renderVehicleHealth(GuiGraphics pGuiGraphics) {
+      if (VisualSettings.global().removeNewerHudElements.isEnabled()) {
+         return;
+      }
       LivingEntity livingentity = this.getPlayerVehicleWithHealth();
       if (livingentity != null) {
          int i = this.getVehicleMaxHearts(livingentity);

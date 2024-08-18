@@ -2,6 +2,8 @@ package net.minecraft.network.protocol.game;
 
 import java.time.Instant;
 import javax.annotation.Nullable;
+
+import de.florianmichael.viafabricplus.fixes.ClientsideFixes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.LastSeenMessages;
 import net.minecraft.network.chat.MessageSignature;
@@ -13,7 +15,7 @@ public record ServerboundChatPacket(String message, Instant timeStamp, long salt
    }
 
    public void write(FriendlyByteBuf pBuffer) {
-      pBuffer.writeUtf(this.message, 256);
+      pBuffer.writeUtf(this.message,  ClientsideFixes.getChatLength());
       pBuffer.writeInstant(this.timeStamp);
       pBuffer.writeLong(this.salt);
       pBuffer.writeNullable(this.signature, MessageSignature::write);

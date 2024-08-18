@@ -39,7 +39,7 @@ public abstract class MixinServerResourcePackLoader_4 {
     private WorldVersion editHeaders() {
         return ResourcePackHeaderDiff.get(ProtocolTranslator.getTargetVersion());
     }
-
+/*
     @Inject(method = "createDownloadHeaders", at = @At("TAIL"), cancellable = true)
     private void removeHeaders(CallbackInfoReturnable<Map<String, String>> cir) {
         final LinkedHashMap<String, String> modifiableMap = new LinkedHashMap<>(cir.getReturnValue());
@@ -51,6 +51,6 @@ public abstract class MixinServerResourcePackLoader_4 {
             }
         }
         cir.setReturnValue(modifiableMap);
-    }
+    }*/
 
 }

@@ -30,11 +30,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(SectionRenderDispatcher.RenderSection.class)
 public abstract class MixinBuiltChunk {
 
+/*
     @Inject(method = "hasAllNeighbors", at = @At("HEAD"), cancellable = true)
     private void modifyRenderCondition(CallbackInfoReturnable<Boolean> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             cir.setReturnValue(true);
         }
     }
+*/
 
 }

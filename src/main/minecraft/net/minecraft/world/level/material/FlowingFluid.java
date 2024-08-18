@@ -2,6 +2,9 @@ package net.minecraft.world.level.material;
 
 import com.google.common.collect.Maps;
 import com.mojang.datafixers.util.Pair;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.fixes.data.Material1_19_4;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import it.unimi.dsi.fastutil.objects.Object2ByteLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2BooleanMap;
 import it.unimi.dsi.fastutil.shorts.Short2BooleanOpenHashMap;
@@ -16,11 +19,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.DoorBlock;
-import net.minecraft.world.level.block.IceBlock;
-import net.minecraft.world.level.block.LiquidBlockContainer;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -107,7 +106,24 @@ public abstract class FlowingFluid extends Fluid {
       } else if (pSide == Direction.UP) {
          return true;
       } else {
-         return blockstate.getBlock() instanceof IceBlock ? false : blockstate.isFaceSturdy(pLevel, pNeighborPos, pSide);
+         boolean isFaceSturdy;
+         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_11_1)) {
+            isFaceSturdy = Material1_19_4.getMaterial(blockstate).solid();
+         } else if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
+            final Block block = blockstate.getBlock();
+            if (block instanceof ShulkerBoxBlock || block instanceof LeavesBlock || block instanceof TrapDoorBlock ||
+                    block == Blocks.BEACON || block == Blocks.CAULDRON || block == Blocks.GLASS ||
+                    block == Blocks.GLOWSTONE || block == Blocks.ICE || block == Blocks.SEA_LANTERN ||
+                    block instanceof StainedGlassBlock || block == Blocks.PISTON || block == Blocks.STICKY_PISTON ||
+                    block == Blocks.PISTON_HEAD || block instanceof StairBlock) {
+               isFaceSturdy = false;
+            } else {
+               isFaceSturdy = blockstate.isFaceSturdy(pLevel, pNeighborPos, pSide);
+            }
+         } else {
+            isFaceSturdy = blockstate.isFaceSturdy(pLevel, pNeighborPos, pSide);
+         }
+         return blockstate.getBlock() instanceof IceBlock ? false : isFaceSturdy;
       }
    }
 

@@ -33,6 +33,8 @@ import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ClientboundPac
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ClientboundPackets1_17;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
+import de.florianmichael.viafabricplus.fixes.versioned.classic.WorldHeightSupport;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -63,7 +65,7 @@ public final class WorldPackets {
             wrapper.setPacketType(packetType);
         });
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.UPDATE_LIGHT, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_16_2.UPDATE_LIGHT, WorldHeightSupport.handleUpdateLight(new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // x
@@ -105,9 +107,10 @@ public final class WorldPackets {
             private boolean isSet(int mask, int i) {
                 return (mask & (1 << i)) != 0;
             }
-        });
+        }));
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.CHUNK_DATA, wrapper -> {
+
+        protocol.registerClientbound(ClientboundPackets1_16_2.CHUNK_DATA, WorldHeightSupport.handleChunkData(wrapper -> {
             Chunk chunk = wrapper.read(ChunkType1_16_2.TYPE);
             if (!chunk.isFullChunk()) {
                 // All chunks are full chunk packets now (1.16 already stopped sending non-full chunks)
@@ -137,7 +140,7 @@ public final class WorldPackets {
                     palette.setIdByIndex(i, mappedBlockStateId);
                 }
             }
-        });
+        }));
 
         blockRewriter.registerEffect(ClientboundPackets1_16_2.EFFECT, 1010, 2001);
     }

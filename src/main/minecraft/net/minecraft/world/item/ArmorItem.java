@@ -5,6 +5,9 @@ import com.google.common.collect.Multimap;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.UUID;
+
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.dispenser.BlockSource;
@@ -12,6 +15,7 @@ import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -24,6 +28,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.phys.AABB;
+import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 
 public class ArmorItem extends Item implements Equipable {
    private static final EnumMap<ArmorItem.Type, UUID> ARMOR_MODIFIER_UUID_PER_TYPE = Util.make(new EnumMap<>(ArmorItem.Type.class), (p_266744_) -> {
@@ -43,7 +48,7 @@ public class ArmorItem extends Item implements Equipable {
    protected final float knockbackResistance;
    protected final ArmorMaterial material;
    private final Multimap<Attribute, AttributeModifier> defaultModifiers;
-
+   private final Multimap<Attribute, AttributeModifier> viaFabricPlus$AttributeModifiers_r1_8 = ImmutableMultimap.of();
    public static boolean dispenseArmor(BlockSource pBlockSource, ItemStack pArmorItem) {
       BlockPos blockpos = pBlockSource.pos().relative(pBlockSource.state().getValue(DispenserBlock.FACING));
       List<LivingEntity> list = pBlockSource.level().getEntitiesOfClass(LivingEntity.class, new AABB(blockpos), EntitySelector.NO_SPECTATORS.and(new EntitySelector.MobCanWearArmorEntitySelector(pArmorItem)));
@@ -99,11 +104,21 @@ public class ArmorItem extends Item implements Equipable {
    }
 
    public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pHand) {
+
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.r1_4_6tor1_4_7)) {
+         return (new InteractionResultHolder<>(InteractionResult.FAIL,pPlayer.getItemInHand(pHand)));
+      }
       return this.swapWithEquipmentSlot(this, pLevel, pPlayer, pHand);
    }
 
    public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot pEquipmentSlot) {
-      return pEquipmentSlot == this.type.getSlot() ? this.defaultModifiers : super.getDefaultAttributeModifiers(pEquipmentSlot);
+      Multimap<Attribute, AttributeModifier> viaFix ;
+      if (DebugSettings.global().replaceAttributeModifiers.isEnabled()) {
+         viaFix= this.viaFabricPlus$AttributeModifiers_r1_8;
+      } else {
+         viaFix= this.defaultModifiers;
+      }
+      return pEquipmentSlot == this.type.getSlot() ? viaFix: super.getDefaultAttributeModifiers(pEquipmentSlot);
    }
 
    public int getDefense() {

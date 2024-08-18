@@ -34,11 +34,13 @@ public abstract class MixinActionResult {
     @Shadow
     public abstract boolean consumesAction();
 
+/*
     @Inject(method = "shouldSwing", at = @At("HEAD"), cancellable = true)
     private void swingWhenConsume(CallbackInfoReturnable<Boolean> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_14_4)) {
             cir.setReturnValue(this.consumesAction());
         }
     }
+*/
 
 }

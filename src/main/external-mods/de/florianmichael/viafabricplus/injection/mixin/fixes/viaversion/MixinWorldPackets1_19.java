@@ -26,7 +26,6 @@ import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.Protocol1_19To1_18_2;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets.WorldPackets;
 import de.florianmichael.viafabricplus.fixes.ClientsideFixes;
-import de.florianmichael.viafabricplus.access.IClientPlayerInteractionManager;
 import de.florianmichael.viafabricplus.protocoltranslator.translator.BlockStateTranslator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -51,8 +50,8 @@ public abstract class MixinWorldPackets1_19 {
                     final ServerboundPlayerActionPacket.Action action = data.readEnum(ServerboundPlayerActionPacket.Action.class);
                     final boolean allGood = data.readBoolean();
 
-                    final var mixinInteractionManager = (IClientPlayerInteractionManager) Minecraft.getInstance().gameMode;
-                    mixinInteractionManager.viaFabricPlus$get1_18_2InteractionManager().handleBlockBreakAck(pos, blockState, action, allGood);
+/*                    final var mixinInteractionManager = (IClientPlayerInteractionManager) Minecraft.getInstance().gameMode;*/
+                    Minecraft.getInstance().gameMode.viaFabricPlus$get1_18_2InteractionManager().handleBlockBreakAck(pos, blockState, action, allGood);
                 } catch (Throwable t) {
                     throw new RuntimeException("Failed to handle BlockBreakAck packet data", t);
                 }

@@ -41,7 +41,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(value = InventoryPackets.class, remap = false)
 public abstract class MixinInventoryPackets {
 
-    @Inject(method = "lambda$registerPackets$0", at = @At(value = "INVOKE", target = "Ljava/util/logging/Logger;warning(Ljava/lang/String;)V", remap = false), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+/*    @Inject(method = "lambda$registerPackets$0", at = @At(value = "INVOKE", target = "Ljava/util/logging/Logger;warning(Ljava/lang/String;)V", remap = false), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     private static void supportLargeContainers(PacketWrapper wrapper, CallbackInfo ci, Short windowId, String type, JsonElement title, Short slots) {
         if ((type.equals("minecraft:container") || type.equals("minecraft:chest")) && (slots > 54 || slots <= 0)) {
             ci.cancel();
@@ -70,6 +70,6 @@ public abstract class MixinInventoryPackets {
             wrapper.write(Type.UNSIGNED_BYTE, slots);
             wrapper.write(Type.TAG, TextComponentTranslator.via1_14toViaLatest(title));
         }
-    }
+    }*/
 
 }

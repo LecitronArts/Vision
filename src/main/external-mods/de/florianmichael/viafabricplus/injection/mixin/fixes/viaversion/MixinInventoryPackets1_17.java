@@ -39,13 +39,13 @@ public abstract class MixinInventoryPackets1_17 extends ItemRewriter<Clientbound
     public MixinInventoryPackets1_17(Protocol1_17To1_16_4 protocol, Type<Item> itemType, Type<Item[]> itemArrayType) {
         super(protocol, itemType, itemArrayType);
     }
-
+/*
     @Inject(method = "registerPackets", at = @At("RETURN"))
     private void removeWindowClickHandler(CallbackInfo ci) {
         this.protocol.registerServerbound(ServerboundPackets1_17.CLICK_WINDOW, ServerboundPackets1_16_2.CLICK_WINDOW, wrapper -> {
             Via.getPlatform().getLogger().severe("Tried to remap >=1.17 CLICK_WINDOW packet which is impossible without breaking the content! Find the cause and fix it!");
             wrapper.cancel();
         }, true);
-    }
+    }*/
 
 }

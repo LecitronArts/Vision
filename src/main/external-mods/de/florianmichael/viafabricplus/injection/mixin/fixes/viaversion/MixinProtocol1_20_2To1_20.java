@@ -32,7 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = Protocol1_20_2To1_20.class, remap = false)
 public abstract class MixinProtocol1_20_2To1_20 {
 
-    @Inject(method = "lambda$queueServerboundPacket$11", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "lambda$queueServerboundPacket$11", at = @At("HEAD"), cancellable = true)
     private static void dontQueueConfigPackets(ServerboundPackets1_20_2 packetType, PacketWrapper wrapper, CallbackInfo ci) {
         if (!DebugSettings.global().queueConfigPackets.getValue()) {
             ci.cancel();
@@ -43,6 +43,6 @@ public abstract class MixinProtocol1_20_2To1_20 {
                 default -> throw new IllegalStateException("Unexpected packet type: " + packetType);
             }
         }
-    }
+    }*/
 
 }

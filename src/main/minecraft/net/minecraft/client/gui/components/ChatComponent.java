@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import javax.annotation.Nullable;
+
+import de.florianmichael.viafabricplus.settings.impl.VisualSettings;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Optionull;
 import net.minecraft.client.GuiMessage;
@@ -201,6 +203,7 @@ public class ChatComponent {
    }
 
    public void addMessage(Component pChatComponent, @Nullable MessageSignature pHeaderSignature, @Nullable GuiMessageTag pTag) {
+      pTag = VisualSettings.global().hideSignatureIndicator.isEnabled() ? null : pTag;
       this.logChatMessage(pChatComponent, pTag);
       this.addMessage(pChatComponent, pHeaderSignature, this.minecraft.gui.getGuiTicks(), pTag, false);
    }

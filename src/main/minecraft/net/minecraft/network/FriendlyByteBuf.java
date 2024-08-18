@@ -12,6 +12,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.fixes.ClientsideFixes;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.ByteBufInputStream;
@@ -587,7 +590,14 @@ public class FriendlyByteBuf extends ByteBuf {
          this.writeByte(pStack.getCount());
          CompoundTag compoundtag = null;
          if (item.canBeDepleted() || item.shouldOverrideMultiplayerNbt()) {
-            compoundtag = pStack.getTag();
+            CompoundTag tag = pStack.getTag();
+
+            if (pStack.viaFabricPlus$has1_10Tag()) {
+               if (tag == null) tag = new CompoundTag();
+               tag.putByte(ClientsideFixes.ITEM_COUNT_NBT_TAG, (byte) pStack.viaFabricPlus$get1_10Count());
+            }
+
+            compoundtag = tag;
          }
 
          this.writeNbt(compoundtag);
@@ -600,10 +610,18 @@ public class FriendlyByteBuf extends ByteBuf {
       if (!this.readBoolean()) {
          return ItemStack.EMPTY;
       } else {
+         CompoundTag tag = this.readNbt();
          Item item = this.readById(BuiltInRegistries.ITEM);
          int i = this.readByte();
          ItemStack itemstack = new ItemStack(item, i);
-         itemstack.setTag(this.readNbt());
+         if (tag != null && tag.contains(ClientsideFixes.ITEM_COUNT_NBT_TAG, Tag.TAG_BYTE) && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_10)) {
+            itemstack.viaFabricPlus$set1_10Count(tag.getByte(ClientsideFixes.ITEM_COUNT_NBT_TAG));
+            tag.remove(ClientsideFixes.ITEM_COUNT_NBT_TAG);
+            if (tag.isEmpty()) tag = null;
+         }
+
+         itemstack.setTag(tag);
+      /*   itemstack.setTag(this.readNbt());*/
          return itemstack;
       }
    }

@@ -39,7 +39,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = Protocolc0_30toc0_30cpe.class, remap = false)
 public abstract class MixinProtocolc0_30toc0_30cpe extends AbstractProtocol<ClientboundPacketsc0_30cpe, ClientboundPacketsc0_28, ServerboundPacketsc0_30cpe, ServerboundPacketsc0_28> {
 
-    @Inject(method = "registerPackets", at = @At("RETURN"))
+/*    @Inject(method = "registerPackets", at = @At("RETURN"))
     private void extendPackets(CallbackInfo ci) {
         this.registerClientbound(CPEAdditions.EXT_WEATHER_TYPE, null, new PacketHandlers() {
             @Override
@@ -49,19 +49,19 @@ public abstract class MixinProtocolc0_30toc0_30cpe extends AbstractProtocol<Clie
                     final byte weatherType = wrapper.read(Type.BYTE);
 
                     final PacketWrapper changeRainState = PacketWrapper.create(ClientboundPackets1_19_4.GAME_EVENT, wrapper.user());
-                    changeRainState.write(Type.BYTE, weatherType == 0 /* sunny */ ? (byte) 2 : (byte) 1); // start raining
+                    changeRainState.write(Type.BYTE, weatherType == 0 *//* sunny *//* ? (byte) 2 : (byte) 1); // start raining
                     changeRainState.write(Type.FLOAT, 0F); // unused
                     changeRainState.send(Protocol1_19_4To1_19_3.class);
 
-                    if (weatherType == 1 /* raining */ || weatherType == 2 /* snowing */) {
+                    if (weatherType == 1 *//* raining *//* || weatherType == 2 *//* snowing *//*) {
                         final PacketWrapper changeRainType = PacketWrapper.create(ClientboundPackets1_19_4.GAME_EVENT, wrapper.user());
                         changeRainType.write(Type.BYTE, (byte) 7);
-                        changeRainType.write(Type.FLOAT, weatherType == 1 /* raining */ ? 0F : 1F);
+                        changeRainType.write(Type.FLOAT, weatherType == 1 *//* raining *//* ? 0F : 1F);
                         changeRainType.send(Protocol1_19_4To1_19_3.class);
                     }
                 });
             }
         });
-    }
+    }*/
 
 }

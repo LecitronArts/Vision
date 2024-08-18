@@ -31,11 +31,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = MetadataRewriter1_9To1_8.class, remap = false)
 public abstract class MixinMetadataRewriter1_9To1_8 {
 
+/*
     @Inject(method = "handleMetadata", at = @At(value = "FIELD", target = "Lcom/viaversion/viaversion/protocols/protocol1_9to1_8/metadata/MetaIndex;PLAYER_HAND:Lcom/viaversion/viaversion/protocols/protocol1_9to1_8/metadata/MetaIndex;", ordinal = 0, shift = At.Shift.BEFORE), cancellable = true)
     private void preventMetadataForClientPlayer(MetaHandlerEvent event, Metadata metadata, CallbackInfo ci) {
         if (event.user().getEntityTracker(Protocol1_9To1_8.class).clientEntityId() == event.entityId()) {
             ci.cancel();
         }
     }
+*/
 
 }

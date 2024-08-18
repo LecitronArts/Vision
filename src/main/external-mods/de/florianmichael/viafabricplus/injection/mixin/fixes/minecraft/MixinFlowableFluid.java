@@ -41,7 +41,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(FlowingFluid.class)
 public abstract class MixinFlowableFluid {
 
-    @Redirect(method = "isSolidFace", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;isFaceSturdy(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)Z"))
+/*    @Redirect(method = "isSolidFace", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;isFaceSturdy(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)Z"))
     private boolean modifyIsSolidBlock(BlockState instance, BlockGetter blockView, BlockPos blockPos, Direction direction) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_11_1)) {
             return Material1_19_4.getMaterial(instance).solid();
@@ -56,6 +56,6 @@ public abstract class MixinFlowableFluid {
             }
         }
         return instance.isFaceSturdy(blockView, blockPos, direction);
-    }
+    }*/
 
 }

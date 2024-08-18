@@ -27,9 +27,9 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 @Mixin(value = WorldPackets.class, remap = false)
 public abstract class MixinWorldPackets1_16_2 {
 
-    @ModifyConstant(method = "lambda$register$1", constant = @Constant(intValue = 16))
+/*    @ModifyConstant(method = "lambda$register$1", constant = @Constant(intValue = 16))
     private static int modifySectionCountToSupportClassicWorldHeight(int constant) {
         return 64;
-    }
+    }*/
 
 }

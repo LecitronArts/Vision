@@ -15,6 +15,11 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.BooleanSupplier;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage.InventoryAcknowledgements;
+import de.florianmichael.viafabricplus.fixes.ClientsideFixes;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.CrashReportCategory;
 import net.minecraft.Util;
@@ -30,6 +35,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.Connection;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.ServerboundPacketListener;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -53,6 +59,7 @@ import net.minecraft.realms.DisconnectedRealmsScreen;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.tags.TagNetworkSerialization;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.slf4j.Logger;
@@ -82,17 +89,44 @@ public abstract class ClientCommonPacketListenerImpl implements ClientCommonPack
    }
 
    public void handleKeepAlive(ClientboundKeepAlivePacket pPacket) {
-      this.sendWhen(new ServerboundKeepAlivePacket(pPacket.getId()), () -> {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_3)) {
+        this.send(new ServerboundKeepAlivePacket(pPacket.getId()));
+      } else {
+         this.sendWhen(new ServerboundKeepAlivePacket(pPacket.getId()), () -> {
+            return !RenderSystem.isFrozenAtPollEvents();
+         }, Duration.ofMinutes(1L));
+      }
+/*      this.sendWhen(new ServerboundKeepAlivePacket(pPacket.getId()), () -> {
          return !RenderSystem.isFrozenAtPollEvents();
-      }, Duration.ofMinutes(1L));
+      }, Duration.ofMinutes(1L));*/
    }
 
    public void handlePing(ClientboundPingPacket pPacket) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4)) {
+         final InventoryAcknowledgements acks = (this.connection).viaFabricPlus$getUserConnection().get(InventoryAcknowledgements.class);
+         if (acks.removeId(pPacket.getId())) {
+            final short inventoryId = (short) ((pPacket.getId() >> 16) & 0xFF);
+
+            AbstractContainerMenu handler = null;
+            if (inventoryId == 0) handler = minecraft.player.inventoryMenu;
+            else if (inventoryId == minecraft.player.containerMenu.containerId) handler = minecraft.player.containerMenu;
+
+            if (handler != null) {
+               acks.addId(pPacket.getId());
+            } else {
+               return;
+            }
+         }
+      }
       PacketUtils.ensureRunningOnSameThread(pPacket, this, this.minecraft);
       this.send(new ServerboundPongPacket(pPacket.getId()));
    }
 
    public void handleCustomPayload(ClientboundCustomPayloadPacket pPacket) {
+      if (pPacket.payload().id().toString().equals(ClientsideFixes.PACKET_SYNC_IDENTIFIER)) {
+         ClientsideFixes.handleSyncTask((FriendlyByteBuf) pPacket.payload());
+         return; // Cancel the packet, so it doesn't get processed by the client
+      }
       CustomPacketPayload custompacketpayload = pPacket.payload();
       if (!(custompacketpayload instanceof DiscardedPayload)) {
          PacketUtils.ensureRunningOnSameThread(pPacket, this, this.minecraft);
@@ -112,6 +146,12 @@ public abstract class ClientCommonPacketListenerImpl implements ClientCommonPack
    protected abstract RegistryAccess.Frozen registryAccess();
 
    public void handleResourcePackPush(ClientboundResourcePackPushPacket pPacket) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20_2)) {
+         if (parseResourcePackUrl(pPacket.url()) == null) {
+            this.connection.send(new ServerboundResourcePackPacket(pPacket.id(), ServerboundResourcePackPacket.Action.INVALID_URL));
+            return;
+         }
+      }
       PacketUtils.ensureRunningOnSameThread(pPacket, this, this.minecraft);
       UUID uuid = pPacket.id();
       URL url = parseResourcePackUrl(pPacket.url());

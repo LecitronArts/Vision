@@ -60,6 +60,7 @@ public abstract class MixinHoeItem extends DiggerItem {
         super(attackDamage, attackSpeed, material, effectiveBlocks, settings);
     }
 
+/*
     @Override
     public boolean isCorrectToolForDrops(BlockState state) {
         return ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_16_4) && super.isCorrectToolForDrops(state);
@@ -75,5 +76,6 @@ public abstract class MixinHoeItem extends DiggerItem {
             return super.getDestroySpeed(stack, state);
         }
     }
+*/
 
 }

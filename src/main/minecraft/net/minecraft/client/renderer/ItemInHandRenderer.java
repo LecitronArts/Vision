@@ -6,6 +6,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import java.util.Objects;
+
+import de.florianmichael.viafabricplus.settings.impl.VisualSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
@@ -436,6 +438,19 @@ public class ItemInHandRenderer {
                            break;
                         case BLOCK:
                            this.applyItemArmTransform(pPoseStack, humanoidarm, pEquippedProgress);
+                           final boolean blockHitAnimation = VisualSettings.global().enableBlockHitAnimation.isEnabled();
+
+                           if (VisualSettings.global().enableSwordBlocking.isEnabled() || blockHitAnimation) {
+                              final HumanoidArm arm = pHand == InteractionHand.MAIN_HAND ? pPlayer.getMainArm() : pPlayer.getMainArm().getOpposite();
+                              pPoseStack.translate(arm == HumanoidArm.RIGHT ? -0.1F : 0.1F, 0.05F, 0.0F);
+
+                              if (blockHitAnimation) {
+                                 applyItemArmAttackTransform( pPoseStack, arm, pSwingProgress);
+                              }
+                              pPoseStack.mulPose(Axis.XP.rotationDegrees(-102.25f));
+                              pPoseStack.mulPose((arm == HumanoidArm.RIGHT ? Axis.YP : Axis.YN).rotationDegrees(13.365f));
+                              pPoseStack.mulPose((arm == HumanoidArm.RIGHT ? Axis.ZP : Axis.ZN).rotationDegrees(78.05f));
+                           }
                            break;
                         case BOW:
                            this.applyItemArmTransform(pPoseStack, humanoidarm, pEquippedProgress);

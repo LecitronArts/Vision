@@ -19,6 +19,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+
+import net.minecraft.ChatFormatting;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
 import net.minecraft.ReportedException;
@@ -556,8 +558,14 @@ public class GuiGraphics implements IForgeGuiGraphics {
    public void renderItemDecorations(Font pFont, ItemStack pStack, int pX, int pY, @Nullable String pText) {
       if (!pStack.isEmpty()) {
          this.pose.pushPose();
-         if (pStack.getCount() != 1 || pText != null) {
-            String s = pText == null ? String.valueOf(pStack.getCount()) : pText;
+         int viaFixCount;
+         if (( pStack).viaFabricPlus$has1_10Tag()) {
+            viaFixCount = (pStack).viaFabricPlus$get1_10Count();
+         } else {
+            viaFixCount = pStack.getCount();
+         }
+         if (viaFixCount != 1 || pText != null) {
+            String s = pText == null ? ( viaFixCount > 0 ? String.valueOf(viaFixCount) : ChatFormatting.RED.toString() + viaFixCount): pText;
             this.pose.translate(0.0F, 0.0F, 200.0F);
             this.drawString(pFont, s, pX + 19 - 2 - pFont.width(s), pY + 6 + 3, 16777215, true);
          }

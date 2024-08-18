@@ -20,7 +20,6 @@
 package de.florianmichael.viafabricplus.injection.mixin.fixes.minecraft.item;
 
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import de.florianmichael.viafabricplus.access.IItemStack;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.player.Player;
@@ -36,7 +35,7 @@ import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = ItemStack.class, priority = 1)
-public abstract class MixinItemStack implements IItemStack {
+public abstract class MixinItemStack  {
 
     @Shadow
     public abstract Item getItem();
@@ -47,7 +46,7 @@ public abstract class MixinItemStack implements IItemStack {
     @Unique
     private int viaFabricPlus$1_10Count;
 
-    @Redirect(method = "getTooltipLines",
+/*    @Redirect(method = "getTooltipLines",
             slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/ai/attributes/Attributes;ATTACK_DAMAGE:Lnet/minecraft/world/entity/ai/attributes/Attribute;", ordinal = 0)),
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;getAttributeBaseValue(Lnet/minecraft/world/entity/ai/attributes/Attribute;)D", ordinal = 0))
     private double fixDamageCalculation(Player player, Attribute attribute) {
@@ -56,17 +55,17 @@ public abstract class MixinItemStack implements IItemStack {
         } else {
             return player.getAttributeBaseValue(attribute);
         }
-    }
+    }*/
 
-    @Inject(method = "copy", at = @At("RETURN"))
+/*    @Inject(method = "copy", at = @At("RETURN"))
     private void copyViaFabricPlusData(CallbackInfoReturnable<ItemStack> cir) {
         final IItemStack mixinItemStack = (IItemStack) (Object) cir.getReturnValue();
         if (this.viaFabricPlus$has1_10Tag) {
             mixinItemStack.viaFabricPlus$set1_10Count(this.viaFabricPlus$1_10Count);
         }
-    }
+    }*/
 
-    @Override
+/*    @Override
     public boolean viaFabricPlus$has1_10Tag() {
         return this.viaFabricPlus$has1_10Tag;
     }
@@ -80,6 +79,6 @@ public abstract class MixinItemStack implements IItemStack {
     public void viaFabricPlus$set1_10Count(final int count) {
         this.viaFabricPlus$has1_10Tag = true;
         this.viaFabricPlus$1_10Count = count;
-    }
+    }*/
 
 }

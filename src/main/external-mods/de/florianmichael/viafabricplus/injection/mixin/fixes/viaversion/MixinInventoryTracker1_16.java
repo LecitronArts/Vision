@@ -26,13 +26,13 @@ import org.spongepowered.asm.mixin.Overwrite;
 @Mixin(value = InventoryTracker1_16.class, remap = false)
 public abstract class MixinInventoryTracker1_16 {
 
-    /**
+/*    *//**
      * @author RK_01
      * @reason Fix ViaVersion cancelling swing packets even when no inventory is open
-     */
+     *//*
     @Overwrite
     public boolean isInventoryOpen() {
         return false;
-    }
+    }*/
 
 }

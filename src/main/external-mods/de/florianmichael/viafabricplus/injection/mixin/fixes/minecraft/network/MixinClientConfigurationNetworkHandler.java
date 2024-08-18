@@ -35,11 +35,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ClientConfigurationPacketListenerImpl.class)
 public abstract class MixinClientConfigurationNetworkHandler {
 
-    @Inject(method = "handleEnabledFeatures", at = @At(value = "HEAD"))
+/*    @Inject(method = "handleEnabledFeatures", at = @At(value = "HEAD"))
     private void notifyAboutFeatures(ClientboundUpdateEnabledFeaturesPacket packet, CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().olderThan(ProtocolVersion.v1_20) && packet.features().contains(new ResourceLocation("update_1_20"))) {
             ChatUtil.sendPrefixedMessage(Component.literal("This server has the update_1_20 features enabled. This is not fully supported and may cause issues.").withStyle(ChatFormatting.RED));
         }
-    }
+    }*/
 
 }

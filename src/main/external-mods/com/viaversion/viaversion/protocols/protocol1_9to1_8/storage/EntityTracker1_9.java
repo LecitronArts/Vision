@@ -258,7 +258,17 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                         BossBar bar = bossBarMap.get(entityId);
                         // Make health range between 0 and 1
                         float maxHealth = type == EntityType.ENDER_DRAGON ? 200.0f : 300.0f;
-                        float health = Math.max(0.0f, Math.min(((float) metadata.getValue()) / maxHealth, 1.0f));
+                        float healthValue ;
+                        if (metadata.getValue() instanceof Float ) {
+                            if(((Float) metadata.getValue()).isNaN()) {
+                                healthValue = 0F;
+                            } else {
+                                healthValue = ((Float) metadata.getValue());
+                            }
+                        }  else {
+                            healthValue = 0f;
+                        }
+                        float health = (healthValue) / maxHealth;
                         if (bar == null) {
                             String title = type == EntityType.ENDER_DRAGON ? DRAGON_TRANSLATABLE : WITHER_TRANSLATABLE;
                             bar = Via.getAPI().legacyAPI().createLegacyBossBar(title, health, BossColor.PINK, BossStyle.SOLID);

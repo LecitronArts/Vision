@@ -9,6 +9,8 @@ import com.mojang.math.MatrixUtil;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
+
+import de.florianmichael.viafabricplus.settings.impl.VisualSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -298,6 +300,9 @@ public class ItemRenderer implements ResourceManagerReloadListener {
    }
 
    public BakedModel getModel(ItemStack pStack, @Nullable Level pLevel, @Nullable LivingEntity pEntity, int pSeed) {
+      if (VisualSettings.global().replacePetrifiedOakSlab.isEnabled() && pLevel != null /* world is null in gui rendering */ && pStack.is(Items.PETRIFIED_OAK_SLAB)) {
+         return (this.itemModelShaper.getModelManager().getMissingModel());
+      }
       BakedModel bakedmodel;
       if (pStack.is(Items.TRIDENT)) {
          bakedmodel = this.itemModelShaper.getModelManager().getModel(TRIDENT_IN_HAND_MODEL);

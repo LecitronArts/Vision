@@ -21,7 +21,6 @@ package de.florianmichael.viafabricplus.injection.mixin.fixes.minecraft.network;
 
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import de.florianmichael.viafabricplus.fixes.ClientsideFixes;
-import de.florianmichael.viafabricplus.access.IItemStack;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -34,11 +33,11 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(value = FriendlyByteBuf.class)
 public abstract class MixinPacketByteBuf {
 
+/*
     @Redirect(method = "readItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;setTag(Lnet/minecraft/nbt/CompoundTag;)V"))
     private void removeViaFabricPlusTag(ItemStack instance, CompoundTag tag) {
         if (tag != null && tag.contains(ClientsideFixes.ITEM_COUNT_NBT_TAG, Tag.TAG_BYTE) && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_10)) {
-            final IItemStack mixinItemStack = ((IItemStack) (Object) instance);
-            mixinItemStack.viaFabricPlus$set1_10Count(tag.getByte(ClientsideFixes.ITEM_COUNT_NBT_TAG));
+            instance.viaFabricPlus$set1_10Count(tag.getByte(ClientsideFixes.ITEM_COUNT_NBT_TAG));
             tag.remove(ClientsideFixes.ITEM_COUNT_NBT_TAG);
             if (tag.isEmpty()) tag = null;
         }
@@ -50,13 +49,13 @@ public abstract class MixinPacketByteBuf {
     private CompoundTag addViaFabricPlusTag(ItemStack instance) {
         CompoundTag tag = instance.getTag();
 
-        final IItemStack mixinItemStack = ((IItemStack) (Object) instance);
-        if (mixinItemStack.viaFabricPlus$has1_10Tag()) {
+        if (instance.viaFabricPlus$has1_10Tag()) {
             if (tag == null) tag = new CompoundTag();
-            tag.putByte(ClientsideFixes.ITEM_COUNT_NBT_TAG, (byte) mixinItemStack.viaFabricPlus$get1_10Count());
+            tag.putByte(ClientsideFixes.ITEM_COUNT_NBT_TAG, (byte) instance.viaFabricPlus$get1_10Count());
         }
 
         return tag;
     }
+*/
 
 }

@@ -39,11 +39,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Equipable.class)
 public interface MixinEquipment {
 
-    @Redirect(method = "swapWithEquipmentSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isCreative()Z"))
+/*    @Redirect(method = "swapWithEquipmentSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isCreative()Z"))
     default boolean removeCreativeCondition(Player instance) {
         return ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_20) && instance.isCreative();
-    }
+    }*/
 
+/*
     @Inject(method = "swapWithEquipmentSlot", at = @At("HEAD"), cancellable = true)
     private void cancelArmorSwap(Item item, Level world, Player user, InteractionHand hand, CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_3)) {
@@ -56,5 +57,6 @@ public interface MixinEquipment {
             }
         }
     }
+*/
 
 }

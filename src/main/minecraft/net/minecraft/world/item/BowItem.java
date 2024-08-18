@@ -1,6 +1,8 @@
 package net.minecraft.world.item;
 
 import java.util.function.Predicate;
+
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -12,6 +14,7 @@ import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
+import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 
 public class BowItem extends ProjectileWeaponItem implements Vanishable {
    public static final int MAX_DRAW_DURATION = 20;
@@ -91,14 +94,30 @@ public class BowItem extends ProjectileWeaponItem implements Vanishable {
    }
 
    public int getUseDuration(ItemStack pStack) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_7tob1_7_3)) {
+         return (0);
+      }
       return 72000;
    }
 
    public UseAnim getUseAnimation(ItemStack pStack) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_7tob1_7_3)) {
+         return (UseAnim.NONE);
+      }
       return UseAnim.BOW;
    }
 
    public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pHand) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_7tob1_7_3)) {
+         final ItemStack stack = pPlayer.getItemInHand(pHand);
+         final ItemStack arrowStack = pPlayer.getProjectile(stack);
+         if (arrowStack.isEmpty()) {
+            return (InteractionResultHolder.fail(stack));
+         } else {
+            arrowStack.shrink(1);
+            return (InteractionResultHolder.pass(stack));
+         }
+      }
       ItemStack itemstack = pPlayer.getItemInHand(pHand);
       boolean flag = !pPlayer.getProjectile(itemstack).isEmpty();
       if (!pPlayer.getAbilities().instabuild && !flag) {

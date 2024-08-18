@@ -29,9 +29,9 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 @Mixin(ChatComponent.class)
 public abstract class MixinChatHud {
 
-    @ModifyVariable(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V", at = @At("HEAD"), ordinal = 0, argsOnly = true)
+/*    @ModifyVariable(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private GuiMessageTag removeIndicator(GuiMessageTag instance) {
         return VisualSettings.global().hideSignatureIndicator.isEnabled() ? null : instance;
-    }
+    }*/
 
 }

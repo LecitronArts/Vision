@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+/*
 package de.florianmichael.viafabricplus.access;
 
 import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.data.ClassicProtocolExtension;
@@ -26,4 +26,4 @@ import java.util.EnumMap;
 public interface IExtensionProtocolMetadataStorage {
 
     EnumMap<ClassicProtocolExtension, Integer> viaFabricPlus$getServerExtensions();
-}
+}*/

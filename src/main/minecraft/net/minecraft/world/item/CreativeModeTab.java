@@ -7,10 +7,15 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
+
+import de.florianmichael.viafabricplus.fixes.data.ItemRegistryDiff;
+import de.florianmichael.viafabricplus.settings.impl.GeneralSettings;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.level.ItemLike;
 
@@ -226,7 +231,20 @@ public class CreativeModeTab {
             if (flag) {
                throw new IllegalStateException("Accidentally adding the same item stack twice " + pStack.getDisplayName().getString() + " to a Creative Mode Tab: " + this.tab.getDisplayName().getString());
             } else {
-               if (pStack.getItem().isEnabled(this.featureFlagSet)) {
+               boolean viaFixEnable;
+
+               final boolean originalValue = pStack.getItem().isEnabled(this.featureFlagSet);
+               final int index = GeneralSettings.global().removeNotAvailableItemsFromCreativeTab.getIndex();
+
+               if (index == 2 /* Off */ || Minecraft.getInstance().isLocalServer()) {
+                  viaFixEnable = originalValue;
+               } else if (index == 1 /* Vanilla only */ && !BuiltInRegistries.CREATIVE_MODE_TAB.getKey(this.tab).getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE)) {
+                  viaFixEnable = originalValue;
+               } else {
+                  viaFixEnable = ItemRegistryDiff.keepItem(pStack.getItem()) && originalValue;
+               }
+
+               if (viaFixEnable) {
                   switch (pTabVisibility) {
                      case PARENT_AND_SEARCH_TABS:
                         this.tabContents.add(pStack);

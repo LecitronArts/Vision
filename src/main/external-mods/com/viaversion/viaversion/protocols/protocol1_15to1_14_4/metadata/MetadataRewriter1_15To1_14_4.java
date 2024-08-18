@@ -24,6 +24,7 @@ import com.viaversion.viaversion.protocols.protocol1_14_4to1_14_3.ClientboundPac
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets.EntityPackets;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
+import de.florianmichael.viafabricplus.fixes.tracker.WolfHealthTracker;
 
 public class MetadataRewriter1_15To1_14_4 extends EntityRewriter<ClientboundPackets1_14_4, Protocol1_15To1_14_4> {
 
@@ -40,7 +41,16 @@ public class MetadataRewriter1_15To1_14_4 extends EntityRewriter<ClientboundPack
         });
 
         filter().type(EntityTypes1_15.LIVINGENTITY).addIndex(12);
-        filter().type(EntityTypes1_15.WOLF).removeIndex(18);
+
+        filter().type(EntityTypes1_15.WOLF).handler((event, meta) -> { // Basically removeIndex, but we need to track the actual health value
+            final int metaIndex = event.index();
+            if (metaIndex == 18) {
+                WolfHealthTracker.get(event.user()).setWolfHealth(event.entityId(), meta.value());
+                event.cancel();
+            } else if (metaIndex > 18) {
+                event.setIndex(metaIndex - 1);
+            }
+        }); //.removeIndex(18);
     }
 
     @Override

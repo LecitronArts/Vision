@@ -179,8 +179,12 @@ public class ServerStatusPinger {
       pServerData.status = CommonComponents.EMPTY;
    }
 
+   /**
+    * @author RK_01
+    * @reason Remove legacy pingLegacyServer which didn't even work
+    */
    void pingLegacyServer(InetSocketAddress pResolvedServerAddress, final ServerAddress pServerAddress, final ServerData pServerData) {
-      (new Bootstrap()).group(Connection.NETWORK_WORKER_GROUP.get()).handler(new ChannelInitializer<Channel>() {
+/*      (new Bootstrap()).group(Connection.NETWORK_WORKER_GROUP.get()).handler(new ChannelInitializer<Channel>() {
          protected void initChannel(Channel p_105498_) {
             try {
                p_105498_.config().setOption(ChannelOption.TCP_NODELAY, true);
@@ -195,7 +199,7 @@ public class ServerStatusPinger {
                pServerData.players = new ServerStatus.Players(p_297985_, p_299389_, List.of());
             }));
          }
-      }).channel(NioSocketChannel.class).connect(pResolvedServerAddress.getAddress(), pResolvedServerAddress.getPort());
+      }).channel(NioSocketChannel.class).connect(pResolvedServerAddress.getAddress(), pResolvedServerAddress.getPort());*/
    }
 
    public static Component formatPlayerCount(int pPlayers, int pCapacity) {

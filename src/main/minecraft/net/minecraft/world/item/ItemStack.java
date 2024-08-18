@@ -23,6 +23,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.advancements.CriteriaTriggers;
@@ -80,6 +83,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.pattern.BlockInWorld;
 import org.slf4j.Logger;
+import org.spongepowered.asm.mixin.Unique;
 
 public final class ItemStack implements IItemStack {
    public static final Codec<ItemStack> CODEC = RecordCodecBuilder.create((p_309238_) -> {
@@ -125,6 +129,8 @@ public final class ItemStack implements IItemStack {
    private static final Component DISABLED_ITEM_TOOLTIP = Component.translatable("item.disabled").withStyle(ChatFormatting.RED);
    private static final int DONT_HIDE_TOOLTIP = 0;
    private static final Style LORE_STYLE = Style.EMPTY.withColor(ChatFormatting.DARK_PURPLE).withItalic(true);
+   private boolean viaFabricPlus$has1_10Tag;
+   private int viaFabricPlus$1_10Count;
    private int count;
    private int popTime;
    /** @deprecated */
@@ -431,6 +437,9 @@ public final class ItemStack implements IItemStack {
 
    public ItemStack copy() {
       if (this.isEmpty()) {
+         if (this.viaFabricPlus$has1_10Tag) {
+            EMPTY.viaFabricPlus$set1_10Count(this.viaFabricPlus$1_10Count);
+         }
          return EMPTY;
       } else {
          ItemStack itemstack = new ItemStack(this.getItem(), this.count);
@@ -439,6 +448,9 @@ public final class ItemStack implements IItemStack {
             itemstack.tag = this.tag.copy();
          }
 
+         if (this.viaFabricPlus$has1_10Tag) {
+            itemstack.viaFabricPlus$set1_10Count(this.viaFabricPlus$1_10Count);
+         }
          return itemstack;
       }
    }
@@ -695,11 +707,14 @@ public final class ItemStack implements IItemStack {
                   boolean flag = false;
                   if (pPlayer != null) {
                      if (attributemodifier.getId() == Item.BASE_ATTACK_DAMAGE_UUID) {
-                        d0 += pPlayer.getAttributeBaseValue(Attributes.ATTACK_DAMAGE);
+                        d0 += pPlayer.getAttributeBaseValue(Attributes.ATTACK_DAMAGE);///
                         d0 += (double)EnchantmentHelper.getDamageBonus(this, MobType.UNDEFINED);
                         flag = true;
                      } else if (attributemodifier.getId() == Item.BASE_ATTACK_SPEED_UUID) {
-                        d0 += pPlayer.getAttributeBaseValue(Attributes.ATTACK_SPEED);
+                        if (!ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+                           d0 += pPlayer.getAttributeBaseValue(Attributes.ATTACK_SPEED);
+                        }
+                        //d0 += pPlayer.getAttributeBaseValue(Attributes.ATTACK_SPEED);
                         flag = true;
                      }
                   }
@@ -1003,6 +1018,20 @@ public final class ItemStack implements IItemStack {
    public int getBaritoneHash() {
       return baritoneHash;
    }
+
+   public boolean viaFabricPlus$has1_10Tag() {
+      return this.viaFabricPlus$has1_10Tag;
+   }
+
+   public int viaFabricPlus$get1_10Count() {
+      return this.viaFabricPlus$1_10Count;
+   }
+
+   public void viaFabricPlus$set1_10Count(final int count) {
+      this.viaFabricPlus$has1_10Tag = true;
+      this.viaFabricPlus$1_10Count = count;
+   }
+
 
    public static enum TooltipPart {
       ENCHANTMENTS,

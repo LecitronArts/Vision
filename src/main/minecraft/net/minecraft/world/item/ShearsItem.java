@@ -1,5 +1,7 @@
 package net.minecraft.world.item;
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -17,6 +19,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.GrowingPlantHeadBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 
 public class ShearsItem extends Item {
    public ShearsItem(Item.Properties pProperties) {
@@ -34,10 +37,20 @@ public class ShearsItem extends Item {
    }
 
    public boolean isCorrectToolForDrops(BlockState pBlock) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_8tob1_8_1)) {
+         return (pBlock.is(Blocks.COBWEB));
+      }
       return pBlock.is(Blocks.COBWEB) || pBlock.is(Blocks.REDSTONE_WIRE) || pBlock.is(Blocks.TRIPWIRE);
    }
 
    public float getDestroySpeed(ItemStack pStack, BlockState pState) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4)) {
+         if (!pState.is(Blocks.COBWEB) && !pState.is(BlockTags.LEAVES)) {
+            return (pState.is(BlockTags.WOOL) ? 5.0F : super.getDestroySpeed(pStack, pState));
+         } else {
+            return (15.0F);
+         }
+      }
       if (!pState.is(Blocks.COBWEB) && !pState.is(BlockTags.LEAVES)) {
          if (pState.is(BlockTags.WOOL)) {
             return 5.0F;

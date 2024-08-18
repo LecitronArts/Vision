@@ -20,15 +20,25 @@ package com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntLists;
 
 public final class InventoryAcknowledgements implements StorableObject {
-    private final IntList ids = new IntArrayList();
+    private it.unimi.dsi.fastutil.ints.IntList viaFabricPlus$ids;
+    private final IntList ids /*= new IntArrayList();*/;
 
     public void addId(int id) {
-        ids.add(id);
+        viaFabricPlus$ids.add(id);
+        return;
+        //ids.add(id);
     }
 
     public boolean removeId(int id) {
-        return ids.rem(id);
+        return (viaFabricPlus$ids.rem(id));
+       // return ids.rem(id);
+    }
+
+    public InventoryAcknowledgements(){
+        this.ids = null;
+        this.viaFabricPlus$ids = IntLists.synchronize(new IntArrayList());
     }
 }

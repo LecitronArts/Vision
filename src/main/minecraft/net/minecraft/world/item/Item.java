@@ -9,6 +9,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.SharedConstants;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -48,6 +51,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 import org.slf4j.Logger;
 
 public class Item implements FeatureElement, ItemLike {
@@ -134,7 +138,7 @@ public class Item implements FeatureElement, ItemLike {
    }
 
    public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
-      if (this.isEdible()) {
+      if (this.isEdible() && !ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_7tob1_7_3)) {
          ItemStack itemstack = pPlayer.getItemInHand(pUsedHand);
          if (pPlayer.canEat(this.getFoodProperties().canAlwaysEat())) {
             pPlayer.startUsingItem(pUsedHand);
@@ -148,19 +152,38 @@ public class Item implements FeatureElement, ItemLike {
    }
 
    public ItemStack finishUsingItem(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity) {
-      return this.isEdible() ? pLivingEntity.eat(pLevel, pStack) : pStack;
+      return  (this.isEdible()  && !ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_7tob1_7_3)) ? pLivingEntity.eat(pLevel, pStack) : pStack;
    }
 
    public final int getMaxStackSize() {
+      if (this.isEdible() && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_7tob1_7_3)) {
+         return (1);
+      }
       return this.maxStackSize;
    }
 
    public final int getMaxDamage() {
-      return this.maxDamage;
+      if (this instanceof ArmorItem armor && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_8tob1_8_1)) {
+         // Counterpart in MixinArmorMaterials
+         return armor.getMaterial().getDurabilityForType(armor.getType());
+      } else if (this instanceof CrossbowItem && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_17_1)) {
+         return 326;
+      } else {
+         return maxDamage;
+      }
+      // return this.maxDamage;
    }
 
    public boolean canBeDepleted() {
-      return this.maxDamage > 0;
+      if (this instanceof ArmorItem armor && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_8tob1_8_1)) {
+         // Counterpart in MixinArmorMaterials
+         return armor.getMaterial().getDurabilityForType(armor.getType())  > 0;
+      } else if (this instanceof CrossbowItem && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_17_1)) {
+         return  false;//326  > 0;
+      } else {
+         return maxDamage > 0;
+      }
+/*      return this.maxDamage > 0;*/
    }
 
    public boolean isBarVisible(ItemStack pStack) {
@@ -168,7 +191,16 @@ public class Item implements FeatureElement, ItemLike {
    }
 
    public int getBarWidth(ItemStack pStack) {
-      return Math.round(13.0F - (float)pStack.getDamageValue() * 13.0F / (float)this.maxDamage);
+      float viaFixDamage;
+      if (this instanceof ArmorItem armor && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_8tob1_8_1)) {
+         // Counterpart in MixinArmorMaterials
+         viaFixDamage = armor.getMaterial().getDurabilityForType(armor.getType());
+      } else if (this instanceof CrossbowItem && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_17_1)) {
+         viaFixDamage = 326;
+      } else {
+         viaFixDamage = maxDamage;
+      }
+      return Math.round(13.0F - (float)pStack.getDamageValue() * 13.0F / (float)viaFixDamage);
    }
 
    public int getBarColor(ItemStack pStack) {
@@ -252,11 +284,11 @@ public class Item implements FeatureElement, ItemLike {
    }
 
    public UseAnim getUseAnimation(ItemStack pStack) {
-      return pStack.getItem().isEdible() ? UseAnim.EAT : UseAnim.NONE;
+      return pStack.getItem().isEdible() && !ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_7tob1_7_3) ? UseAnim.EAT : UseAnim.NONE;
    }
 
    public int getUseDuration(ItemStack pStack) {
-      if (pStack.getItem().isEdible()) {
+      if (pStack.getItem().isEdible() && !ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_7tob1_7_3)) {
          return this.getFoodProperties().isFastFood() ? 16 : 32;
       } else {
          return 0;

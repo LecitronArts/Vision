@@ -39,7 +39,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(BlockItem.class)
 public abstract class MixinBlockItem {
 
-    @Inject(method = "canPlace", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "canPlace", at = @At("HEAD"), cancellable = true)
     private void checkChestPlacement(BlockPlaceContext context, BlockState state, CallbackInfoReturnable<Boolean> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
             Block block = state.getBlock();
@@ -63,6 +63,6 @@ public abstract class MixinBlockItem {
                 }
             }
         }
-    }
+    }*/
 
 }

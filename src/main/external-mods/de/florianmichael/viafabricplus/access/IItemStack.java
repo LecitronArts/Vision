@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
 package de.florianmichael.viafabricplus.access;
 
 public interface IItemStack {
@@ -28,3 +29,4 @@ public interface IItemStack {
     void viaFabricPlus$set1_10Count(final int count);
 
 }
+*/

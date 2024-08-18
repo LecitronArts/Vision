@@ -17,12 +17,14 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_11to1_10.rewriter;
 
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.ByteTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.util.Key;
+import de.florianmichael.viafabricplus.fixes.ClientsideFixes;
 
 public class EntityIdRewriter {
     private static final BiMap<String, String> oldToNewNames = HashBiMap.create();
@@ -141,6 +143,16 @@ public class EntityIdRewriter {
     }
 
     public static void toClientItem(Item item, boolean backwards) {
+        if (item != null && item.amount() <= 0) {
+            CompoundTag tag = item.tag();
+            if (tag == null) {
+                tag = new CompoundTag();
+                item.setTag(tag);
+            }
+
+            tag.putByte(ClientsideFixes.ITEM_COUNT_NBT_TAG, (byte) item.amount());
+            item.setTag(tag);
+        }
         if (hasEntityTag(item)) {
             toClient(item.tag().getCompoundTag("EntityTag"), backwards);
         }
@@ -152,6 +164,13 @@ public class EntityIdRewriter {
     }
 
     public static void toServerItem(Item item, boolean backwards) {
+        if (item != null && item.tag() != null) {
+            if (item.tag().contains(ClientsideFixes.ITEM_COUNT_NBT_TAG)) {
+                item.setAmount(item.tag().<ByteTag>remove(ClientsideFixes.ITEM_COUNT_NBT_TAG).asByte());
+                if (item.tag().isEmpty()) item.setTag(null);
+            }
+        }
+
         if (!hasEntityTag(item)) return;
 
         CompoundTag entityTag = item.tag().getCompoundTag("EntityTag");

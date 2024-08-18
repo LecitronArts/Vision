@@ -28,9 +28,11 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 @Mixin(ServerboundChatPacket.class)
 public abstract class MixinChatMessageC2SPacket {
 
+/*
     @ModifyConstant(method = "write", constant = @Constant(intValue = 256))
     private int modifyChatLength(int maxLength) {
         return ClientsideFixes.getChatLength();
     }
+*/
 
 }

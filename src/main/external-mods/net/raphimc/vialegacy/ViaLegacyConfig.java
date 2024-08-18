@@ -86,12 +86,14 @@ public class ViaLegacyConfig extends Config implements net.raphimc.vialegacy.pla
 
     @Override
     public boolean isLegacySkullLoading() {
-        return GeneralSettings.global().loadSkinsAndSkullsInLegacyVersions.getValue();
+       return (GeneralSettings.global().loadSkinsAndSkullsInLegacyVersions.getValue());
+       // return GeneralSettings.global().loadSkinsAndSkullsInLegacyVersions.getValue();
     }
 
     @Override
     public boolean isLegacySkinLoading() {
-        return GeneralSettings.global().loadSkinsAndSkullsInLegacyVersions.getValue();
+        return (GeneralSettings.global().loadSkinsAndSkullsInLegacyVersions.getValue());
+        //return GeneralSettings.global().loadSkinsAndSkullsInLegacyVersions.getValue();
     }
 
     @Override

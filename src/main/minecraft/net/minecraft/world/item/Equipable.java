@@ -1,6 +1,9 @@
 package net.minecraft.world.item;
 
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.stats.Stats;
@@ -21,10 +24,19 @@ public interface Equipable extends Vanishable {
    }
 
    default InteractionResultHolder<ItemStack> swapWithEquipmentSlot(Item pItem, Level pLevel, Player pPlayer, InteractionHand pHand) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_3)) {
+         final ItemStack heldItem = pPlayer.getItemInHand(pHand);
+         final EquipmentSlot targetSlot = Mob.getEquipmentSlotForItem(heldItem);
+         final ItemStack targetItem = pPlayer.getItemBySlot(targetSlot);
+
+         if (!targetItem.isEmpty()) {
+            return (InteractionResultHolder.fail(heldItem));
+         }
+      }
       ItemStack itemstack = pPlayer.getItemInHand(pHand);
       EquipmentSlot equipmentslot = Mob.getEquipmentSlotForItem(itemstack);
       ItemStack itemstack1 = pPlayer.getItemBySlot(equipmentslot);
-      if ((!EnchantmentHelper.hasBindingCurse(itemstack1) || pPlayer.isCreative()) && !ItemStack.matches(itemstack, itemstack1)) {
+      if ((!EnchantmentHelper.hasBindingCurse(itemstack1) || (ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_20) &&  pPlayer.isCreative())) && !ItemStack.matches(itemstack, itemstack1)) {
          if (!pLevel.isClientSide()) {
             pPlayer.awardStat(Stats.ITEM_USED.get(pItem));
          }

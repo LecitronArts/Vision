@@ -1,5 +1,7 @@
 package net.minecraft.world.item;
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -104,7 +106,7 @@ public class BrushItem extends Item {
    private HitResult calculateHitResult(Player pPlayer) {
       return ProjectileUtil.getHitResultOnViewVector(pPlayer, (p_281111_) -> {
          return !p_281111_.isSpectator() && p_281111_.isPickable();
-      }, (double)Player.getPickRange(pPlayer.isCreative()));
+      }, (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20_2) ? 5f : (double)Player.getPickRange(pPlayer.isCreative())));
    }
 
    private void spawnDustParticles(Level pLevel, BlockHitResult pHitResult, BlockState pState, Vec3 pPos, HumanoidArm pArm) {

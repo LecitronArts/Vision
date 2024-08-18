@@ -36,7 +36,7 @@ public abstract class MixinMetadataRewriter1_15To1_14_4 extends EntityRewriter<C
         super(protocol);
     }
 
-    @Redirect(method = "registerRewrites", at = @At(value = "INVOKE", target = "Lcom/viaversion/viaversion/rewriter/meta/MetaFilter$Builder;removeIndex(I)V"))
+/*    @Redirect(method = "registerRewrites", at = @At(value = "INVOKE", target = "Lcom/viaversion/viaversion/rewriter/meta/MetaFilter$Builder;removeIndex(I)V"))
     private void trackHealth(MetaFilter.Builder instance, int index) {
         instance.handler((event, meta) -> { // Basically removeIndex, but we need to track the actual health value
             final int metaIndex = event.index();
@@ -47,6 +47,6 @@ public abstract class MixinMetadataRewriter1_15To1_14_4 extends EntityRewriter<C
                 event.setIndex(metaIndex - 1);
             }
         });
-    }
+    }*/
 
 }

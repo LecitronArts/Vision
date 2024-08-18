@@ -27,9 +27,9 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 @Mixin(targets = "com.viaversion.viaversion.protocols.protocol1_11to1_10.Protocol1_11To1_10$13", remap = false)
 public abstract class MixinProtocol1_11To1_10 {
 
-    @ModifyConstant(method = "lambda$register$0", constant = @Constant(intValue = 100))
+/*    @ModifyConstant(method = "lambda$register$0", constant = @Constant(intValue = 100))
     private static int changeMaxChatLength(int constant) {
         return ClientsideFixes.getChatLength();
-    }
+    }*/
 
 }

@@ -204,6 +204,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
         registerTrackerWithData1_19(ClientboundPackets1_19_3.SPAWN_ENTITY, EntityTypes1_19_4.FALLING_BLOCK);
         registerRemoveEntities(ClientboundPackets1_19_3.REMOVE_ENTITIES);
         registerMetadataRewriter(ClientboundPackets1_19_3.ENTITY_METADATA, Types1_19_3.METADATA_LIST, Types1_19_4.METADATA_LIST);
+        this.protocol.registerClientbound(ClientboundPackets1_19_3.ENTITY_TELEPORT, ClientboundPackets1_19_4.ENTITY_TELEPORT, wrapper -> {}, true);
     }
 
     private int damageTypeFromEntityEvent(byte entityEvent) {

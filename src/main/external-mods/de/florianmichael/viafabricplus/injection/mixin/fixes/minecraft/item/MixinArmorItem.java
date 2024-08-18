@@ -45,7 +45,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ArmorItem.class)
 public abstract class MixinArmorItem {
 
-    @Shadow
+/*    @Shadow
     @Final
     private Multimap<Attribute, AttributeModifier> defaultModifiers;
 
@@ -66,6 +66,6 @@ public abstract class MixinArmorItem {
         } else {
             return this.defaultModifiers;
         }
-    }
+    }*/
 
 }

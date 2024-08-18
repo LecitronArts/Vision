@@ -61,17 +61,20 @@ public abstract class MixinClientWorld extends Level {
         super(properties, registryRef, registryManager, dimensionEntry, profiler, isClient, debugWorld, biomeAccess, maxChainedNeighborUpdates);
     }
 
-    @Inject(method = "<init>", at = @At("RETURN"))
+/*    @Inject(method = "<init>", at = @At("RETURN"))
     private void removePendingUpdateManager(ClientPacketListener networkHandler, ClientLevel.ClientLevelData properties, ResourceKey<Level> registryRef, Holder<DimensionType> dimensionTypeEntry, int loadDistance, int simulationDistance, Supplier<ProfilerFiller> profiler, LevelRenderer worldRenderer, boolean debugWorld, long seed, CallbackInfo ci) {
         if (DebugSettings.global().disableSequencing.isEnabled()) {
             this.blockStatePredictionHandler = new PendingUpdateManager1_18_2();
         }
-    }
+    }*/
 
-    /**
+/*
+    */
+/**
      * @author RK_01
      * @reason Versions <= 1.8.x and >= 1.17 always tick entities, even if they are not in a loaded chunk.
-     */
+     *//*
+
     @Overwrite
     public void tickNonPassenger(Entity entity) {
         entity.setOldPosAndRot();
@@ -91,10 +94,12 @@ public abstract class MixinClientWorld extends Level {
         }
     }
 
-    /**
+    */
+/**
      * @author RK_01
      * @reason Versions <= 1.8.x and >= 1.17 always tick entities, even if they are not in a loaded chunk.
-     */
+     *//*
+
     @Overwrite
     private void tickPassenger(Entity entity, Entity passenger) {
         if (!passenger.isRemoved() && passenger.getVehicle() == entity) {
@@ -131,5 +136,6 @@ public abstract class MixinClientWorld extends Level {
         }
         this.getProfiler().pop();
     }
+*/
 
 }

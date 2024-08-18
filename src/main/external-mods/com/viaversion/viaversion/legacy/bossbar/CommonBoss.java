@@ -51,7 +51,7 @@ public class CommonBoss implements BossBar {
 
     public CommonBoss(String title, float health, BossColor color, BossStyle style) {
         Preconditions.checkNotNull(title, "Title cannot be null");
-        Preconditions.checkArgument((health >= 0 && health <= 1), "Health must be between 0 and 1. Input: " + health);
+        //Preconditions.checkArgument((health >= 0 && health <= 1), "Health must be between 0 and 1. Input: " + health);
 
         this.uuid = UUID.randomUUID();
         this.title = title;
@@ -73,7 +73,7 @@ public class CommonBoss implements BossBar {
 
     @Override
     public BossBar setHealth(float health) {
-        Preconditions.checkArgument((health >= 0 && health <= 1), "Health must be between 0 and 1. Input: " + health);
+        //Preconditions.checkArgument((health >= 0 && health <= 1), "Health must be between 0 and 1. Input: " + health);
         this.health = health;
         sendPacket(CommonBoss.UpdateAction.UPDATE_HEALTH);
         return this;

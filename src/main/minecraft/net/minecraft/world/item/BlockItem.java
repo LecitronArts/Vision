@@ -3,8 +3,12 @@ package net.minecraft.world.item;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
@@ -19,13 +23,12 @@ import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.ShulkerBoxBlock;
-import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.ChestType;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -145,6 +148,26 @@ public class BlockItem extends Item {
 
    protected boolean canPlace(BlockPlaceContext pContext, BlockState pState) {
       Player player = pContext.getPlayer();
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
+         Block block = pState.getBlock();
+         if (block == Blocks.CHEST || block == Blocks.TRAPPED_CHEST) {
+            Level world = pContext.getLevel();
+            BlockPos pos = pContext.getClickedPos();
+            boolean foundAdjChest = false;
+            for (Direction dir : Direction.Plane.HORIZONTAL) {
+               BlockState otherState = world.getBlockState(pos.relative(dir));
+               if (otherState.getBlock() == block) {
+                  if (foundAdjChest) {
+                     return (false);
+                  }
+                  foundAdjChest = true;
+                  if (otherState.getValue(ChestBlock.TYPE) != ChestType.SINGLE) {
+                     return (false);
+                  }
+               }
+            }
+         }
+      }
       CollisionContext collisioncontext = player == null ? CollisionContext.empty() : CollisionContext.of(player);
       return (!this.mustSurvive() || pState.canSurvive(pContext.getLevel(), pContext.getClickedPos())) && pContext.getLevel().isUnobstructed(pState, pContext.getClickedPos(), collisioncontext);
    }

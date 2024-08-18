@@ -5,6 +5,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.mojang.logging.LogUtils;
+import de.florianmichael.viafabricplus.access.IEntity;
+import de.florianmichael.viafabricplus.fixes.versioned.PendingUpdateManager1_18_2;
+import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
 import dev.tr7zw.entityculling.EntityCullingMod;
 import dev.tr7zw.entityculling.EntityCullingModBase;
 import dev.tr7zw.entityculling.versionless.access.Cullable;
@@ -147,7 +150,7 @@ public class ClientLevel extends Level {
    private final ClientChunkCache chunkSource;
    private final Deque<Runnable> lightUpdateQueue = Queues.newArrayDeque();
    private int serverSimulationDistance;
-   private final BlockStatePredictionHandler blockStatePredictionHandler = new BlockStatePredictionHandler();
+   private final BlockStatePredictionHandler blockStatePredictionHandler ;
    private static final Set<Item> MARKER_PARTICLE_ITEMS = Set.of(Items.BARRIER, Items.LIGHT);
    private final Int2ObjectMap<PartEntity<?>> partEntities = new Int2ObjectOpenHashMap<>();
    private final ModelDataManager modelDataManager = new ModelDataManager(this);
@@ -219,7 +222,11 @@ public class ClientLevel extends Level {
          this.minecraft.gameMode = new PlayerControllerOF(this.minecraft, this.connection);
          CustomGuis.setPlayerControllerOF((PlayerControllerOF)this.minecraft.gameMode);
       }
-
+      if (DebugSettings.global().disableSequencing.isEnabled()) {
+         this.blockStatePredictionHandler = new PendingUpdateManager1_18_2();
+      } else {
+         this.blockStatePredictionHandler = new BlockStatePredictionHandler();
+      }
    }
 
    public void queueLightUpdate(Runnable pTask) {
@@ -309,7 +316,28 @@ public class ClientLevel extends Level {
       return pEntity.chunkPosition().getChessboardDistance(this.minecraft.player.chunkPosition()) <= this.serverSimulationDistance;
    }
 
+
+   /**
+    * @author RK_01
+    * @reason Versions <= 1.8.x and >= 1.17 always tick entities, even if they are not in a loaded chunk.
+    */
    public void tickNonPassenger(Entity entity) {
+      entity.setOldPosAndRot();
+      final IEntity mixinEntity = (IEntity) entity;
+      if (mixinEntity.viaFabricPlus$isInLoadedChunkAndShouldTick() || entity.isSpectator()) {
+         entity.tickCount++;
+         this.getProfiler().push(() -> BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString());
+         entity.tick();
+         this.getProfiler().pop();
+      }
+      this.viaFabricPlus$checkChunk(entity);
+
+      if (mixinEntity.viaFabricPlus$isInLoadedChunkAndShouldTick()) {
+         for (Entity entity2 : entity.getPassengers()) {
+            this.tickPassenger(entity, entity2);
+         }
+      }
+/*
       if (!EntityCullingModBase.instance.config.tickCulling
               || EntityCullingModBase.instance.config.skipEntityCulling) {
          return;
@@ -346,6 +374,7 @@ public class ClientLevel extends Level {
       for (Entity entity1 : entity.getPassengers()) {
          this.tickPassenger(entity1, entity1);
       }
+*/
 
 
    }
@@ -381,6 +410,27 @@ public class ClientLevel extends Level {
    }
 
    private void tickPassenger(Entity pMount, Entity pRider) {
+
+      if (!pRider.isRemoved() && pRider.getVehicle() == pMount) {
+         if (pRider instanceof Player || this.tickingEntities.contains(pRider)) {
+            final IEntity mixinPassenger = (IEntity) pRider;
+            pRider.setOldPosAndRot();
+            if (mixinPassenger.viaFabricPlus$isInLoadedChunkAndShouldTick()) {
+               pRider.tickCount++;
+               pRider.rideTick();
+            }
+            this.viaFabricPlus$checkChunk(pRider);
+
+            if (mixinPassenger.viaFabricPlus$isInLoadedChunkAndShouldTick()) {
+               for (Entity entity2 : pRider.getPassengers()) {
+                  this.tickPassenger(pRider, entity2);
+               }
+            }
+         }
+      } else {
+         pRider.stopRiding();
+      }
+/*
       if (!pRider.isRemoved() && pRider.getVehicle() == pMount) {
          if (pRider instanceof Player || this.tickingEntities.contains(pRider)) {
             pRider.setOldPosAndRot();
@@ -394,6 +444,7 @@ public class ClientLevel extends Level {
       } else {
          pRider.stopRiding();
       }
+*/
 
    }
 
@@ -1264,5 +1315,18 @@ public class ClientLevel extends Level {
 
       public void onSectionChange(Entity p_233660_) {
       }
+   }
+
+   private void viaFabricPlus$checkChunk(Entity entity) {
+      this.getProfiler().push("chunkCheck");
+      final IEntity mixinEntity = (IEntity) entity;
+      final int chunkX = Mth.floor(entity.getX() / 16.0D);
+      final int chunkZ = Mth.floor(entity.getZ() / 16.0D);
+      if (!mixinEntity.viaFabricPlus$isInLoadedChunkAndShouldTick() || entity.chunkPosition().x != chunkX || entity.chunkPosition().z != chunkZ) {
+         if (!(this.getChunk(chunkX, chunkZ).isEmpty())) {
+            mixinEntity.viaFabricPlus$setInLoadedChunkAndShouldTick(true);
+         }
+      }
+      this.getProfiler().pop();
    }
 }

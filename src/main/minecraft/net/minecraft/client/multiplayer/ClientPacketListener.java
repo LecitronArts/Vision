@@ -16,6 +16,11 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.logging.LogUtils;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.fixes.data.recipe.RecipeInfo;
+import de.florianmichael.viafabricplus.fixes.data.recipe.Recipes1_11_2;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+import de.florianmichael.viafabricplus.settings.impl.VisualSettings;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import java.time.Instant;
 import java.util.*;
@@ -273,6 +278,7 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MapItem;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Explosion;
@@ -301,6 +307,7 @@ import net.minecraft.world.scores.Team;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.raphimc.viabedrock.api.BedrockProtocolVersion;
 import org.slf4j.Logger;
 
 @OnlyIn(Dist.CLIENT)
@@ -316,7 +323,7 @@ public class ClientPacketListener extends ClientCommonPacketListenerImpl impleme
    private ClientLevel level;
    private ClientLevel.ClientLevelData levelData;
    private final Map<UUID, PlayerInfo> playerInfoMap = Maps.newHashMap();
-   private final Set<PlayerInfo> listedPlayers = new ReferenceOpenHashSet<>();
+   private final Set<PlayerInfo> listedPlayers ;
    private final ClientAdvancements advancements;
    private final ClientSuggestionProvider suggestionsProvider;
    private final DebugQueryHandler debugQueryHandler = new DebugQueryHandler(this);
@@ -349,6 +356,11 @@ public class ClientPacketListener extends ClientCommonPacketListenerImpl impleme
       this.advancements = new ClientAdvancements(pMinecraft, this.telemetryManager);
       this.suggestionsProvider = new ClientSuggestionProvider(this, pMinecraft);
       this.pingDebugMonitor = new PingDebugMonitor(this, pMinecraft.getDebugOverlay().getPingLogger());
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_1)) {
+         this.listedPlayers = new LinkedHashSet<>();
+      } else {
+         this.listedPlayers = new ReferenceOpenHashSet<>();
+      }
    }
 
    public ClientSuggestionProvider getSuggestionsProvider() {
@@ -422,6 +434,18 @@ public class ClientPacketListener extends ClientCommonPacketListenerImpl impleme
 
       this.telemetryManager.onPlayerInfoReceived(commonplayerspawninfo.gameType(), pPacket.hardcore());
       this.minecraft.quickPlayLog().log(this.minecraft);
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_11_1)) {
+         final List<RecipeHolder<?>> recipes = new ArrayList<>();
+         final List<RecipeInfo> recipeInfos = Recipes1_11_2.getRecipes(ProtocolTranslator.getTargetVersion());
+         for (int i = 0; i < recipeInfos.size(); i++) {
+            recipes.add(recipeInfos.get(i).create(new ResourceLocation("viafabricplus", "recipe/" + i)));
+         }
+         this.handleUpdateRecipes(new ClientboundUpdateRecipesPacket(recipes));
+
+         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+            this.handleEntityEvent(new ClientboundEntityEventPacket(this.minecraft.player, (byte) 28)); // Op-level 4
+         }
+      }
    }
 
    public void handleAddEntity(ClientboundAddEntityPacket pPacket) {
@@ -508,10 +532,21 @@ public class ClientPacketListener extends ClientCommonPacketListenerImpl impleme
          double d1 = pPacket.getY();
          double d2 = pPacket.getZ();
          entity.syncPacketPositionCodec(d0, d1, d2);
-         if (!entity.isControlledByLocalInstance()) {
+         boolean viaFix;
+         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_3) || ProtocolTranslator.getTargetVersion().equals(BedrockProtocolVersion.bedrockLatest)) {
+            viaFix = entity.getControllingPassenger() instanceof Player player ? player.isLocalPlayer() : !entity.level().isClientSide;
+         } else {
+            viaFix = entity.isControlledByLocalInstance();
+         }
+         if (!viaFix) {
             float f = (float)(pPacket.getyRot() * 360) / 256.0F;
             float f1 = (float)(pPacket.getxRot() * 360) / 256.0F;
-            entity.lerpTo(d0, d1, d2, f, f1, 3);
+            if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_1) && Math.abs(entity.getX() - d0) < 0.03125 && Math.abs(entity.getY() - d1) < 0.015625 && Math.abs(entity.getZ() - d2) < 0.03125) {
+               entity.lerpTo(entity.getX(), entity.getY(), entity.getZ(),  f, f1, ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_15_2) ? 0 : 3);
+            } else {
+               entity.lerpTo(d0, d1, d2, f, f1, 3);
+            }
+            //entity.lerpTo(d0, d1, d2, f, f1, 3);
             entity.setOnGround(pPacket.isOnGround());
          }
 
@@ -547,7 +582,13 @@ public class ClientPacketListener extends ClientCommonPacketListenerImpl impleme
       PacketUtils.ensureRunningOnSameThread(pPacket, this, this.minecraft);
       Entity entity = pPacket.getEntity(this.level);
       if (entity != null) {
-         if (!entity.isControlledByLocalInstance()) {
+         boolean viaFix;
+         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_3) || ProtocolTranslator.getTargetVersion().equals(BedrockProtocolVersion.bedrockLatest)) {
+            viaFix = entity.getControllingPassenger() instanceof Player player ? player.isLocalPlayer() : !entity.level().isClientSide;
+         } else {
+            viaFix = entity.isControlledByLocalInstance();
+         }
+         if (!viaFix) {
             if (pPacket.hasPosition()) {
                VecDeltaCodec vecdeltacodec = entity.getPositionCodec();
                Vec3 vec3 = vecdeltacodec.decode((long)pPacket.getXa(), (long)pPacket.getYa(), (long)pPacket.getZa());
@@ -654,6 +695,9 @@ public class ClientPacketListener extends ClientCommonPacketListenerImpl impleme
 
       this.connection.send(new ServerboundAcceptTeleportationPacket(pPacket.getId()));
       this.connection.send(new ServerboundMovePlayerPacket.PosRot(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot(), false));
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_18) && this.minecraft.screen instanceof ReceivingLevelScreen m) {
+         m.viaFabricPlus$setReady();
+      }
    }
 
    public void handleChunkBlocksUpdate(ClientboundSectionBlocksUpdatePacket pPacket) {
@@ -867,7 +911,8 @@ public class ClientPacketListener extends ClientCommonPacketListenerImpl impleme
          UUID uuid = pPacket.sender();
          PlayerInfo playerinfo = this.getPlayerInfo(uuid);
          if (playerinfo == null) {
-            LOGGER.error("Received player chat packet for unknown player with ID: {}", (Object)uuid);
+            if (ProtocolTranslator.getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_20_2))
+               LOGGER.error("Received player chat packet for unknown player with ID: {}", (Object) uuid);
             this.minecraft.getChatListener().handleChatMessageError(uuid, optional1.get());
          } else {
             RemoteChatSession remotechatsession = playerinfo.getChatSession();
@@ -956,6 +1001,10 @@ public class ClientPacketListener extends ClientCommonPacketListenerImpl impleme
    public void handleSetSpawn(ClientboundSetDefaultSpawnPositionPacket pPacket) {
       PacketUtils.ensureRunningOnSameThread(pPacket, this, this.minecraft);
       this.minecraft.level.setDefaultSpawnPos(pPacket.getPos(), pPacket.getAngle());
+      if (ProtocolTranslator.getTargetVersion().betweenInclusive(ProtocolVersion.v1_18_2, ProtocolVersion.v1_20_2) && this.minecraft.screen instanceof ReceivingLevelScreen screen) {
+         screen.viaFabricPlus$setReady();
+      }
+
    }
 
    public void handleSetEntityPassengersPacket(ClientboundSetPassengersPacket pPacket) {
@@ -972,7 +1021,10 @@ public class ClientPacketListener extends ClientCommonPacketListenerImpl impleme
             if (entity1 != null) {
                entity1.startRiding(entity, true);
                if (entity1 == this.minecraft.player && !flag) {
-                  if (entity instanceof Boat) {
+                  if (entity instanceof Boat && !ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_18)) {
+                /*     if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_18)) {
+                        return Integer.class; // Dummy class file to false the instanceof check
+                     } */
                      this.minecraft.player.yRotO = entity.getYRot();
                      this.minecraft.player.setYRot(entity.getYRot());
                      this.minecraft.player.setYHeadRot(entity.getYRot());
@@ -1085,7 +1137,9 @@ public class ClientPacketListener extends ClientCommonPacketListenerImpl impleme
          localplayer1 = this.minecraft.gameMode.createPlayer(this.level, localplayer.getStats(), localplayer.getRecipeBook());
       }
 
-      this.startWaitingForNewLevel(localplayer1, this.level);
+      if (ProtocolTranslator.getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_20_3) || resourcekey != this.minecraft.player.level().dimension()) {
+         this.startWaitingForNewLevel(localplayer1, this.level);
+      }
       localplayer1.setId(localplayer.getId());
       this.minecraft.player = localplayer1;
       if (resourcekey != localplayer.level().dimension()) {
@@ -1591,7 +1645,7 @@ public class ClientPacketListener extends ClientCommonPacketListenerImpl impleme
          pPacket.getIconBytes().map(ServerData::validateIcon).ifPresent(this.serverData::setIconBytes);
          this.serverData.setEnforcesSecureChat(pPacket.enforcesSecureChat());
          ServerList.saveSingleServer(this.serverData);
-         if (!this.seenInsecureChatWarning && !this.enforcesSecureChat()) {
+         if (!this.seenInsecureChatWarning && !(this.enforcesSecureChat() || VisualSettings.global().disableSecureChatWarning.isEnabled())) {
             SystemToast systemtoast = SystemToast.multiline(this.minecraft, SystemToast.SystemToastId.UNSECURE_SERVER_WARNING, UNSECURE_SERVER_TOAST_TITLE, UNSERURE_SERVER_TOAST);
             this.minecraft.getToasts().addToast(systemtoast);
             this.seenInsecureChatWarning = true;
@@ -1666,7 +1720,8 @@ public class ClientPacketListener extends ClientCommonPacketListenerImpl impleme
       for(ClientboundPlayerInfoUpdatePacket.Entry clientboundplayerinfoupdatepacket$entry1 : pPacket.entries()) {
          PlayerInfo playerinfo1 = this.playerInfoMap.get(clientboundplayerinfoupdatepacket$entry1.profileId());
          if (playerinfo1 == null) {
-            LOGGER.warn("Ignoring player info update for unknown player {} ({})", clientboundplayerinfoupdatepacket$entry1.profileId(), pPacket.actions());
+            if (ProtocolTranslator.getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_19_3))
+               LOGGER.warn("Ignoring player info update for unknown player {} ({})", clientboundplayerinfoupdatepacket$entry1.profileId(), pPacket.actions());
          } else {
             for(ClientboundPlayerInfoUpdatePacket.Action clientboundplayerinfoupdatepacket$action : pPacket.actions()) {
                this.applyPlayerInfoUpdate(clientboundplayerinfoupdatepacket$action, clientboundplayerinfoupdatepacket$entry1, playerinfo1);
@@ -1683,7 +1738,10 @@ public class ClientPacketListener extends ClientCommonPacketListenerImpl impleme
             break;
          case UPDATE_GAME_MODE:
             if (pPlayerInfo.getGameMode() != pEntry.gameMode() && this.minecraft.player != null && this.minecraft.player.getUUID().equals(pEntry.profileId())) {
-               this.minecraft.player.onGameModeChanged(pEntry.gameMode());
+               if (ProtocolTranslator.getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_20)) {
+                  this.minecraft.player.onGameModeChanged(pEntry.gameMode());
+               }
+               //this.minecraft.player.onGameModeChanged(pEntry.gameMode());
             }
 
             pPlayerInfo.setGameMode(pEntry.gameMode());
@@ -1708,7 +1766,8 @@ public class ClientPacketListener extends ClientCommonPacketListenerImpl impleme
       GameProfile gameprofile = pPlayerInfo.getProfile();
       SignatureValidator signaturevalidator = this.minecraft.getProfileKeySignatureValidator();
       if (signaturevalidator == null) {
-         LOGGER.warn("Ignoring chat session from {} due to missing Services public key", (Object)gameprofile.getName());
+         if (ProtocolTranslator.getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_19_4))
+            LOGGER.warn("Ignoring chat session from {} due to missing Services public key", (Object) gameprofile.getName());
          pPlayerInfo.clearChatSession(this.enforcesSecureChat());
       } else {
          RemoteChatSession.Data remotechatsession$data = pEntry.chatSession();

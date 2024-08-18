@@ -70,6 +70,7 @@ public abstract class MixinSwordItem extends TieredItem {
         super(material, settings);
     }
 
+/*
     @Inject(method = "<init>", at = @At("RETURN"))
     private void init1_8Fields(Tier toolMaterial, int attackDamage, float attackSpeed, Properties settings, CallbackInfo ci) {
         this.viaFabricPlus$attackDamage_r1_8 = 4 + toolMaterial.getAttackDamageBonus();
@@ -77,8 +78,9 @@ public abstract class MixinSwordItem extends TieredItem {
         builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", this.viaFabricPlus$attackDamage_r1_8, AttributeModifier.Operation.ADDITION));
         this.viaFabricPlus$AttributeModifiers_r1_8 = builder.build();
     }
+*/
 
-    @Override
+/*    @Override
     public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
         if (ProtocolTranslator.getTargetVersion().betweenInclusive(LegacyProtocolVersion.b1_8tob1_8_1, ProtocolVersion.v1_8)) {
             ItemStack itemStack = user.getItemInHand(hand);
@@ -105,31 +107,33 @@ public abstract class MixinSwordItem extends TieredItem {
         } else {
             return super.getUseDuration(stack);
         }
-    }
+    }*/
 
-    @Redirect(method = "getDamage", at = @At(value = "FIELD", target = "Lnet/minecraft/world/item/SwordItem;attackDamage:F"))
+/*    @Redirect(method = "getDamage", at = @At(value = "FIELD", target = "Lnet/minecraft/world/item/SwordItem;attackDamage:F"))
     private float changeAttackDamage(SwordItem instance) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             return this.viaFabricPlus$attackDamage_r1_8;
         } else {
             return this.attackDamage;
         }
-    }
+    }*/
 
-    @Redirect(method = "getDefaultAttributeModifiers", at = @At(value = "FIELD", target = "Lnet/minecraft/world/item/SwordItem;defaultModifiers:Lcom/google/common/collect/Multimap;"))
+/*    @Redirect(method = "getDefaultAttributeModifiers", at = @At(value = "FIELD", target = "Lnet/minecraft/world/item/SwordItem;defaultModifiers:Lcom/google/common/collect/Multimap;"))
     private Multimap<Attribute, AttributeModifier> changeAttributeModifiers(SwordItem instance) {
         if (DebugSettings.global().replaceAttributeModifiers.isEnabled()) {
             return this.viaFabricPlus$AttributeModifiers_r1_8;
         } else {
             return this.defaultModifiers;
         }
-    }
+    }*/
 
+/*
     @Inject(method = "getDestroySpeed", at = @At("HEAD"), cancellable = true)
     private void changeMiningSpeed(ItemStack stack, BlockState state, CallbackInfoReturnable<Float> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_8tob1_8_1)) {
             cir.setReturnValue(state.is(Blocks.COBWEB) ? 15.0F : 1.5F);
         }
     }
+*/
 
 }

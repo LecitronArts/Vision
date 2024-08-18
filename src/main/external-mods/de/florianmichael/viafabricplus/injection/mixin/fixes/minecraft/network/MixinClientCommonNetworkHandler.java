@@ -71,16 +71,16 @@ public abstract class MixinClientCommonNetworkHandler {
         return null;
     }
 
-    @Redirect(method = "handleKeepAlive", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientCommonPacketListenerImpl;sendWhen(Lnet/minecraft/network/protocol/Packet;Ljava/util/function/BooleanSupplier;Ljava/time/Duration;)V"))
+/*    @Redirect(method = "handleKeepAlive", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientCommonPacketListenerImpl;sendWhen(Lnet/minecraft/network/protocol/Packet;Ljava/util/function/BooleanSupplier;Ljava/time/Duration;)V"))
     private void forceSendKeepAlive(ClientCommonPacketListenerImpl instance, Packet<? extends ServerboundPacketListener> packet, BooleanSupplier sendCondition, Duration expiry) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_3)) {
             send(packet);
         } else {
             sendWhen(packet, sendCondition, expiry);
         }
-    }
+    }*/
 
-    @Inject(method = "handlePing", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/PacketUtils;ensureRunningOnSameThread(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;Lnet/minecraft/util/thread/BlockableEventLoop;)V", shift = At.Shift.AFTER), cancellable = true)
+/*    @Inject(method = "handlePing", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/PacketUtils;ensureRunningOnSameThread(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;Lnet/minecraft/util/thread/BlockableEventLoop;)V", shift = At.Shift.AFTER), cancellable = true)
     private void onPing(ClientboundPingPacket packet, CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4)) {
             final InventoryAcknowledgements acks = (this.connection).viaFabricPlus$getUserConnection().get(InventoryAcknowledgements.class);
@@ -98,23 +98,23 @@ public abstract class MixinClientCommonNetworkHandler {
                 }
             }
         }
-    }
+    }*/
 
-    @Inject(method = "handleCustomPayload(Lnet/minecraft/network/protocol/common/ClientboundCustomPayloadPacket;)V", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "handleCustomPayload(Lnet/minecraft/network/protocol/common/ClientboundCustomPayloadPacket;)V", at = @At("HEAD"), cancellable = true)
     private void handleSyncTask(ClientboundCustomPayloadPacket packet, CallbackInfo ci) {
-        /*
+        *//*
         if (packet.payload().id().toString().equals(ClientsideFixes.PACKET_SYNC_IDENTIFIER) && packet.payload() instanceof ResolvablePayload payload) {
             ClientsideFixes.handleSyncTask(((UntypedPayload) payload.resolve(null)).buffer());
             ci.cancel();
         }
-        */
+        *//*
         if (packet.payload().id().toString().equals(ClientsideFixes.PACKET_SYNC_IDENTIFIER)) {
             ClientsideFixes.handleSyncTask((FriendlyByteBuf) packet.payload());
             ci.cancel(); // Cancel the packet, so it doesn't get processed by the client
         }
-    }
+    }*/
 
-    @Inject(method = "handleResourcePackPush", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "handleResourcePackPush", at = @At("HEAD"), cancellable = true)
     private void validateUrlInNetworkThread(ClientboundResourcePackPushPacket packet, CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20_2)) {
             if (parseResourcePackUrl(packet.url()) == null) {
@@ -122,6 +122,6 @@ public abstract class MixinClientCommonNetworkHandler {
                 ci.cancel();
             }
         }
-    }
+    }*/
 
 }

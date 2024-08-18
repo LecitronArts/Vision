@@ -20,7 +20,6 @@
 package de.florianmichael.viafabricplus.injection.mixin.fixes.minecraft.screen;
 
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import de.florianmichael.viafabricplus.access.IDownloadingTerrainScreen;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.client.gui.screens.ReceivingLevelScreen;
 import net.minecraft.client.gui.screens.Screen;
@@ -36,7 +35,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ReceivingLevelScreen.class)
-public abstract class MixinDownloadingTerrainScreen extends Screen implements IDownloadingTerrainScreen {
+public abstract class MixinDownloadingTerrainScreen extends Screen{
 
     @Shadow
     @Final
@@ -95,7 +94,7 @@ public abstract class MixinDownloadingTerrainScreen extends Screen implements ID
         }
     }
 
-    @Override
+
     public void viaFabricPlus$setReady() {
         this.viaFabricPlus$ready = true;
     }

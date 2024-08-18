@@ -30,13 +30,13 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(BrushItem.class)
 public abstract class MixinBrushItem {
 
-    @Redirect(method = "calculateHitResult", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;getPickRange(Z)F"))
+/*    @Redirect(method = "calculateHitResult", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;getPickRange(Z)F"))
     private float modifyReachDistance(boolean creative) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20_2)) {
             return 5F;
         } else {
             return Player.getPickRange(creative);
         }
-    }
+    }*/
 
 }

@@ -40,7 +40,7 @@ import java.util.Map;
 @Mixin(ClientboundCustomPayloadPacket.class)
 public abstract class MixinCustomPayloadS2CPacket {
 
-    @Unique
+/*    @Unique
     private static final Map<ResourceLocation, ProtocolVersion> viaFabricPlus$PAYLOAD_DIFF = ImmutableMap.<ResourceLocation, ProtocolVersion>builder()
             .put(BrandPayload.ID, LegacyProtocolVersion.c0_0_15a_1)
             .put(GameTestAddMarkerDebugPayload.ID, ProtocolVersion.v1_14)
@@ -83,6 +83,6 @@ public abstract class MixinCustomPayloadS2CPacket {
         } else {
             return null;
         }
-    }
+    }*/
 
 }

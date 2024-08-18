@@ -4,6 +4,9 @@ import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.function.IntFunction;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -53,7 +56,7 @@ public class FireworkRocketItem extends Item {
    }
 
    public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pHand) {
-      if (pPlayer.isFallFlying()) {
+      if (ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_11) && pPlayer.isFallFlying()) {
          ItemStack itemstack = pPlayer.getItemInHand(pHand);
          if (!pLevel.isClientSide) {
             FireworkRocketEntity fireworkrocketentity = new FireworkRocketEntity(pLevel, itemstack, pPlayer);

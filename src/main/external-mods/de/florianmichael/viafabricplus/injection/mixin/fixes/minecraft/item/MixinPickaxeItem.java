@@ -57,7 +57,7 @@ public abstract class MixinPickaxeItem extends DiggerItem {
         super(attackDamage, attackSpeed, material, effectiveBlocks, settings);
     }
 
-    @Override
+/*    @Override
     public boolean isCorrectToolForDrops(BlockState state) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4)) {
             final int miningLevel = this.getTier().getLevel();
@@ -86,6 +86,6 @@ public abstract class MixinPickaxeItem extends DiggerItem {
         }
 
         return super.getDestroySpeed(stack, state);
-    }
+    }*/
 
 }

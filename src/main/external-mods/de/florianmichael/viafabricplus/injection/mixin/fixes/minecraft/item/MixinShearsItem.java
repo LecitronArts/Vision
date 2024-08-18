@@ -40,7 +40,7 @@ public abstract class MixinShearsItem extends Item {
         super(settings);
     }
 
-    @Inject(method = "getDestroySpeed", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "getDestroySpeed", at = @At("HEAD"), cancellable = true)
     private void changeMiningSpeed(ItemStack stack, BlockState state, CallbackInfoReturnable<Float> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4)) {
             if (!state.is(Blocks.COBWEB) && !state.is(BlockTags.LEAVES)) {
@@ -49,13 +49,15 @@ public abstract class MixinShearsItem extends Item {
                 cir.setReturnValue(15.0F);
             }
         }
-    }
+    }*/
 
+/*
     @Inject(method = "isCorrectToolForDrops", at = @At("HEAD"), cancellable = true)
     private void changeEffectiveBlocks(BlockState state, CallbackInfoReturnable<Boolean> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_8tob1_8_1)) {
             cir.setReturnValue(state.is(Blocks.COBWEB));
         }
     }
+*/
 
 }

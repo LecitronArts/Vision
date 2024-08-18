@@ -20,6 +20,8 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.CrashReportCategory;
 import net.minecraft.Util;
 import net.minecraft.client.ClientBrandRetriever;
@@ -186,7 +188,8 @@ public class ClientHandshakePacketListenerImpl implements ClientLoginPacketListe
 
    public void handleCompression(ClientboundLoginCompressionPacket pPacket) {
       if (!this.connection.isMemoryConnection()) {
-         this.connection.setupCompression(pPacket.getCompressionThreshold(), false);
+         this.connection.setupCompression(pPacket.getCompressionThreshold(), ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_17));
+         ;
       }
 
    }

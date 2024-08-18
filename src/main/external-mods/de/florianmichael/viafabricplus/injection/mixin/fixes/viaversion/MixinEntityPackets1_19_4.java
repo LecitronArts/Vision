@@ -36,10 +36,12 @@ public abstract class MixinEntityPackets1_19_4 extends EntityRewriter<Clientboun
         super(protocol);
     }
 
+/*
     @Inject(method = "registerPackets", at = @At("RETURN"))
     private void fixTeleportBehaviour(CallbackInfo ci) {
         this.protocol.registerClientbound(ClientboundPackets1_19_3.ENTITY_TELEPORT, ClientboundPackets1_19_4.ENTITY_TELEPORT, wrapper -> {
         }, true);
     }
+*/
 
 }

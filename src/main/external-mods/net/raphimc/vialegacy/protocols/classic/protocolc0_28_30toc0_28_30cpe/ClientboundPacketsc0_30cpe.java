@@ -19,6 +19,7 @@ package net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import de.florianmichael.viafabricplus.fixes.versioned.classic.CPEAdditions;
 import io.netty.buffer.ByteBuf;
 import net.raphimc.vialegacy.api.splitter.PreNettyPacketType;
 
@@ -60,6 +61,9 @@ public enum ClientboundPacketsc0_30cpe implements ClientboundPacketType, PreNett
     }
 
     public static ClientboundPacketsc0_30cpe getPacket(final int id) {
+        if (CPEAdditions.CUSTOM_PACKETS.containsKey(id)) {
+            return (CPEAdditions.CUSTOM_PACKETS.get(id));
+        }
         return REGISTRY[id];
     }
 

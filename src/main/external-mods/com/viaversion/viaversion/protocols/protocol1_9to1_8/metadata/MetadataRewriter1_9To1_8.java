@@ -78,6 +78,9 @@ public class MetadataRewriter1_9To1_8 extends EntityRewriter<ClientboundPackets1
                     if ((((Byte) value) & 0x10) == 0x10) { // Player eating/aiming/drinking
                         val = 1;
                     }
+                    if (event.user().getEntityTracker(Protocol1_9To1_8.class).clientEntityId() == event.entityId()) {
+                        return;
+                    }
                     int newIndex = MetaIndex.PLAYER_HAND.getNewIndex();
                     MetaType metaType = MetaIndex.PLAYER_HAND.getNewType();
                     event.createExtraMeta(new Metadata(newIndex, metaType, val));

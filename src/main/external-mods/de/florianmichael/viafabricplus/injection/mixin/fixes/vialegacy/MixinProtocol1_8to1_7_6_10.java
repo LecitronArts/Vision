@@ -37,6 +37,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = Protocol1_8to1_7_6_10.class, remap = false)
 public abstract class MixinProtocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_7_2, ClientboundPackets1_8, ServerboundPackets1_7_2, ServerboundPackets1_8> {
 
+/*
     @Inject(method = "registerPackets", at = @At("RETURN"))
     private void addTeleportTracker(CallbackInfo ci) {
         this.registerClientbound(ClientboundPackets1_7_2.PLAYER_POSITION, ClientboundPackets1_8.PLAYER_POSITION, new PacketHandlers() {
@@ -86,5 +87,6 @@ public abstract class MixinProtocol1_8to1_7_6_10 extends AbstractProtocol<Client
     private void initPipeline(UserConnection userConnection, CallbackInfo ci) {
         userConnection.put(new TeleportTracker(userConnection));
     }
+*/
 
 }

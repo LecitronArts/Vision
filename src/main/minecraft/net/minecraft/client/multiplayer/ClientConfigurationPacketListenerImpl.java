@@ -2,6 +2,10 @@ package net.minecraft.client.multiplayer;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.logging.LogUtils;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+import de.florianmichael.viafabricplus.util.ChatUtil;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.Connection;
@@ -14,6 +18,7 @@ import net.minecraft.network.protocol.configuration.ClientboundFinishConfigurati
 import net.minecraft.network.protocol.configuration.ClientboundRegistryDataPacket;
 import net.minecraft.network.protocol.configuration.ClientboundUpdateEnabledFeaturesPacket;
 import net.minecraft.network.protocol.configuration.ServerboundFinishConfigurationPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraftforge.api.distmarker.Dist;
@@ -63,6 +68,9 @@ public class ClientConfigurationPacketListenerImpl extends ClientCommonPacketLis
    }
 
    public void handleEnabledFeatures(ClientboundUpdateEnabledFeaturesPacket pPacket) {
+      if (ProtocolTranslator.getTargetVersion().olderThan(ProtocolVersion.v1_20) && pPacket.features().contains(new ResourceLocation("update_1_20"))) {
+         ChatUtil.sendPrefixedMessage(Component.literal("This server has the update_1_20 features enabled. This is not fully supported and may cause issues.").withStyle(ChatFormatting.RED));
+      }
       this.enabledFeatures = FeatureFlags.REGISTRY.fromNames(pPacket.features());
    }
 

@@ -55,6 +55,7 @@ import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import java.util.UUID;
 import com.viaversion.viaversion.util.Key;
+import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPackets1_19_4, ClientboundPackets1_20_2, ServerboundPackets1_19_4, ServerboundPackets1_20_2> {
@@ -323,6 +324,24 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
 
     private PacketHandler queueServerboundPacket(final ServerboundPackets1_20_2 packetType) {
         return wrapper -> {
+            if (!DebugSettings.global().queueConfigPackets.getValue()) {
+                switch (packetType) {
+                    case PLUGIN_MESSAGE -> wrapper.setPacketType(ServerboundPackets1_19_4.PLUGIN_MESSAGE);
+                    case KEEP_ALIVE -> wrapper.setPacketType(ServerboundPackets1_19_4.KEEP_ALIVE);
+                    case PONG -> wrapper.setPacketType(ServerboundPackets1_19_4.PONG);
+                    default -> throw new IllegalStateException("Unexpected packet type: " + packetType);
+                }
+                return;
+            }
+            if (!DebugSettings.global().queueConfigPackets.getValue()) {
+                switch (packetType) {
+                    case PLUGIN_MESSAGE -> wrapper.setPacketType(ServerboundPackets1_19_4.PLUGIN_MESSAGE);
+                    case KEEP_ALIVE -> wrapper.setPacketType(ServerboundPackets1_19_4.KEEP_ALIVE);
+                    case PONG -> wrapper.setPacketType(ServerboundPackets1_19_4.PONG);
+                    default -> throw new IllegalStateException("Unexpected packet type: " + packetType);
+                }
+                return;
+            }
             wrapper.setPacketType(packetType);
             wrapper.user().get(ConfigurationState.class).addPacketToQueue(wrapper, false);
             wrapper.cancel();

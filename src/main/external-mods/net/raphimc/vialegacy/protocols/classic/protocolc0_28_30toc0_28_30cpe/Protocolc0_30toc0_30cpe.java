@@ -27,7 +27,10 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.FixedByteArrayType;
+import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ClientboundPackets1_19_4;
+import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.Protocol1_19_4To1_19_3;
 import com.viaversion.viaversion.util.IdAndData;
+import de.florianmichael.viafabricplus.fixes.versioned.classic.CPEAdditions;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
 import net.raphimc.vialegacy.api.model.ChunkCoord;
@@ -294,6 +297,27 @@ public class Protocolc0_30toc0_30cpe extends StatelessProtocol<ClientboundPacket
                     blockChange.write(Typesc0_30.POSITION, position); // position
                     blockChange.write(Type.BYTE, (byte) block); // block id
                     blockChange.send(Protocolc0_30toc0_30cpe.class);
+                });
+            }
+        });
+        this.registerClientbound(CPEAdditions.EXT_WEATHER_TYPE, null, new PacketHandlers() {
+            @Override
+            public void register() {
+                handler(wrapper -> {
+                    wrapper.cancel();
+                    final byte weatherType = wrapper.read(Type.BYTE);
+
+                    final PacketWrapper changeRainState = PacketWrapper.create(ClientboundPackets1_19_4.GAME_EVENT, wrapper.user());
+                    changeRainState.write(Type.BYTE, weatherType == 0 /* sunny */ ? (byte) 2 : (byte) 1); // start raining
+                    changeRainState.write(Type.FLOAT, 0F); // unused
+                    changeRainState.send(Protocol1_19_4To1_19_3.class);
+
+                    if (weatherType == 1 /* raining */ || weatherType == 2 /* snowing */) {
+                        final PacketWrapper changeRainType = PacketWrapper.create(ClientboundPackets1_19_4.GAME_EVENT, wrapper.user());
+                        changeRainType.write(Type.BYTE, (byte) 7);
+                        changeRainType.write(Type.FLOAT, weatherType == 1 /* raining */ ? 0F : 1F);
+                        changeRainType.send(Protocol1_19_4To1_19_3.class);
+                    }
                 });
             }
         });

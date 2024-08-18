@@ -24,7 +24,6 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import de.florianmichael.viafabricplus.fixes.data.recipe.RecipeInfo;
 import de.florianmichael.viafabricplus.fixes.data.recipe.Recipes1_11_2;
-import de.florianmichael.viafabricplus.access.IDownloadingTerrainScreen;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import de.florianmichael.viafabricplus.settings.impl.VisualSettings;
 import net.minecraft.client.Minecraft;
@@ -90,69 +89,81 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonPacketLi
         super(client, connection, connectionState);
     }
 
+/*
     @WrapWithCondition(method = "handleRespawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;startWaitingForNewLevel(Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/client/multiplayer/ClientLevel;)V"))
     private boolean checkDimensionChange(ClientPacketListener instance, LocalPlayer player, ClientLevel world, @Local ResourceKey<Level> registryKey) {
         return ProtocolTranslator.getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_20_3) || registryKey != this.minecraft.player.level().dimension();
     }
+*/
 
+/*
     @WrapWithCondition(method = "handlePlayerChat", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;error(Ljava/lang/String;Ljava/lang/Object;)V", remap = false))
     private boolean removeChatPacketError(Logger instance, String s, Object o) {
         return ProtocolTranslator.getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_20_2);
     }
+*/
 
-    @Redirect(method = "applyPlayerInfoUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;onGameModeChanged(Lnet/minecraft/world/level/GameType;)V"))
+/*    @Redirect(method = "applyPlayerInfoUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;onGameModeChanged(Lnet/minecraft/world/level/GameType;)V"))
     private void dontResetVelocity(LocalPlayer instance, GameType gameMode) {
         if (ProtocolTranslator.getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_20)) {
             instance.onGameModeChanged(gameMode);
         }
-    }
+    }*/
 
+/*
     @WrapWithCondition(method = "initializeChatSession", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;warn(Ljava/lang/String;Ljava/lang/Object;)V", remap = false))
     private boolean removeInvalidSignatureWarning(Logger instance, String s, Object o) {
         return ProtocolTranslator.getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_19_4);
     }
+*/
 
+/*
     @WrapWithCondition(method = "handlePlayerInfoUpdate", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;warn(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V", remap = false))
     private boolean removeUnknownPlayerListEntryWarning(Logger instance, String s, Object object1, Object object2) {
         return ProtocolTranslator.getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_19_3);
     }
+*/
 
-    @Redirect(method = {"handleTeleportEntity", "handleMoveEntity"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;isControlledByLocalInstance()Z"))
+/*    @Redirect(method = {"handleTeleportEntity", "handleMoveEntity"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;isControlledByLocalInstance()Z"))
     private boolean allowPlayerToBeMovedByEntityPackets(Entity instance) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_3) || ProtocolTranslator.getTargetVersion().equals(BedrockProtocolVersion.bedrockLatest)) {
             return instance.getControllingPassenger() instanceof Player player ? player.isLocalPlayer() : !instance.level().isClientSide;
         } else {
             return instance.isControlledByLocalInstance();
         }
-    }
+    }*/
 
-    @Inject(method = "<init>", at = @At("RETURN"))
+/*    @Inject(method = "<init>", at = @At("RETURN"))
     private void fixPlayerListOrdering(Minecraft client, Connection clientConnection, CommonListenerCookie clientConnectionState, CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_1)) {
             this.listedPlayers = new LinkedHashSet<>();
         }
-    }
+    }*/
 
+/*
     @Redirect(method = "handleServerData", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;enforcesSecureChat()Z"))
     private boolean removeSecureChatWarning(ClientPacketListener instance) {
         return enforcesSecureChat() || VisualSettings.global().disableSecureChatWarning.isEnabled();
     }
+*/
 
+/*
     @Inject(method = "handleSetSpawn", at = @At("RETURN"))
     private void moveDownloadingTerrainClosing(ClientboundSetDefaultSpawnPositionPacket packet, CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().betweenInclusive(ProtocolVersion.v1_18_2, ProtocolVersion.v1_20_2) && this.minecraft.screen instanceof IDownloadingTerrainScreen mixinDownloadingTerrainScreen) {
             mixinDownloadingTerrainScreen.viaFabricPlus$setReady();
         }
     }
+*/
 
-    @Inject(method = "handleMovePlayer", at = @At("RETURN"))
+/*    @Inject(method = "handleMovePlayer", at = @At("RETURN"))
     private void closeDownloadingTerrain(ClientboundPlayerPositionPacket packet, CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_18) && this.minecraft.screen instanceof IDownloadingTerrainScreen mixinDownloadingTerrainScreen) {
             mixinDownloadingTerrainScreen.viaFabricPlus$setReady();
         }
-    }
+    }*/
 
-    @SuppressWarnings({"InvalidInjectorMethodSignature"})
+/*    @SuppressWarnings({"InvalidInjectorMethodSignature"})
     @ModifyConstant(method = "handleSetEntityPassengersPacket", constant = @Constant(classValue = Boat.class))
     private Class<?> dontChangeYawWhenMountingBoats(Object entity, Class<?> boatClass) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_18)) {
@@ -160,25 +171,25 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonPacketLi
         } else {
             return boatClass;
         }
-    }
+    }*/
 
-    @Inject(method = "handleSetChunkCacheRadius", at = @At("RETURN"))
+/*    @Inject(method = "handleSetChunkCacheRadius", at = @At("RETURN"))
     private void emulateSimulationDistance(ClientboundSetChunkCacheRadiusPacket packet, CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_17_1)) {
             this.handleSetSimulationDistance(new ClientboundSetSimulationDistancePacket(packet.getRadius()));
         }
-    }
+    }*/
 
-    @Redirect(method = "handleTeleportEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;lerpTo(DDDFFI)V"))
+/*    @Redirect(method = "handleTeleportEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;lerpTo(DDDFFI)V"))
     private void cancelSmallChanges(Entity instance, double x, double y, double z, float yaw, float pitch, int interpolationSteps) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_1) && Math.abs(instance.getX() - x) < 0.03125 && Math.abs(instance.getY() - y) < 0.015625 && Math.abs(instance.getZ() - z) < 0.03125) {
             instance.lerpTo(instance.getX(), instance.getY(), instance.getZ(), yaw, pitch, ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_15_2) ? 0 : interpolationSteps);
         } else {
             instance.lerpTo(x, y, z, yaw, pitch, interpolationSteps);
         }
-    }
+    }*/
 
-    @Inject(method = "handleLogin", at = @At("RETURN"))
+/*    @Inject(method = "handleLogin", at = @At("RETURN"))
     private void sendAdditionalData(CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_11_1)) {
             final List<RecipeHolder<?>> recipes = new ArrayList<>();
@@ -192,6 +203,6 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonPacketLi
                 this.handleEntityEvent(new ClientboundEntityEventPacket(this.minecraft.player, (byte) 28)); // Op-level 4
             }
         }
-    }
+    }*/
 
 }

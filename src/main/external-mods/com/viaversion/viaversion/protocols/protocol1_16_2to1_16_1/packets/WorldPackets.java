@@ -73,7 +73,7 @@ public class WorldPackets {
             chunkPosition |= (chunkX & 0x3FFFFFL) << 42;
             chunkPosition |= (chunkZ & 0x3FFFFFL) << 20;
 
-            List<BlockChangeRecord>[] sectionRecords = new List[16];
+            List<BlockChangeRecord>[] sectionRecords = new List[64];
             BlockChangeRecord[] blockChangeRecord = wrapper.read(Type.BLOCK_CHANGE_RECORD_ARRAY);
             for (BlockChangeRecord record : blockChangeRecord) {
                 int chunkY = record.getY() >> 4;

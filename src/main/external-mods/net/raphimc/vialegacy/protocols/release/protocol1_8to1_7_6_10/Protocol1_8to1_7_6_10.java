@@ -47,6 +47,7 @@ import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.util.IdAndData;
+import de.florianmichael.viafabricplus.fixes.tracker.TeleportTracker;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
@@ -1452,6 +1453,47 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
         });
         this.cancelServerbound(ServerboundPackets1_8.SPECTATE);
         this.cancelServerbound(ServerboundPackets1_8.RESOURCE_PACK_STATUS);
+        this.registerClientbound(ClientboundPackets1_7_2.PLAYER_POSITION, ClientboundPackets1_8.PLAYER_POSITION, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Type.DOUBLE); // x
+                map(Type.DOUBLE, Type.DOUBLE, stance -> stance - 1.62F); // y
+                map(Type.DOUBLE); // z
+                map(Type.FLOAT); // yaw
+                map(Type.FLOAT); // pitch
+                handler(wrapper -> {
+                    final boolean onGround = wrapper.read(Type.BOOLEAN); // On Ground
+                    final TeleportTracker teleportTracker = wrapper.user().get(TeleportTracker.class);
+                    if (teleportTracker != null) {
+                        teleportTracker.setPending(onGround);
+                    }
+
+                    wrapper.write(Type.BYTE, (byte) 0); // flags
+                });
+            }
+        }, true);
+        this.registerServerbound(ServerboundPackets1_8.PLAYER_POSITION_AND_ROTATION, ServerboundPackets1_7_2.PLAYER_POSITION_AND_ROTATION, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Type.DOUBLE); // x
+                map(Type.DOUBLE); // y
+                handler(wrapper -> wrapper.write(Type.DOUBLE, wrapper.get(Type.DOUBLE, 1) + 1.62)); // stance
+                map(Type.DOUBLE); // z
+                map(Type.FLOAT); // yaw
+                map(Type.FLOAT); // pitch
+                map(Type.BOOLEAN); // onGround
+                handler(wrapper -> {
+                    final TeleportTracker teleportTracker = wrapper.user().get(TeleportTracker.class);
+                    if (teleportTracker != null) {
+                        Boolean pendingTeleport = teleportTracker.getPending();
+                        if (pendingTeleport != null) {
+                            wrapper.set(Type.BOOLEAN, 0, pendingTeleport);
+                            teleportTracker.setPending(null);
+                        }
+                    }
+                });
+            }
+        }, true);
     }
 
     private float randomFloatClamp(Random rnd, float min, float max) {
@@ -1493,6 +1535,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
         userConnection.put(new MapStorage());
         userConnection.put(new DimensionTracker());
         userConnection.put(new ChunkTracker());
+        userConnection.put(new TeleportTracker(userConnection));
     }
 
     @Override

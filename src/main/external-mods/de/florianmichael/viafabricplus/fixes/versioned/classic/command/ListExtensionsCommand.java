@@ -20,7 +20,6 @@
 package de.florianmichael.viafabricplus.fixes.versioned.classic.command;
 
 import com.viaversion.viaversion.api.command.ViaCommandSender;
-import de.florianmichael.viafabricplus.access.IExtensionProtocolMetadataStorage;
 import de.florianmichael.viafabricplus.protocoltranslator.impl.command.VFPViaSubCommand;
 import net.minecraft.ChatFormatting;
 import net.raphimc.vialegacy.api.LegacyProtocolVersion;
@@ -44,7 +43,7 @@ public class ListExtensionsCommand extends VFPViaSubCommand {
             sendMessage(sender, ChatFormatting.RED + "Only for " + LegacyProtocolVersion.c0_30cpe.getName());
             return true;
         }
-        ((IExtensionProtocolMetadataStorage) getUser().get(ExtensionProtocolMetadataStorage.class)).viaFabricPlus$getServerExtensions().forEach((extension, version) -> {
+        (getUser().get(ExtensionProtocolMetadataStorage.class)).viaFabricPlus$getServerExtensions().forEach((extension, version) -> {
             sendMessage(sender, ChatFormatting.GREEN + extension.getName() + ChatFormatting.GOLD + " v" + version);
         });
         return true;

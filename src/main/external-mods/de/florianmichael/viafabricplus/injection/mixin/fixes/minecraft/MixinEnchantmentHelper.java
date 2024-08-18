@@ -29,7 +29,7 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 @Mixin(EnchantmentHelper.class)
 public abstract class MixinEnchantmentHelper {
 
-    @ModifyConstant(method = "getEnchantmentLevel", constant = @Constant(intValue = 0))
+/*    @ModifyConstant(method = "getEnchantmentLevel", constant = @Constant(intValue = 0))
     private static int usePossibleMinLevel(int constant) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_14_4)) {
             return Short.MIN_VALUE;
@@ -45,6 +45,6 @@ public abstract class MixinEnchantmentHelper {
         } else {
             return constant;
         }
-    }
+    }*/
 
 }

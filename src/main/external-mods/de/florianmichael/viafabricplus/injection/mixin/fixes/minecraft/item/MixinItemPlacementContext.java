@@ -43,7 +43,7 @@ public abstract class MixinItemPlacementContext extends UseOnContext {
         super(player, hand, hit);
     }
 
-    @Inject(method = "getNearestLookingDirection", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "getNearestLookingDirection", at = @At("HEAD"), cancellable = true)
     private void getPlayerLookDirection1_12_2(CallbackInfoReturnable<Direction> cir) {
         final BlockPlaceContext self = (BlockPlaceContext) (Object) this;
         final Player player = self.getPlayer();
@@ -68,13 +68,13 @@ public abstract class MixinItemPlacementContext extends UseOnContext {
 
             cir.setReturnValue(player.getDirection());
         }
-    }
+    }*/
 
-    @Inject(method = "canPlace", at = @At("RETURN"), cancellable = true)
+/*    @Inject(method = "canPlace", at = @At("RETURN"), cancellable = true)
     private void canPlace1_12_2(CallbackInfoReturnable<Boolean> cir) {
         if (!cir.getReturnValueZ() && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
             cir.setReturnValue(Material1_19_4.getMaterial(this.getLevel().getBlockState(this.getClickedPos())).equals(Material1_19_4.DECORATION) && Block.byItem(this.getItemInHand().getItem()).equals(Blocks.ANVIL));
         }
-    }
+    }*/
 
 }

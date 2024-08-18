@@ -24,6 +24,8 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
+import de.florianmichael.viafabricplus.fixes.versioned.visual.FootStepParticle1_12_2;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -90,6 +92,9 @@ public class ParticleRewriter {
         // BlockState	VarInt	The ID of the block state.
         add(41); // (47->41) totem -> minecraft:totem_of_undying
         add(38); // (48->38) spit -> minecraft:spit
+        if (FootStepParticle1_12_2.ID < particles.size()) {
+            throw new IllegalStateException("ViaFabricPlus FootStepParticle ID overlaps with a vanilla 1.12.2 particle ID");
+        }
     }
 
     public static Particle rewriteParticle(int particleId, Integer[] data) {
@@ -103,6 +108,9 @@ public class ParticleRewriter {
     }
 
     private static void add(int newId) {
+        if (particles.size() == 28) { // minecraft:footstep -> viafabricplus:footstep
+            newId = FootStepParticle1_12_2.ID;
+        }
         particles.add(new NewParticle(newId, null));
     }
 

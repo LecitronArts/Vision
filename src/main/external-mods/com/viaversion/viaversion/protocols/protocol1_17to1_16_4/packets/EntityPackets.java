@@ -35,6 +35,7 @@ import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.TagUtil;
+import de.florianmichael.viafabricplus.fixes.versioned.classic.WorldHeightSupport;
 
 public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2, Protocol1_17To1_16_4> {
 
@@ -65,7 +66,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.JOIN_GAME, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_16_2.JOIN_GAME, WorldHeightSupport.handleJoinGame( new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // Entity ID
@@ -89,12 +90,12 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
                 });
                 handler(playerTrackerHandler());
             }
-        });
+        } ));
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.RESPAWN, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_16_2.RESPAWN, WorldHeightSupport.handleRespawn( wrapper -> {
             CompoundTag dimensionData = wrapper.passthrough(Type.NAMED_COMPOUND_TAG);
             addNewDimensionData(dimensionData);
-        });
+        }));
 
         protocol.registerClientbound(ClientboundPackets1_16_2.ENTITY_PROPERTIES, new PacketHandlers() {
             @Override

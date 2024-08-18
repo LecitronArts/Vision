@@ -58,23 +58,25 @@ public abstract class MixinAxeItem extends DiggerItem {
         super(attackDamage, attackSpeed, material, effectiveBlocks, settings);
     }
 
-    @Override
+/*    @Override
     public boolean isCorrectToolForDrops(BlockState state) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4)) {
             return false;
         } else {
             return super.isCorrectToolForDrops(state);
         }
-    }
+    }*/
 
+/*
     @Inject(method = "useOn", at = @At("HEAD"), cancellable = true)
     private void disableUse(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
             cir.setReturnValue(InteractionResult.PASS);
         }
     }
+*/
 
-    @Override
+/*    @Override
     public float getDestroySpeed(ItemStack stack, BlockState state) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_8tob1_8_1)) {
             return viaFabricPlus$effective_blocks_b1_8_1.contains(state.getBlock()) ? this.speed : 1.0F;
@@ -83,6 +85,6 @@ public abstract class MixinAxeItem extends DiggerItem {
         } else {
             return super.getDestroySpeed(stack, state);
         }
-    }
+    }*/
 
 }

@@ -26,10 +26,17 @@ import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.ClientboundPackets1_18;
+import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPackets1_19;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.Protocol1_19To1_18_2;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ServerboundPackets1_19;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.util.MathUtil;
+import de.florianmichael.viafabricplus.fixes.ClientsideFixes;
+import de.florianmichael.viafabricplus.protocoltranslator.translator.BlockStateTranslator;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
+import net.minecraft.world.level.block.state.BlockState;
 
 public final class WorldPackets {
 
@@ -40,7 +47,26 @@ public final class WorldPackets {
         blockRewriter.registerVarLongMultiBlockChange(ClientboundPackets1_18.MULTI_BLOCK_CHANGE);
         blockRewriter.registerEffect(ClientboundPackets1_18.EFFECT, 1010, 2001);
 
-        protocol.cancelClientbound(ClientboundPackets1_18.ACKNOWLEDGE_PLAYER_DIGGING);
+        protocol.registerClientbound(ClientboundPackets1_18.ACKNOWLEDGE_PLAYER_DIGGING, ClientboundPackets1_19.PLUGIN_MESSAGE, wrapper -> {
+            wrapper.resetReader();
+
+            final String uuid = ClientsideFixes.executeSyncTask(data -> {
+                try {
+                    final BlockPos pos = data.readBlockPos();
+                    final BlockState blockState = BlockStateTranslator.via1_18_2toMc(data.readVarInt());
+                    final ServerboundPlayerActionPacket.Action action = data.readEnum(ServerboundPlayerActionPacket.Action.class);
+                    final boolean allGood = data.readBoolean();
+
+                    /*                    final var mixinInteractionManager = (IClientPlayerInteractionManager) Minecraft.getInstance().gameMode;*/
+                    Minecraft.getInstance().gameMode.viaFabricPlus$get1_18_2InteractionManager().handleBlockBreakAck(pos, blockState, action, allGood);
+                } catch (Throwable t) {
+                    throw new RuntimeException("Failed to handle BlockBreakAck packet data", t);
+                }
+            });
+            wrapper.write(Type.STRING, ClientsideFixes.PACKET_SYNC_IDENTIFIER);
+            wrapper.write(Type.STRING, uuid);
+        });
+        //protocol.cancelClientbound(ClientboundPackets1_18.ACKNOWLEDGE_PLAYER_DIGGING);
 
         protocol.registerClientbound(ClientboundPackets1_18.CHUNK_DATA, wrapper -> {
             final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());

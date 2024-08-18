@@ -44,7 +44,7 @@ public class TagType extends Type<Tag> {
             return null;
         }
 
-        final TagLimiter tagLimiter = TagLimiter.create(NamedCompoundTagType.MAX_NBT_BYTES, NamedCompoundTagType.MAX_NESTING_LEVEL);
+        final TagLimiter tagLimiter =  TagLimiter.noop();//TagLimiter.create(NamedCompoundTagType.MAX_NBT_BYTES, NamedCompoundTagType.MAX_NESTING_LEVEL);
         return TagRegistry.read(id, new ByteBufInputStream(buffer), tagLimiter, 0);
     }
 

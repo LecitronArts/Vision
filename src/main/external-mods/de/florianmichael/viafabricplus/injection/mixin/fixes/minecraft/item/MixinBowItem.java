@@ -36,7 +36,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(BowItem.class)
 public abstract class MixinBowItem {
 
-    @Inject(method = "getUseDuration", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "getUseDuration", at = @At("HEAD"), cancellable = true)
     private void makeInstantUsable(CallbackInfoReturnable<Integer> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_7tob1_7_3)) {
             cir.setReturnValue(0);
@@ -62,6 +62,6 @@ public abstract class MixinBowItem {
                 cir.setReturnValue(InteractionResultHolder.pass(stack));
             }
         }
-    }
+    }*/
 
 }

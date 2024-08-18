@@ -126,12 +126,14 @@ public class ProtocolTranslator {
             channel.attr(ProtocolTranslator.CLIENT_CONNECTION_ATTRIBUTE_KEY).set(connection);
             channel.attr(ProtocolTranslator.TARGET_VERSION_ATTRIBUTE_KEY).set(serverVersion);
 
+/*
             if (serverVersion.equals(BedrockProtocolVersion.bedrockLatest)) {
                 channel.config().setOption(RakChannelOption.RAK_PROTOCOL_VERSION, ProtocolConstants.BEDROCK_RAKNET_PROTOCOL_VERSION);
                 channel.config().setOption(RakChannelOption.RAK_CONNECT_TIMEOUT, 4_000L);
                 channel.config().setOption(RakChannelOption.RAK_SESSION_TIMEOUT, 30_000L);
                 channel.config().setOption(RakChannelOption.RAK_GUID, ThreadLocalRandom.current().nextLong());
             }
+*/
 
             final UserConnection user = new UserConnectionImpl(channel, true);
             new ProtocolPipelineImpl(user);

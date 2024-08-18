@@ -20,7 +20,6 @@
 package de.florianmichael.viafabricplus.injection.mixin.vialegacy;
 
 import de.florianmichael.viafabricplus.event.LoadClassicProtocolExtensionCallback;
-import de.florianmichael.viafabricplus.access.IExtensionProtocolMetadataStorage;
 import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.data.ClassicProtocolExtension;
 import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.storage.ExtensionProtocolMetadataStorage;
 import org.spongepowered.asm.mixin.Final;
@@ -33,18 +32,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.EnumMap;
 
 @Mixin(value = ExtensionProtocolMetadataStorage.class, remap = false)
-public abstract class MixinExtensionProtocolMetadataStorage implements IExtensionProtocolMetadataStorage {
+public abstract class MixinExtensionProtocolMetadataStorage {
 
     @Shadow @Final private EnumMap<ClassicProtocolExtension, Integer> serverExtensions;
 
+/*
     @Inject(method = "addServerExtension", at = @At("RETURN"))
     private void updateChatLengthDefinition(ClassicProtocolExtension extension, int version, CallbackInfo ci) {
         LoadClassicProtocolExtensionCallback.EVENT.invoker().onLoadClassicProtocolExtension(extension);
     }
+*/
 
-    @Override
-    public EnumMap<ClassicProtocolExtension, Integer> viaFabricPlus$getServerExtensions() {
-        return this.serverExtensions;
-    }
 
 }

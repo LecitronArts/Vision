@@ -129,7 +129,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
    public void channelActive(ChannelHandlerContext pContext) throws Exception {
       // super.channelActive(pContext); before
 
-      if(!BedrockProtocolVersion.bedrockLatest.equals(this.viaFabricPlus$serverVersion)) {
+      if(true  /* || !BedrockProtocolVersion.bedrockLatest.equals(this.viaFabricPlus$serverVersion)*/) {
          super.channelActive(pContext);
       }
 
@@ -516,7 +516,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
       }
 
 
-      if (BedrockProtocolVersion.bedrockLatest.equals(( pConnection).viaFabricPlus$getTargetVersion())) {
+     /* if (BedrockProtocolVersion.bedrockLatest.equals(( pConnection).viaFabricPlus$getTargetVersion())) {
 
          if(!pUseEpollIfAvailable) {
             return (new Bootstrap()).group(eventloopgroup).handler(new ChannelInitializer<Channel>() {
@@ -559,7 +559,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
                pConnection.configurePacketHandler(channelpipeline);
             }
          }).channel(oclass).channelFactory(oclass == EpollSocketChannel.class ? RakChannelFactory.client(EpollDatagramChannel.class) : RakChannelFactory.client(NioDatagramChannel.class)).connect(pAddress.getAddress(), pAddress.getPort());
-      } else {
+      } else {*/
          return (new Bootstrap()).group(eventloopgroup).handler(new ChannelInitializer<Channel>() {
             protected void initChannel(Channel p_129552_) {
                Connection.setInitialProtocolAttributes(p_129552_);
@@ -572,9 +572,10 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
                ChannelPipeline channelpipeline = p_129552_.pipeline().addLast("timeout", new ReadTimeoutHandler(30));
                Connection.configureSerialization(channelpipeline, PacketFlow.CLIENTBOUND, pConnection.bandwidthDebugMonitor);
                pConnection.configurePacketHandler(channelpipeline);
+               ProtocolTranslator.injectViaPipeline(pConnection, p_129552_);
             }
          }).channel(oclass).connect(pAddress.getAddress(), pAddress.getPort());
-      }
+   /*   }*/
    }
 
    private static ChannelFuture useRakNetPingHandlers(Bootstrap instance, InetAddress inetHost, int inetPort, @Local(argsOnly = true) Connection clientConnection, @Local(argsOnly = true) boolean isConnecting) {
@@ -734,9 +735,9 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
    @Override
    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
       super.channelRegistered(ctx);
-      if (BedrockProtocolVersion.bedrockLatest.equals(this.viaFabricPlus$serverVersion)) { // Call channelActive manually when the channel is registered
+/*      if (BedrockProtocolVersion.bedrockLatest.equals(this.viaFabricPlus$serverVersion)) { // Call channelActive manually when the channel is registered
          this.channelActive(ctx);
-      }
+      }*/
    }
    public float getAverageReceivedPackets() {
       return this.averageReceivedPackets;

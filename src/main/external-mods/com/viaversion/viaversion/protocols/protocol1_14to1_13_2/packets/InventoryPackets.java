@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets;
 
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.DoubleTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.ListTag;
@@ -43,6 +44,15 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
+import de.florianmichael.viafabricplus.fixes.ClientsideFixes;
+import de.florianmichael.viafabricplus.protocoltranslator.translator.TextComponentTranslator;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.inventory.ChestMenu;
+
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -128,6 +138,33 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
                 }
 
                 if (typeId == -1) {
+                    if ((type.equals("minecraft:container") || type.equals("minecraft:chest")) && (slots > 54 || slots <= 0)) {
+
+                        final String uuid = ClientsideFixes.executeSyncTask(data -> {
+                            final Minecraft mc = Minecraft.getInstance();
+
+                            try {
+                                final int syncId = data.readUnsignedByte();
+                                final int size = data.readUnsignedByte();
+                                final Component title1_20 = data.readComponent();
+
+                                final ChestMenu screenHandler = new ChestMenu(null, syncId, mc.player.getInventory(), new SimpleContainer(size), Mth.ceil(size / 9F));
+                                mc.player.containerMenu = screenHandler;
+                                mc.setScreen(new ContainerScreen(screenHandler, mc.player.getInventory(), title1_20));
+                            } catch (Throwable t) {
+                                throw new RuntimeException("Failed to handle OpenWindow packet data", t);
+                            }
+                        });
+
+                        wrapper.clearPacket();
+                        wrapper.setPacketType(ClientboundPackets1_14.PLUGIN_MESSAGE);
+                        wrapper.write(Type.STRING, ClientsideFixes.PACKET_SYNC_IDENTIFIER); // sync task header
+                        wrapper.write(Type.STRING, uuid); // sync task id
+                        wrapper.write(Type.UNSIGNED_BYTE, windowId);
+                        wrapper.write(Type.UNSIGNED_BYTE, slots);
+                        wrapper.write(Type.TAG, TextComponentTranslator.via1_14toViaLatest(title));
+                        return;
+                    }
                     Via.getPlatform().getLogger().warning("Can't open inventory for 1.14 player! Type: " + type + " Size: " + slots);
                 }
 
@@ -232,6 +269,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
         registerCreativeInvAction(ServerboundPackets1_14.CREATIVE_INVENTORY_ACTION);
 
         registerSpawnParticle(ClientboundPackets1_13.SPAWN_PARTICLE, Type.FLOAT);
+
+        this.protocol.registerServerbound(ServerboundPackets1_14.SELECT_TRADE, ServerboundPackets1_13.SELECT_TRADE, (PacketHandler) null, true);
+
     }
 
     @Override

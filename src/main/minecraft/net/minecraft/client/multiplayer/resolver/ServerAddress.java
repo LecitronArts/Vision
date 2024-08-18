@@ -3,6 +3,9 @@ package net.minecraft.client.multiplayer.resolver;
 import com.google.common.net.HostAndPort;
 import com.mojang.logging.LogUtils;
 import java.net.IDN;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.slf4j.Logger;
@@ -37,14 +40,19 @@ public final class ServerAddress {
       if (pIp == null) {
          return INVALID;
       } else {
+
          try {
             HostAndPort hostandport = HostAndPort.fromString(pIp).withDefaultPort(25565);
+            if (!(hostandport.getHost().isEmpty() ? INVALID : new ServerAddress(hostandport)).equals(INVALID) && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4)) {
+               return (ServerNameResolver.DEFAULT.redirectHandler.lookupRedirect(hostandport.getHost().isEmpty() ? INVALID : new ServerAddress(hostandport)).orElse(hostandport.getHost().isEmpty() ? INVALID : new ServerAddress(hostandport)));
+            }
             return hostandport.getHost().isEmpty() ? INVALID : new ServerAddress(hostandport);
          } catch (IllegalArgumentException illegalargumentexception) {
             LOGGER.info("Failed to parse URL {}", pIp, illegalargumentexception);
             return INVALID;
          }
       }
+
    }
 
    public static boolean isValidAddress(String pHostAndPort) {

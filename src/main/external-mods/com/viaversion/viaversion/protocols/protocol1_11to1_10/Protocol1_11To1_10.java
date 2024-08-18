@@ -41,6 +41,7 @@ import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPac
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.util.Pair;
+import de.florianmichael.viafabricplus.fixes.ClientsideFixes;
 
 public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3, ClientboundPackets1_9_3, ServerboundPackets1_9_3, ServerboundPackets1_9_3> {
     private static final ValueTransformer<Float, Short> toOldByte = new ValueTransformer<Float, Short>(Type.UNSIGNED_BYTE) {
@@ -308,8 +309,8 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
                 handler(wrapper -> {
                     // 100 character limit on older servers
                     String msg = wrapper.get(Type.STRING, 0);
-                    if (msg.length() > 100) {
-                        wrapper.set(Type.STRING, 0, msg.substring(0, 100));
+                    if (msg.length() > ClientsideFixes.getChatLength()) {
+                        wrapper.set(Type.STRING, 0, msg.substring(0, ClientsideFixes.getChatLength()));
                     }
                 });
             }

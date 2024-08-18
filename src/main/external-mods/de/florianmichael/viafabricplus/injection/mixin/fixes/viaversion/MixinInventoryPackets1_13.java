@@ -40,9 +40,11 @@ public abstract class MixinInventoryPackets1_13 extends ItemRewriter<Clientbound
         super(protocol, itemType, itemArrayType);
     }
 
+/*
     @Inject(method = "registerPackets", at = @At("RETURN"))
     private void dontResyncInventory(CallbackInfo ci) {
         this.protocol.registerServerbound(ServerboundPackets1_14.SELECT_TRADE, ServerboundPackets1_13.SELECT_TRADE, (PacketHandler) null, true);
     }
+*/
 
 }

@@ -29,11 +29,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(value = MappingDataBase.class, remap = false)
 public abstract class MixinMappingDataBase {
 
-    @Inject(method = "getNewParticleId", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "getNewParticleId", at = @At("HEAD"), cancellable = true)
     private void passthroughFootStepParticle(int id, CallbackInfoReturnable<Integer> cir) {
         if (id == FootStepParticle1_12_2.ID) {
             cir.setReturnValue(id);
         }
-    }
+    }*/
 
 }

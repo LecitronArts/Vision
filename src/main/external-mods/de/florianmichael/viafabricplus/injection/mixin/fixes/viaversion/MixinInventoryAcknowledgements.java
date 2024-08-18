@@ -37,7 +37,7 @@ public abstract class MixinInventoryAcknowledgements {
     @Final
     private IntList ids;
 
-    @Unique
+/*    @Unique
     private it.unimi.dsi.fastutil.ints.IntList viaFabricPlus$ids;
 
     @Inject(method = "<init>", at = @At("RETURN"))
@@ -55,6 +55,6 @@ public abstract class MixinInventoryAcknowledgements {
     @Inject(method = "removeId", at = @At("HEAD"), cancellable = true)
     private void forwardRemove(int id, CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(viaFabricPlus$ids.rem(id));
-    }
+    }*/
 
 }

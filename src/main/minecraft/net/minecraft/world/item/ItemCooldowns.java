@@ -3,6 +3,8 @@ package net.minecraft.world.item;
 import com.google.common.collect.Maps;
 import java.util.Iterator;
 import java.util.Map;
+
+import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
 import net.minecraft.util.Mth;
 
 public class ItemCooldowns {
@@ -41,6 +43,9 @@ public class ItemCooldowns {
    }
 
    public void addCooldown(Item pItem, int pTicks) {
+      if (DebugSettings.global().removeCooldowns.isEnabled()) {
+         return;
+      }
       this.cooldowns.put(pItem, new ItemCooldowns.CooldownInstance(this.tickCount, this.tickCount + pTicks));
       this.onCooldownStarted(pItem, pTicks);
    }

@@ -44,17 +44,19 @@ import java.util.Set;
 @Mixin(ShovelItem.class)
 public abstract class MixinShovelItem extends DiggerItem {
 
+/*
     @Unique
     private static final Set<Block> viaFabricPlus$effective_blocks_b1_8_1 = ImmutableSet.of(Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.SAND, Blocks.GRAVEL, Blocks.SNOW, Blocks.SNOW_BLOCK, Blocks.CLAY, Blocks.FARMLAND);
 
     @Unique
     private static final Set<Block> viaFabricPlus$effective_blocks_r1_16_5 = ImmutableSet.of(Blocks.CLAY, Blocks.DIRT, Blocks.COARSE_DIRT, Blocks.PODZOL, Blocks.FARMLAND, Blocks.GRASS_BLOCK, Blocks.GRAVEL, Blocks.MYCELIUM, Blocks.SAND, Blocks.RED_SAND, Blocks.SNOW_BLOCK, Blocks.SNOW, Blocks.SOUL_SAND, Blocks.DIRT_PATH, Blocks.WHITE_CONCRETE_POWDER, Blocks.ORANGE_CONCRETE_POWDER, Blocks.MAGENTA_CONCRETE_POWDER, Blocks.LIGHT_BLUE_CONCRETE_POWDER, Blocks.YELLOW_CONCRETE_POWDER, Blocks.LIME_CONCRETE_POWDER, Blocks.PINK_CONCRETE_POWDER, Blocks.GRAY_CONCRETE_POWDER, Blocks.LIGHT_GRAY_CONCRETE_POWDER, Blocks.CYAN_CONCRETE_POWDER, Blocks.PURPLE_CONCRETE_POWDER, Blocks.BLUE_CONCRETE_POWDER, Blocks.BROWN_CONCRETE_POWDER, Blocks.GREEN_CONCRETE_POWDER, Blocks.RED_CONCRETE_POWDER, Blocks.BLACK_CONCRETE_POWDER, Blocks.SOUL_SOIL);
+*/
 
     protected MixinShovelItem(float attackDamage, float attackSpeed, Tier material, TagKey<Block> effectiveBlocks, Item.Properties settings) {
         super(attackDamage, attackSpeed, material, effectiveBlocks, settings);
     }
 
-    @Override
+/*    @Override
     public boolean isCorrectToolForDrops(BlockState state) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4)) {
             return state.is(Blocks.SNOW) || state.is(Blocks.SNOW_BLOCK);
@@ -70,9 +72,9 @@ public abstract class MixinShovelItem extends DiggerItem {
         } else {
             return instance.get(grassBlock);
         }
-    }
+    }*/
 
-    @Override
+/*    @Override
     public float getDestroySpeed(ItemStack stack, BlockState state) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_8tob1_8_1)) {
             return viaFabricPlus$effective_blocks_b1_8_1.contains(state.getBlock()) ? this.speed : 1.0F;
@@ -81,6 +83,6 @@ public abstract class MixinShovelItem extends DiggerItem {
         }
 
         return super.getDestroySpeed(stack, state);
-    }
+    }*/
 
 }

@@ -57,14 +57,14 @@ public abstract class MixinChatInputSuggestor {
     @Final
     private List<FormattedCharSequence> commandUsage;
 
-    @Inject(method = "formatChat", at = @At(value = "HEAD"), cancellable = true)
+/*    @Inject(method = "formatChat", at = @At(value = "HEAD"), cancellable = true)
     private void disableTextFieldColors(String original, int firstCharacterIndex, CallbackInfoReturnable<FormattedCharSequence> cir) {
         if (this.viaFabricPlus$cancelTabComplete()) {
             cir.setReturnValue(FormattedCharSequence.forward(original, Style.EMPTY));
         }
-    }
+    }*/
 
-    @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void handle1_12_2KeyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         if (this.viaFabricPlus$cancelTabComplete()) {
             if (keyCode == GLFW.GLFW_KEY_TAB && this.suggestions == null) {
@@ -78,14 +78,14 @@ public abstract class MixinChatInputSuggestor {
                 this.suggestions = null;
             }
         }
-    }
+    }*/
 
-    @Inject(method = "render", at = @At("HEAD"))
+/*    @Inject(method = "render", at = @At("HEAD"))
     private void clearMessages(GuiGraphics drawContext, int mouseX, int mouseY, CallbackInfo ci) {
         if (this.viaFabricPlus$cancelTabComplete()) {
             this.commandUsage.clear();
         }
-    }
+    }*/
 
     @Unique
     private boolean viaFabricPlus$cancelTabComplete() {

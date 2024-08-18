@@ -65,7 +65,7 @@ public class NamedCompoundTagType extends Type<CompoundTag> {
             buffer.skipBytes(buffer.readUnsignedShort());
         }
 
-        final TagLimiter tagLimiter = TagLimiter.create(MAX_NBT_BYTES, MAX_NESTING_LEVEL);
+        final TagLimiter tagLimiter = TagLimiter.noop();//TagLimiter.create(MAX_NBT_BYTES, MAX_NESTING_LEVEL);
         return CompoundTag.read(new ByteBufInputStream(buffer), tagLimiter, 0);
     }
 

@@ -19,7 +19,6 @@
 
 package de.florianmichael.viafabricplus.injection.mixin.fixes.minecraft.item;
 
-import de.florianmichael.viafabricplus.access.IItemStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
@@ -30,6 +29,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(GuiGraphics.class)
 public abstract class MixinDrawContext {
 
+/*
     @Redirect(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getCount()I"))
     private int handleNegativeItemCount(ItemStack instance) {
         if (((IItemStack) (Object) instance).viaFabricPlus$has1_10Tag()) {
@@ -47,5 +47,6 @@ public abstract class MixinDrawContext {
             return String.valueOf(count);
         }
     }
+*/
 
 }

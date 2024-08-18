@@ -27,9 +27,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(targets = "com.viaversion.viaversion.protocols.protocol1_12to1_11_1.Protocol1_12To1_11_1$3", remap = false)
 public abstract class MixinProtocol1_12To1_11_1 {
 
-    @Redirect(method = "lambda$register$1", at = @At(value = "INVOKE", target = "Lcom/viaversion/viaversion/api/protocol/version/ProtocolVersion;newerThanOrEqualTo(Lcom/viaversion/viaversion/api/protocol/version/ProtocolVersion;)Z"))
+/*    @Redirect(method = "lambda$register$1", at = @At(value = "INVOKE", target = "Lcom/viaversion/viaversion/api/protocol/version/ProtocolVersion;newerThanOrEqualTo(Lcom/viaversion/viaversion/api/protocol/version/ProtocolVersion;)Z"))
     private static boolean dontClearRecipes(ProtocolVersion instance, ProtocolVersion other) {
         return false;
-    }
+    }*/
 
 }

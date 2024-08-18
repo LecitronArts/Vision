@@ -32,7 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = EntityIdRewriter.class, remap = false)
 public abstract class MixinEntityIdRewriter {
 
-    @Inject(method = "toClientItem(Lcom/viaversion/viaversion/api/minecraft/item/Item;Z)V", at = @At("HEAD"))
+/*    @Inject(method = "toClientItem(Lcom/viaversion/viaversion/api/minecraft/item/Item;Z)V", at = @At("HEAD"))
     private static void handleNegativeItemCountS2C(Item item, boolean backwards, CallbackInfo ci) {
         if (item != null && item.amount() <= 0) {
             CompoundTag tag = item.tag();
@@ -44,9 +44,9 @@ public abstract class MixinEntityIdRewriter {
             tag.putByte(ClientsideFixes.ITEM_COUNT_NBT_TAG, (byte) item.amount());
             item.setTag(tag);
         }
-    }
+    }*/
 
-    @Inject(method = "toServerItem(Lcom/viaversion/viaversion/api/minecraft/item/Item;Z)V", at = @At("HEAD"))
+/*    @Inject(method = "toServerItem(Lcom/viaversion/viaversion/api/minecraft/item/Item;Z)V", at = @At("HEAD"))
     private static void handleNegativeItemCountC2S(Item item, boolean backwards, CallbackInfo ci) {
         if (item != null && item.tag() != null) {
             if (item.tag().contains(ClientsideFixes.ITEM_COUNT_NBT_TAG)) {
@@ -54,6 +54,6 @@ public abstract class MixinEntityIdRewriter {
                 if (item.tag().isEmpty()) item.setTag(null);
             }
         }
-    }
+    }*/
 
 }

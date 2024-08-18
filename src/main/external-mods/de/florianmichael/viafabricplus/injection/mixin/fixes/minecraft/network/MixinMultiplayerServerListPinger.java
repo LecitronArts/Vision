@@ -30,12 +30,16 @@ import net.minecraft.client.multiplayer.resolver.ServerAddress;
 @Mixin(ServerStatusPinger.class)
 public abstract class MixinMultiplayerServerListPinger {
 
-    /**
+/*
+    */
+/**
      * @author RK_01
      * @reason Remove legacy pingLegacyServer which didn't even work
-     */
+     *//*
+
     @Overwrite
     public void pingLegacyServer(InetSocketAddress socketAddress, ServerAddress address, ServerData serverInfo) {
     }
+*/
 
 }

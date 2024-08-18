@@ -1,12 +1,18 @@
 package net.minecraft.world.item.context;
 
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.fixes.data.Material1_19_4;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
@@ -37,7 +43,11 @@ public class BlockPlaceContext extends UseOnContext {
    }
 
    public boolean canPlace() {
-      return this.replaceClicked || this.getLevel().getBlockState(this.getClickedPos()).canBeReplaced(this);
+      boolean returnValue = this.replaceClicked || this.getLevel().getBlockState(this.getClickedPos()).canBeReplaced(this);
+      if (!returnValue && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
+         return (Material1_19_4.getMaterial(this.getLevel().getBlockState(this.getClickedPos())).equals(Material1_19_4.DECORATION) && Block.byItem(this.getItemInHand().getItem()).equals(Blocks.ANVIL));
+      }
+      return returnValue;
    }
 
    public boolean replacingClickedOnBlock() {
@@ -45,6 +55,27 @@ public class BlockPlaceContext extends UseOnContext {
    }
 
    public Direction getNearestLookingDirection() {
+      final BlockPlaceContext self = (BlockPlaceContext) (Object) this;
+      final Player player = self.getPlayer();
+
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
+         final BlockPos placementPos = self.getClickedPos();
+         final double blockPosCenterFactor = ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_10) ? 0.5 : 0;
+
+         if (Math.abs(player.getX() - (placementPos.getX() + blockPosCenterFactor)) < 2 && Math.abs(player.getZ() - (placementPos.getZ() + blockPosCenterFactor)) < 2) {
+            final double eyeY = player.getY() + player.getEyeHeight(player.getPose());
+
+            if (eyeY - placementPos.getY() > 2) {
+               return (Direction.DOWN);
+            }
+
+            if (placementPos.getY() - eyeY > 0) {
+               return (Direction.UP);
+            }
+         }
+
+        return (player.getDirection());
+      }
       return Direction.orderedByNearest(this.getPlayer())[0];
    }
 

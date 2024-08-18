@@ -12,17 +12,15 @@ import java.io.UncheckedIOException;
 import java.net.Proxy;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.OptionalLong;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.SharedConstants;
 import net.minecraft.WorldVersion;
 import net.minecraft.client.Minecraft;
@@ -161,8 +159,18 @@ public class DownloadedPackSource implements AutoCloseable {
 
          private Map<String, String> createDownloadHeaders() {
             WorldVersion worldversion = SharedConstants.getCurrentVersion();
-            return Map.of("X-Minecraft-Username", pUser.getName(), "X-Minecraft-UUID", UndashedUuid.toString(pUser.getProfileId()), "X-Minecraft-Version", worldversion.getName(), "X-Minecraft-Version-ID", worldversion.getId(), "X-Minecraft-Pack-Format", String.valueOf(worldversion.getPackVersion(PackType.CLIENT_RESOURCES)), "User-Agent", "Minecraft Java/" + worldversion.getName());
-         }
+
+            final LinkedHashMap<String, String> modifiableMap = new LinkedHashMap<>(Map.of("X-Minecraft-Username", pUser.getName(), "X-Minecraft-UUID", UndashedUuid.toString(pUser.getProfileId()), "X-Minecraft-Version", worldversion.getName(), "X-Minecraft-Version-ID", worldversion.getId(), "X-Minecraft-Pack-Format", String.valueOf(worldversion.getPackVersion(PackType.CLIENT_RESOURCES)), "User-Agent", "Minecraft Java/" + worldversion.getName()));
+            if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_14_3)) {
+               modifiableMap.remove("X-Minecraft-Version-ID");
+               if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
+                  modifiableMap.remove("X-Minecraft-Pack-Format");
+                  modifiableMap.remove("User-Agent");
+               }
+            }
+            return (modifiableMap);
+/*            return Map.of("X-Minecraft-Username", pUser.getName(), "X-Minecraft-UUID", UndashedUuid.toString(pUser.getProfileId()), "X-Minecraft-Version", worldversion.getName(), "X-Minecraft-Version-ID", worldversion.getId(), "X-Minecraft-Pack-Format", String.valueOf(worldversion.getPackVersion(PackType.CLIENT_RESOURCES)), "User-Agent", "Minecraft Java/" + worldversion.getName());
+        */ }
 
          public void download(Map<UUID, DownloadQueue.DownloadRequest> p_310177_, Consumer<DownloadQueue.BatchResult> p_310806_) {
             pDownloadQueue.downloadBatch(new DownloadQueue.BatchConfig(CACHE_HASHING_FUNCTION, 262144000, this.createDownloadHeaders(), pProxy, DownloadedPackSource.this.createDownloadNotifier(p_310177_.size())), p_310177_).thenAcceptAsync(p_310806_, pExecutor);

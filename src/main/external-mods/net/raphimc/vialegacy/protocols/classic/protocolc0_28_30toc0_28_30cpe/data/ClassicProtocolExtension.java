@@ -17,6 +17,7 @@
  */
 package net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.data;
 
+import de.florianmichael.viafabricplus.fixes.versioned.classic.CPEAdditions;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
@@ -86,6 +87,9 @@ public enum ClassicProtocolExtension {
     }
 
     public boolean supportsVersion(int version) {
+        if (CPEAdditions.ALLOWED_EXTENSIONS.contains((ClassicProtocolExtension) (Object) this)) {
+            return (true);
+        }
         return this.supportedVersions.contains(version);
     }
 
@@ -94,6 +98,9 @@ public enum ClassicProtocolExtension {
     }
 
     public int getHighestSupportedVersion() {
+        if (CPEAdditions.ALLOWED_EXTENSIONS.contains((ClassicProtocolExtension) (Object) this)) {
+           return  (1);
+        }
         int highest = 0;
         for (int supportedVersion : this.supportedVersions) {
             if (supportedVersion > highest) highest = supportedVersion;
@@ -102,6 +109,9 @@ public enum ClassicProtocolExtension {
     }
 
     public boolean isSupported() {
+        if (CPEAdditions.ALLOWED_EXTENSIONS.contains((ClassicProtocolExtension) (Object) this)) {
+            return  (true);
+        }
         return !this.supportedVersions.isEmpty();
     }
 

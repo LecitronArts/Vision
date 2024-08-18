@@ -37,7 +37,7 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(targets = "net.minecraft.world.item.CreativeModeTab.ItemDisplayBuilder")
 public abstract class MixinItemGroup_EntriesImpl {
 
-    @Shadow
+/*    @Shadow
     @Final
     private CreativeModeTab tab;
 
@@ -46,13 +46,13 @@ public abstract class MixinItemGroup_EntriesImpl {
         final boolean originalValue = original.call(instance, featureSet);
         final int index = GeneralSettings.global().removeNotAvailableItemsFromCreativeTab.getIndex();
 
-        if (index == 2 /* Off */ || Minecraft.getInstance().isLocalServer()) {
+        if (index == 2 *//* Off *//* || Minecraft.getInstance().isLocalServer()) {
             return originalValue;
-        } else if (index == 1 /* Vanilla only */ && !BuiltInRegistries.CREATIVE_MODE_TAB.getKey(this.tab).getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE)) {
+        } else if (index == 1 *//* Vanilla only *//* && !BuiltInRegistries.CREATIVE_MODE_TAB.getKey(this.tab).getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE)) {
             return originalValue;
         } else {
             return ItemRegistryDiff.keepItem(instance) && originalValue;
         }
-    }
+    }*/
 
 }

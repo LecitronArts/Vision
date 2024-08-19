@@ -1,0 +1,2 @@
+/gamemode 1
+/gamemode 0

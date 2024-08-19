@@ -180,6 +180,7 @@ public class NbtIo {
       try {
          return TagTypes.getType(pType).load(pInput, pAccounter);
       } catch (IOException ioexception) {
+         ioexception.printStackTrace();
          CrashReport crashreport = CrashReport.forThrowable(ioexception, "Loading NBT data");
          CrashReportCategory crashreportcategory = crashreport.addCategory("NBT Tag");
          crashreportcategory.setDetail("Tag type", pType);

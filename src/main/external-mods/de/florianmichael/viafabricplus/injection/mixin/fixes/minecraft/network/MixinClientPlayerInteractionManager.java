@@ -28,7 +28,6 @@ import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ServerboundPac
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
 import de.florianmichael.viafabricplus.fixes.versioned.ActionResultException1_12_2;
 import de.florianmichael.viafabricplus.fixes.versioned.ClientPlayerInteractionManager1_18_2;
-import de.florianmichael.viafabricplus.access.IScreenHandler;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import de.florianmichael.viafabricplus.protocoltranslator.impl.provider.viaversion.ViaFabricPlusHandItemProvider;
 import de.florianmichael.viafabricplus.protocoltranslator.translator.ItemTranslator;

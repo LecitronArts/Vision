@@ -198,7 +198,13 @@ public class FriendlyByteBuf extends ByteBuf {
       C c = pCollectionFactory.apply(i);
 
       for(int j = 0; j < i; ++j) {
-         c.add(pElementReader.apply(this));
+         try {
+            T c1 = pElementReader.apply(this);
+            if (c1 != null)
+               c.add(c1);
+         } catch (Exception e){
+            e.printStackTrace();
+         }
       }
 
       return c;
@@ -610,17 +616,23 @@ public class FriendlyByteBuf extends ByteBuf {
       if (!this.readBoolean()) {
          return ItemStack.EMPTY;
       } else {
-         CompoundTag tag = this.readNbt();
          Item item = this.readById(BuiltInRegistries.ITEM);
          int i = this.readByte();
          ItemStack itemstack = new ItemStack(item, i);
-         if (tag != null && tag.contains(ClientsideFixes.ITEM_COUNT_NBT_TAG, Tag.TAG_BYTE) && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_10)) {
-            itemstack.viaFabricPlus$set1_10Count(tag.getByte(ClientsideFixes.ITEM_COUNT_NBT_TAG));
-            tag.remove(ClientsideFixes.ITEM_COUNT_NBT_TAG);
-            if (tag.isEmpty()) tag = null;
+         try {
+            CompoundTag tag = this.readNbt();
+
+            if (tag != null && tag.contains(ClientsideFixes.ITEM_COUNT_NBT_TAG, Tag.TAG_BYTE) && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_10)) {
+               itemstack.viaFabricPlus$set1_10Count(tag.getByte(ClientsideFixes.ITEM_COUNT_NBT_TAG));
+               tag.remove(ClientsideFixes.ITEM_COUNT_NBT_TAG);
+               if (tag.isEmpty()) tag = null;
+            }
+
+            itemstack.setTag(tag);
+         } catch (Exception e){
+            e.printStackTrace();
          }
 
-         itemstack.setTag(tag);
       /*   itemstack.setTag(this.readNbt());*/
          return itemstack;
       }

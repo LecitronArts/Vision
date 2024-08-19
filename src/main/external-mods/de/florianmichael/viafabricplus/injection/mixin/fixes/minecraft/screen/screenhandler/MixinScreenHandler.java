@@ -20,7 +20,6 @@
 package de.florianmichael.viafabricplus.injection.mixin.fixes.minecraft.screen.screenhandler;
 
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import de.florianmichael.viafabricplus.access.IScreenHandler;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
@@ -31,7 +30,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(AbstractContainerMenu.class)
-public abstract class MixinScreenHandler implements IScreenHandler {
+public abstract class MixinScreenHandler{
 
     @Shadow
     private ItemStack carried;
@@ -39,19 +38,19 @@ public abstract class MixinScreenHandler implements IScreenHandler {
     @Unique
     private short viaFabricPlus$actionId = 0;
 
-    @Redirect(method = "initializeContents", at = @At(value = "FIELD", target = "Lnet/minecraft/world/inventory/AbstractContainerMenu;carried:Lnet/minecraft/world/item/ItemStack;"))
+/*    @Redirect(method = "initializeContents", at = @At(value = "FIELD", target = "Lnet/minecraft/world/inventory/AbstractContainerMenu;carried:Lnet/minecraft/world/item/ItemStack;"))
     private void preventUpdate(AbstractContainerMenu instance, ItemStack value) {
         if (ProtocolTranslator.getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_17_1)) {
             this.carried = value;
         }
-    }
+    }*/
 
-    @Override
+
     public short viaFabricPlus$getActionId() {
         return viaFabricPlus$actionId;
     }
 
-    @Override
+
     public short viaFabricPlus$incrementAndGetActionId() {
         return ++viaFabricPlus$actionId;
     }

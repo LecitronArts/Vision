@@ -5,7 +5,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.mojang.logging.LogUtils;
-import de.florianmichael.viafabricplus.access.IEntity;
 import de.florianmichael.viafabricplus.fixes.versioned.PendingUpdateManager1_18_2;
 import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
 import dev.tr7zw.entityculling.EntityCullingMod;
@@ -323,8 +322,8 @@ public class ClientLevel extends Level {
     */
    public void tickNonPassenger(Entity entity) {
       entity.setOldPosAndRot();
-      final IEntity mixinEntity = (IEntity) entity;
-      if (mixinEntity.viaFabricPlus$isInLoadedChunkAndShouldTick() || entity.isSpectator()) {
+/*      final IEntity mixinEntity = (IEntity) entity;*/
+      if (entity.viaFabricPlus$isInLoadedChunkAndShouldTick() || entity.isSpectator()) {
          entity.tickCount++;
          this.getProfiler().push(() -> BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString());
          entity.tick();
@@ -332,7 +331,7 @@ public class ClientLevel extends Level {
       }
       this.viaFabricPlus$checkChunk(entity);
 
-      if (mixinEntity.viaFabricPlus$isInLoadedChunkAndShouldTick()) {
+      if (entity.viaFabricPlus$isInLoadedChunkAndShouldTick()) {
          for (Entity entity2 : entity.getPassengers()) {
             this.tickPassenger(entity, entity2);
          }
@@ -413,15 +412,15 @@ public class ClientLevel extends Level {
 
       if (!pRider.isRemoved() && pRider.getVehicle() == pMount) {
          if (pRider instanceof Player || this.tickingEntities.contains(pRider)) {
-            final IEntity mixinPassenger = (IEntity) pRider;
+        /*    final IEntity mixinPassenger = (IEntity) pRider;*/
             pRider.setOldPosAndRot();
-            if (mixinPassenger.viaFabricPlus$isInLoadedChunkAndShouldTick()) {
+            if (pRider.viaFabricPlus$isInLoadedChunkAndShouldTick()) {
                pRider.tickCount++;
                pRider.rideTick();
             }
             this.viaFabricPlus$checkChunk(pRider);
 
-            if (mixinPassenger.viaFabricPlus$isInLoadedChunkAndShouldTick()) {
+            if (pRider.viaFabricPlus$isInLoadedChunkAndShouldTick()) {
                for (Entity entity2 : pRider.getPassengers()) {
                   this.tickPassenger(pRider, entity2);
                }
@@ -1319,12 +1318,12 @@ public class ClientLevel extends Level {
 
    private void viaFabricPlus$checkChunk(Entity entity) {
       this.getProfiler().push("chunkCheck");
-      final IEntity mixinEntity = (IEntity) entity;
+/*      final IEntity mixinEntity = (IEntity) entity;*/
       final int chunkX = Mth.floor(entity.getX() / 16.0D);
       final int chunkZ = Mth.floor(entity.getZ() / 16.0D);
-      if (!mixinEntity.viaFabricPlus$isInLoadedChunkAndShouldTick() || entity.chunkPosition().x != chunkX || entity.chunkPosition().z != chunkZ) {
+      if (!entity.viaFabricPlus$isInLoadedChunkAndShouldTick() || entity.chunkPosition().x != chunkX || entity.chunkPosition().z != chunkZ) {
          if (!(this.getChunk(chunkX, chunkZ).isEmpty())) {
-            mixinEntity.viaFabricPlus$setInLoadedChunkAndShouldTick(true);
+           entity.viaFabricPlus$setInLoadedChunkAndShouldTick(true);
          }
       }
       this.getProfiler().pop();

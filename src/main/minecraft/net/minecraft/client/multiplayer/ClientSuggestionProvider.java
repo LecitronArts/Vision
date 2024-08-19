@@ -50,9 +50,9 @@ public class ClientSuggestionProvider implements SharedSuggestionProvider {
    }
 
    public Collection<String> getOnlinePlayerNames() {
-      if (ProtocolTranslator.getTargetVersion().equals(BedrockProtocolVersion.bedrockLatest)) {
+/*      if (ProtocolTranslator.getTargetVersion().equals(BedrockProtocolVersion.bedrockLatest)) {
          return (this.customCompletionSuggestions);
-      }
+      }*/
       List<String> list = Lists.newArrayList();
 
       for(PlayerInfo playerinfo : this.connection.getOnlinePlayers()) {
@@ -63,9 +63,9 @@ public class ClientSuggestionProvider implements SharedSuggestionProvider {
    }
 
    public Collection<String> getCustomTabSugggestions() {
-      if (ProtocolTranslator.getTargetVersion().equals(BedrockProtocolVersion.bedrockLatest)) {
+/*      if (ProtocolTranslator.getTargetVersion().equals(BedrockProtocolVersion.bedrockLatest)) {
          return (this.customCompletionSuggestions);
-      }
+      }*/
       if (this.customCompletionSuggestions.isEmpty()) {
          return this.getOnlinePlayerNames();
       } else {

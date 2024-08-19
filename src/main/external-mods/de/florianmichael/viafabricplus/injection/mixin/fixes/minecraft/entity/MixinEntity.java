@@ -21,7 +21,6 @@ package de.florianmichael.viafabricplus.injection.mixin.fixes.minecraft.entity;
 
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import de.florianmichael.viafabricplus.fixes.versioned.visual.EntityRidingOffsetsPre1_20_2;
-import de.florianmichael.viafabricplus.access.IEntity;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
@@ -49,7 +48,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @SuppressWarnings("ConstantValue")
 @Mixin(Entity.class)
-public abstract class MixinEntity implements IEntity {
+public abstract class MixinEntity/* implements IEntity*/ {
 
     @Shadow
     private Level level;
@@ -113,38 +112,41 @@ public abstract class MixinEntity implements IEntity {
     }
 */
 
-    @ModifyConstant(method = "checkInsideBlocks", constant = @Constant(doubleValue = 1.0E-7))
+/*    @ModifyConstant(method = "checkInsideBlocks", constant = @Constant(doubleValue = 1.0E-7))
     private double fixBlockCollisionMargin(double constant) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_1)) {
             return 1E-3;
         } else {
             return constant;
         }
-    }
+    }*/
 
-    @Inject(method = "getBlockPosBelowThatAffectsMyMovement", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "getBlockPosBelowThatAffectsMyMovement", at = @At("HEAD"), cancellable = true)
     private void modifyVelocityAffectingPos(CallbackInfoReturnable<BlockPos> cir) {
         final ProtocolVersion target = ProtocolTranslator.getTargetVersion();
 
         if (target.olderThanOrEqualTo(ProtocolVersion.v1_19_4)) {
             cir.setReturnValue(BlockPos.containing(position.x, getBoundingBox().minY - (target.olderThanOrEqualTo(ProtocolVersion.v1_14_4) ? 1 : 0.5000001), position.z));
         }
-    }
+    }*/
 
+/*
     @Redirect(method = {"setYRot", "setXRot"}, at = @At(value = "INVOKE", target = "Ljava/lang/Float;isFinite(F)Z"))
     private boolean allowInfiniteValues(float f) {
         return Float.isFinite(f) || ((Object) this instanceof LocalPlayer && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4));
     }
+*/
 
-    @ModifyConstant(method = "getInputVector", constant = @Constant(doubleValue = 1E-7))
+/*    @ModifyConstant(method = "getInputVector", constant = @Constant(doubleValue = 1E-7))
     private static double fixVelocityEpsilon(double epsilon) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
             return 1E-4;
         } else {
             return epsilon;
         }
-    }
+    }*/
 
+/*
     @Redirect(method = "collideWithShapes", at = @At(value = "INVOKE", target = "Ljava/lang/Math;abs(D)D", ordinal = 0))
     private static double alwaysSortYXZ(double a) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
@@ -153,22 +155,23 @@ public abstract class MixinEntity implements IEntity {
             return Math.abs(a);
         }
     }
+*/
 
-    @Inject(method = "calculateViewVector", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "calculateViewVector", at = @At("HEAD"), cancellable = true)
     private void revertCalculation(float pitch, float yaw, CallbackInfoReturnable<Vec3> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
             cir.setReturnValue(Vec3.directionFromRotation(pitch, yaw));
         }
-    }
+    }*/
 
-    @Inject(method = "setSwimming", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "setSwimming", at = @At("HEAD"), cancellable = true)
     private void cancelSwimming(boolean swimming, CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2) && swimming) {
             ci.cancel();
         }
-    }
+    }*/
 
-    @Inject(method = "updateMovementInFluid", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "updateFluidHeightAndDoFluidPushing", at = @At("HEAD"), cancellable = true)
     private void modifyFluidMovementBoundingBox(TagKey<Fluid> fluidTag, double d, CallbackInfoReturnable<Boolean> cir) {
         if (ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_12_2)) {
             return;
@@ -220,19 +223,19 @@ public abstract class MixinEntity implements IEntity {
         cir.setReturnValue(foundFluid);
     }
 
-    @Inject(method = "getTargetingMargin", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getPickRadius", at = @At("HEAD"), cancellable = true)
     private void expandHitBox(CallbackInfoReturnable<Float> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             cir.setReturnValue(0.1F);
         }
     }
 
-    @Override
+
     public boolean viaFabricPlus$isInLoadedChunkAndShouldTick() {
         return this.viaFabricPlus$isInLoadedChunkAndShouldTick || DebugSettings.global().alwaysTickClientPlayer.isEnabled();
     }
 
-    @Override
+
     public void viaFabricPlus$setInLoadedChunkAndShouldTick(final boolean inLoadedChunkAndShouldTick) {
         this.viaFabricPlus$isInLoadedChunkAndShouldTick = inLoadedChunkAndShouldTick;
     }

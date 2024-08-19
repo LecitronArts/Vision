@@ -10,6 +10,7 @@ import com.mojang.logging.LogUtils;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import de.florianmichael.viafabricplus.fixes.versioned.visual.EntityRidingOffsetsPre1_20_2;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
 import dev.tr7zw.entityculling.versionless.EntityCullingVersionlessBase;
 import dev.tr7zw.entityculling.versionless.access.Cullable;
 import it.unimi.dsi.fastutil.objects.Object2DoubleArrayMap;
@@ -810,6 +811,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
    }
 
    protected BlockPos getBlockPosBelowThatAffectsMyMovement() {
+      final ProtocolVersion target = ProtocolTranslator.getTargetVersion();
+
+      if (target.olderThanOrEqualTo(ProtocolVersion.v1_19_4)) {
+         return (BlockPos.containing(position.x, getBoundingBox().minY - (target.olderThanOrEqualTo(ProtocolVersion.v1_14_4) ? 1 : 0.5000001), position.z));
+      }
       return this.getOnPos(0.500001F);
    }
 
@@ -948,6 +954,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
       if (pShapes.isEmpty()) {
          return pDeltaMovement;
       } else {
+/*         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
+            return Double.MAX_VALUE;
+         } else {
+            return Math.abs(a);
+         }*/
          double d0 = pDeltaMovement.x;
          double d1 = pDeltaMovement.y;
          double d2 = pDeltaMovement.z;
@@ -958,7 +969,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
             }
          }
 
-         boolean flag = Math.abs(d0) < Math.abs(d2);
+         boolean flag = (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2) ? Double.MAX_VALUE : Math.abs(d0)) < Math.abs(d2);
          if (flag && d2 != 0.0D) {
             d2 = Shapes.collide(Direction.Axis.Z, pEntityBB, pShapes, d2);
             if (d2 != 0.0D) {
@@ -1364,7 +1375,13 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
 
    private static Vec3 getInputVector(Vec3 pRelative, float pMotionScaler, float pFacing) {
       double d0 = pRelative.lengthSqr();
-      if (d0 < 1.0E-7D) {
+      double viaFix  ;
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
+         viaFix = 1E-4;
+      } else {
+         viaFix = 1.0E-7D;
+      }
+      if (d0 < viaFix) {
          return Vec3.ZERO;
       } else {
          Vec3 vec3 = (d0 > 1.0D ? pRelative.normalize() : pRelative).scale((double)pMotionScaler);
@@ -1522,6 +1539,9 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
    }
 
    protected final Vec3 calculateViewVector(float pXRot, float pYRot) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
+         return  (Vec3.directionFromRotation(pXRot, pYRot));
+      }
       float f = pXRot * ((float)Math.PI / 180F);
       float f1 = -pYRot * ((float)Math.PI / 180F);
       float f2 = Mth.cos(f1);
@@ -2066,6 +2086,9 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
    }
 
    public float getPickRadius() {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+         return (0.1F);
+      }
       return 0.0F;
    }
 
@@ -2241,6 +2264,9 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
    }
 
    public void setSwimming(boolean pSwimming) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2) && pSwimming) {
+         return;
+      }
       this.setSharedFlag(4, pSwimming);
    }
 
@@ -3066,6 +3092,53 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
    }
 
    public boolean updateFluidHeightAndDoFluidPushing(TagKey<Fluid> pFluidTag, double pMotionScale) {
+      if (!ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_12_2)) {
+         AABB box = this.getBoundingBox().inflate(0, -0.4, 0).deflate(0.001);
+         int minX = Mth.floor(box.minX);
+         int maxX = Mth.ceil(box.maxX);
+         int minY = Mth.floor(box.minY);
+         int maxY = Mth.ceil(box.maxY);
+         int minZ = Mth.floor(box.minZ);
+         int maxZ = Mth.ceil(box.maxZ);
+
+         if (!this.level.hasChunksAt(minX, minY, minZ, maxX, maxY, maxZ)) {
+            return (false);
+         }
+
+         double waterHeight = 0;
+         boolean foundFluid = false;
+         Vec3 pushVec = Vec3.ZERO;
+
+         BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos();
+
+         for (int x = minX; x < maxX; x++) {
+            for (int y = minY - 1; y < maxY; y++) {
+               for (int z = minZ; z < maxZ; z++) {
+                  mutable.set(x, y, z);
+                  FluidState state = this.level.getFluidState(mutable);
+                  if (state.is(pFluidTag)) {
+                     double height = y + state.getHeight(this.level, mutable);
+                     if (height >= box.minY - 0.4)
+                        waterHeight = Math.max(height - box.minY + 0.4, waterHeight);
+                     if (y >= minY && maxY >= height) {
+                        foundFluid = true;
+                        pushVec = pushVec.add(state.getFlow(this.level, mutable));
+                     }
+                  }
+               }
+            }
+         }
+
+         if (pushVec.length() > 0) {
+            pushVec = pushVec.normalize().scale(0.014);
+            this.setDeltaMovement(this.getDeltaMovement().add(pushVec));
+         }
+
+         this.fluidHeight.put(pFluidTag, waterHeight);
+         return (foundFluid);
+      }
+
+
       if (this.touchingUnloadedChunk()) {
          return false;
       } else {
@@ -3326,7 +3399,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
    }
 
    public void setYRot(float pYRot) {
-      if (!Float.isFinite(pYRot)) {
+      if (!(Float.isFinite(pYRot)  || ((Object) this instanceof LocalPlayer && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4)))) {
          Util.logAndPauseIfInIde("Invalid entity rotation: " + pYRot + ", discarding.");
       } else {
          this.yRot = pYRot;
@@ -3338,7 +3411,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
    }
 
    public void setXRot(float pXRot) {
-      if (!Float.isFinite(pXRot)) {
+      if (!(Float.isFinite(pXRot)  || ((Object) this instanceof LocalPlayer && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4)))) {
          Util.logAndPauseIfInIde("Invalid entity rotation: " + pXRot + ", discarding.");
       } else {
          this.xRot = pXRot;
@@ -3524,5 +3597,13 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
       if (!EntityCullingVersionlessBase.enabled)
          return false;
       return outOfCamera;
+   }
+
+   public boolean viaFabricPlus$isInLoadedChunkAndShouldTick() {
+      return this.viaFabricPlus$isInLoadedChunkAndShouldTick || DebugSettings.global().alwaysTickClientPlayer.isEnabled();
+   }
+
+   public void viaFabricPlus$setInLoadedChunkAndShouldTick(final boolean inLoadedChunkAndShouldTick) {
+      this.viaFabricPlus$isInLoadedChunkAndShouldTick = inLoadedChunkAndShouldTick;
    }
 }

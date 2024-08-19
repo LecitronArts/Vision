@@ -32,6 +32,7 @@ public abstract class ModernMetaType extends MetaTypeTemplate {
 
     @Override
     public Metadata read(final ByteBuf buffer) throws Exception {
+
         final short index = buffer.readUnsignedByte();
         if (index == END) return null; // End of metadata
         final MetaType type = this.getType(Type.VAR_INT.readPrimitive(buffer));

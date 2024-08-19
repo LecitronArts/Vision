@@ -40,7 +40,7 @@ public class TagType extends Type<Tag> {
     @Override
     public Tag read(final ByteBuf buffer) throws IOException {
         final byte id = buffer.readByte();
-        if (id == 0) {
+        if (id == 0 ) {
             return null;
         }
 

@@ -398,12 +398,15 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
             try {
                 handler.handle(packetWrapper);
             } catch (CancelException e) {
+                e.printStackTrace();
                 throw e; // Pass through CancelExceptions
             } catch (InformativeException e) {
+                e.printStackTrace();
                 e.addSource(handler.getClass());
                 printRemapError(direction, state, unmappedId, packetWrapper.getId(), e);
                 throw e;
             } catch (Exception e) {
+                e.printStackTrace();
                 // Wrap other exceptions during packet handling
                 InformativeException ex = new InformativeException(e);
                 ex.addSource(handler.getClass());

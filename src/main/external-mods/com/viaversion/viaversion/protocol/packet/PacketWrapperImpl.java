@@ -57,6 +57,11 @@ public class PacketWrapperImpl implements PacketWrapper {
     public PacketWrapperImpl(int packetId, @Nullable ByteBuf inputBuffer, UserConnection userConnection) {
         this.id = packetId;
         this.inputBuffer = inputBuffer;
+/*        if(userConnection == null) {
+            System.out.println("null!!!");
+        } else {
+            System.out.println("not null!!! ");
+        }*/
         this.userConnection = userConnection;
     }
 
@@ -64,6 +69,11 @@ public class PacketWrapperImpl implements PacketWrapper {
         this.packetType = packetType;
         this.id = packetType != null ? packetType.getId() : -1;
         this.inputBuffer = inputBuffer;
+/*        if(userConnection == null) {
+            System.out.println("null!!! 1");
+        } else {
+            System.out.println("not null!!! 1");
+        }*/
         this.userConnection = userConnection;
     }
 

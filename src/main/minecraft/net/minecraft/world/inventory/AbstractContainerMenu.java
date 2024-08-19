@@ -6,6 +6,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import com.mojang.logging.LogUtils;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import java.util.List;
@@ -59,7 +61,7 @@ public abstract class AbstractContainerMenu {
    @Nullable
    private ContainerSynchronizer synchronizer;
    private boolean suppressRemoteUpdates;
-
+   private short viaFabricPlus$actionId = 0;
    protected AbstractContainerMenu(@Nullable MenuType<?> pMenuType, int pContainerId) {
       this.menuType = pMenuType;
       this.containerId = pContainerId;
@@ -579,7 +581,9 @@ public abstract class AbstractContainerMenu {
          this.getSlot(i).set(pItems.get(i));
       }
 
-      this.carried = pCarried;
+      if (ProtocolTranslator.getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_17_1)) {
+         this.carried = pCarried;
+      }
       this.stateId = pStateId;
    }
 
@@ -806,5 +810,14 @@ public abstract class AbstractContainerMenu {
    public int incrementStateId() {
       this.stateId = this.stateId + 1 & 32767;
       return this.stateId;
+   }
+
+
+   public short viaFabricPlus$getActionId() {
+      return viaFabricPlus$actionId;
+   }
+
+   public short viaFabricPlus$incrementAndGetActionId() {
+      return ++viaFabricPlus$actionId;
    }
 }

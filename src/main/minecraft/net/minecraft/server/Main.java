@@ -16,6 +16,9 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import javax.annotation.Nullable;
+
+import de.florianmichael.viafabricplus.ViaFabricPlus;
+import de.florianmichael.viafabricplus.event.LoadCallback;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
@@ -100,6 +103,9 @@ public class Main {
 
          Bootstrap.bootStrap();
          Bootstrap.validate();
+         LoadCallback.EVENT.invoker().onLoad(LoadCallback.State.PRE);
+         ViaFabricPlus.global().init();
+         LoadCallback.EVENT.invoker().onLoad(LoadCallback.State.POST);
          Util.startTimerHackThread();
          Path path1 = Paths.get("server.properties");
          DedicatedServerSettings dedicatedserversettings = new DedicatedServerSettings(path1);

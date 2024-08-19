@@ -20,6 +20,8 @@
 package de.florianmichael.viafabricplus.injection.mixin.base.perserverversion;
 
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,7 +30,6 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(JoinMultiplayerScreen.class)
 public abstract class MixinMultiplayerScreen {
-/*
 
     @Shadow protected abstract void join(ServerData entry);
 
@@ -37,6 +38,5 @@ public abstract class MixinMultiplayerScreen {
         ( entry).viaFabricPlus$passDirectConnectScreen(true);
         original.call(instance, entry);
     }
-*/
 
 }

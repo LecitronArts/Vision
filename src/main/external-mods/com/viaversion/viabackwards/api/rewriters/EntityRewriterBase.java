@@ -41,6 +41,7 @@ import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEvent;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Entity rewriter base class.
@@ -65,7 +66,7 @@ public abstract class EntityRewriterBase<C extends ClientboundPacketType, T exte
     }
 
     @Override
-    public void handleMetadata(int entityId, List<Metadata> metadataList, UserConnection connection) {
+    public void handleMetadata(int entityId, @NotNull List<Metadata> metadataList, UserConnection connection) {
         final TrackedEntity entity = tracker(connection).entity(entityId);
         final boolean initialMetadata = !(entity != null && entity.hasSentMetadata());
 

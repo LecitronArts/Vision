@@ -49,11 +49,11 @@ public abstract class MixinEntityIndex<T extends EntityAccess> {
     }
 */
 
-    @Inject(method = "count", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "count", at = @At("HEAD"), cancellable = true)
     private void returnRealSize(CallbackInfoReturnable<Integer> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4)) {
             cir.setReturnValue(this.byId.size());
         }
-    }
+    }*/
 
 }

@@ -8,7 +8,6 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ServerboundPackets1_16_2;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
-import de.florianmichael.viafabricplus.access.IScreenHandler;
 import de.florianmichael.viafabricplus.fixes.versioned.ActionResultException1_12_2;
 import de.florianmichael.viafabricplus.fixes.versioned.ClientPlayerInteractionManager1_18_2;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
@@ -566,7 +565,7 @@ public class MultiPlayerGameMode implements IPlayerControllerMP {
                clickWindowPacket.write(Type.UNSIGNED_BYTE, (short) clickSlot.getContainerId());
                clickWindowPacket.write(Type.SHORT, (short) clickSlot.getSlotNum());
                clickWindowPacket.write(Type.BYTE, (byte) clickSlot.getButtonNum());
-               clickWindowPacket.write(Type.SHORT, ((IScreenHandler) minecraft.player.containerMenu).viaFabricPlus$incrementAndGetActionId());
+               clickWindowPacket.write(Type.SHORT, ( minecraft.player.containerMenu).viaFabricPlus$incrementAndGetActionId());
                clickWindowPacket.write(Type.VAR_INT, clickSlot.getClickType().ordinal());
                clickWindowPacket.write(Type.ITEM1_13_2, ItemTranslator.mcToVia(slotItemBeforeModification, ProtocolVersion.v1_16_4));
                clickWindowPacket.scheduleSendToServer(Protocol1_17To1_16_4.class);

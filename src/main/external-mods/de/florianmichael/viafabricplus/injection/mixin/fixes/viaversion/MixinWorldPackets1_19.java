@@ -38,7 +38,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(value = WorldPackets.class, remap = false)
 public abstract class MixinWorldPackets1_19 {
 
-    @Redirect(method = "register", at = @At(value = "INVOKE", target = "Lcom/viaversion/viaversion/protocols/protocol1_19to1_18_2/Protocol1_19To1_18_2;cancelClientbound(Lcom/viaversion/viaversion/api/protocol/packet/ClientboundPacketType;)V"))
+/*    @Redirect(method = "register", at = @At(value = "INVOKE", target = "Lcom/viaversion/viaversion/protocols/protocol1_19to1_18_2/Protocol1_19To1_18_2;cancelClientbound(Lcom/viaversion/viaversion/api/protocol/packet/ClientboundPacketType;)V"))
     private static void handleLegacyAcknowledgePlayerDigging(Protocol1_19To1_18_2 instance, ClientboundPacketType clientboundPacketType) {
         instance.registerClientbound(ClientboundPackets1_18.ACKNOWLEDGE_PLAYER_DIGGING, ClientboundPackets1_19.PLUGIN_MESSAGE, wrapper -> {
             wrapper.resetReader();
@@ -50,7 +50,7 @@ public abstract class MixinWorldPackets1_19 {
                     final ServerboundPlayerActionPacket.Action action = data.readEnum(ServerboundPlayerActionPacket.Action.class);
                     final boolean allGood = data.readBoolean();
 
-/*                    final var mixinInteractionManager = (IClientPlayerInteractionManager) Minecraft.getInstance().gameMode;*/
+*//*                    final var mixinInteractionManager = (IClientPlayerInteractionManager) Minecraft.getInstance().gameMode;*//*
                     Minecraft.getInstance().gameMode.viaFabricPlus$get1_18_2InteractionManager().handleBlockBreakAck(pos, blockState, action, allGood);
                 } catch (Throwable t) {
                     throw new RuntimeException("Failed to handle BlockBreakAck packet data", t);
@@ -59,6 +59,6 @@ public abstract class MixinWorldPackets1_19 {
             wrapper.write(Type.STRING, ClientsideFixes.PACKET_SYNC_IDENTIFIER);
             wrapper.write(Type.STRING, uuid);
         });
-    }
+    }*/
 
 }

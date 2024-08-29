@@ -29,11 +29,11 @@ public class PacketDecoder extends ByteToMessageDecoder implements ProtocolSwapH
          int j = friendlybytebuf.readVarInt();
          Packet<?> packet = codecdata.createPacket(j, friendlybytebuf);
          if (packet == null) {
-            throw new IOException("Bad packet id " + j);
+           /* throw */new IOException("Bad packet id " + j).printStackTrace();
          } else {
             JvmProfiler.INSTANCE.onPacketReceived(codecdata.protocol(), j, pContext.channel().remoteAddress(), i);
             if (friendlybytebuf.readableBytes() > 0) {
-               throw new IOException("Packet " + codecdata.protocol().id() + "/" + j + " (" + packet.getClass().getSimpleName() + ") was larger than I expected, found " + friendlybytebuf.readableBytes() + " bytes extra whilst reading packet " + j);
+              /* throw */new IOException("Packet " + codecdata.protocol().id() + "/" + j + " (" + packet.getClass().getSimpleName() + ") was larger than I expected, found " + friendlybytebuf.readableBytes() + " bytes extra whilst reading packet " + j).printStackTrace();
             } else {
                pOut.add(packet);
                if (LOGGER.isDebugEnabled()) {

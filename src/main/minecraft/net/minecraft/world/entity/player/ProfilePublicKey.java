@@ -77,6 +77,8 @@ public record ProfilePublicKey(ProfilePublicKey.Data data) {
             return this.expiresAt.equals(profilepublickey$data.expiresAt) && this.key.equals(profilepublickey$data.key) && Arrays.equals(this.keySignature, profilepublickey$data.keySignature);
          }
       }
+
+
    }
 
    public static class ValidationException extends ThrowingComponent {

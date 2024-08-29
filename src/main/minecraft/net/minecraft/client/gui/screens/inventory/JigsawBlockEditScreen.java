@@ -1,13 +1,12 @@
 package net.minecraft.client.gui.screens.inventory;
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+import de.florianmichael.viafabricplus.settings.impl.VisualSettings;
 import net.minecraft.client.GameNarrator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractSliderButton;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.CycleButton;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -150,6 +149,20 @@ public class JigsawBlockEditScreen extends Screen {
       }).bounds(this.width / 2 + 4, 210, 150, 20).build());
       this.setInitialFocus(this.poolEdit);
       this.updateValidity();
+
+      if (VisualSettings.global().removeNewerFeaturesFromJigsawScreen.isEnabled()) {
+         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_15_2)) {
+            nameEdit.active = false;
+            jointButton.active = false;
+            int index = children().indexOf(jointButton);
+            ((AbstractWidget) children().get(index + 1)).active = false; // levels slider
+            ((AbstractWidget) children().get(index + 2)).active = false; // keep jigsaws toggle
+            ((AbstractWidget) children().get(index + 3)).active = false; // generate button
+         }
+
+         selectionPriorityEdit.active = false;
+         placementPriorityEdit.active = false;
+      }
    }
 
    private void updateValidity() {
@@ -191,6 +204,9 @@ public class JigsawBlockEditScreen extends Screen {
    }
 
    public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+      if (VisualSettings.global().removeNewerFeaturesFromJigsawScreen.isEnabled() && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_15_2)) {
+         nameEdit.setValue(targetEdit.getValue());
+      }
       super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
       pGuiGraphics.drawString(this.font, POOL_LABEL, this.width / 2 - 153, 10, 10526880);
       this.poolEdit.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);

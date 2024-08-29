@@ -49,46 +49,52 @@ public abstract class MixinChatScreen {
     @Shadow
     CommandSuggestions commandSuggestions;
 
+/*
     @Inject(method = "init", at = @At("RETURN"))
     private void changeChatLength(CallbackInfo ci) {
         this.input.setMaxLength(ClientsideFixes.getChatLength());
     }
+*/
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;getMessageTagAt(DD)Lnet/minecraft/client/GuiMessageTag;"))
+/*    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;getMessageTagAt(DD)Lnet/minecraft/client/GuiMessageTag;"))
     private GuiMessageTag removeIndicator(ChatComponent instance, double mouseX, double mouseY) {
         if (VisualSettings.global().hideSignatureIndicator.isEnabled()) {
             return null;
         } else {
             return instance.getMessageTagAt(mouseX, mouseY);
         }
-    }
+    }*/
 
+/*
     @WrapWithCondition(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;setValue(Ljava/lang/String;)V"))
     public boolean moveSetTextDown(EditBox instance, String text) {
         return ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_12_2);
     }
+*/
 
-    @Inject(method = "init", at = @At("RETURN"))
+/*    @Inject(method = "init", at = @At("RETURN"))
     private void moveSetTextDown(CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
             this.input.setValue(this.initial);
             this.commandSuggestions.updateCommandInfo();
         }
-    }
+    }*/
 
-    @Redirect(method = "onEdited", at = @At(value = "INVOKE", target = "Ljava/lang/String;equals(Ljava/lang/Object;)Z"))
+/*    @Redirect(method = "onEdited", at = @At(value = "INVOKE", target = "Ljava/lang/String;equals(Ljava/lang/Object;)Z"))
     private boolean fixCommandKey(String instance, Object other) {
         if (this.viaFabricPlus$keepTabComplete()) {
             return instance.equals(other);
         } else {
             return instance.isEmpty();
         }
-    }
+    }*/
 
+/*
     @WrapWithCondition(method = "onEdited", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/CommandSuggestions;updateCommandInfo()V"))
     private boolean disableAutoTabComplete(CommandSuggestions instance) {
         return this.viaFabricPlus$keepTabComplete();
     }
+*/
 
     @Unique
     private boolean viaFabricPlus$keepTabComplete() {

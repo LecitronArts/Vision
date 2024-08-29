@@ -1,6 +1,8 @@
 package net.minecraft.client.gui.screens;
 
 import java.util.function.Supplier;
+
+import de.florianmichael.viafabricplus.settings.impl.VisualSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.GuiGraphics;
@@ -82,6 +84,9 @@ public class OptionsScreen extends Screen {
       gridlayout$rowhelper.addChild(this.openScreenButton(TELEMETRY, () -> {
          return new TelemetryInfoScreen(this, this.options);
       }));
+      if (VisualSettings.global().showSuperSecretSettings.isEnabled() && Minecraft.getInstance().player != null) {
+         this.addRenderableWidget(Button.builder(Component.literal("Super Secret Settings..."), button -> Minecraft.getInstance().gameRenderer.cycleEffect()).bounds(this.width / 2 + 5, this.height / 6 + 18, 150, 20).build());
+      }
       gridlayout$rowhelper.addChild(this.openScreenButton(CREDITS_AND_ATTRIBUTION, () -> {
          return new CreditsAndAttributionScreen(this);
       }));

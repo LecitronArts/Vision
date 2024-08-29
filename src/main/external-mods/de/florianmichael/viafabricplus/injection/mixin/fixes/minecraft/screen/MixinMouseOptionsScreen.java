@@ -45,11 +45,13 @@ public abstract class MixinMouseOptionsScreen extends OptionsSubScreen {
         super(parent, gameOptions, title);
     }
 
+/*
     @Inject(method = "render", at = @At("RETURN"))
     private void render1_13SliderValue(GuiGraphics drawContext, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2) && this.list.findOption(this.options.sensitivity()).isHovered()) {
             drawContext.renderTooltip(font, Component.nullToEmpty("<=1.13.2 Sensitivity: " + MathUtil.get1_13SliderValue(this.options.sensitivity().get().floatValue()).valueInt() + "%"), mouseX, mouseY);
         }
     }
+*/
 
 }

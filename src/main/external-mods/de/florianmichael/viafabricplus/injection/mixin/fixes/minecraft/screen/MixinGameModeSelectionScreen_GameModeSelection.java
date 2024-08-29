@@ -43,7 +43,7 @@ public abstract class MixinGameModeSelectionScreen_GameModeSelection {
     @Final
     public static GameModeSwitcherScreen.GameModeIcon CREATIVE;
 
-    @Inject(method = "getNext", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "getNext", at = @At("HEAD"), cancellable = true)
     private void unwrapGameModes(CallbackInfoReturnable<GameModeSwitcherScreen.GameModeIcon> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_7_6)) {
             switch ((GameModeSwitcherScreen.GameModeIcon) (Object) this) {
@@ -58,9 +58,9 @@ public abstract class MixinGameModeSelectionScreen_GameModeSelection {
                 case ADVENTURE -> cir.setReturnValue(CREATIVE);
             }
         }
-    }
+    }*/
 
-    @Inject(method = "getCommand", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "getCommand", at = @At("HEAD"), cancellable = true)
     private void oldCommand(CallbackInfoReturnable<String> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.r1_2_4tor1_2_5)) {
             cir.setReturnValue(
@@ -71,6 +71,6 @@ public abstract class MixinGameModeSelectionScreen_GameModeSelection {
                     }
             );
         }
-    }
+    }*/
 
 }

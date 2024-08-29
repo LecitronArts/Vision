@@ -29,7 +29,7 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 @Mixin(BookEditScreen.class)
 public abstract class MixinBookEditScreen {
 
-    @ModifyConstant(method = "lambda$new$0", constant = @Constant(intValue = 1024))
+/*    @ModifyConstant(method = "lambda$new$0", constant = @Constant(intValue = 1024))
     private int modifyPageLength(int constant) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
             return 256;
@@ -45,6 +45,6 @@ public abstract class MixinBookEditScreen {
         } else {
             return constant;
         }
-    }
+    }*/
 
 }

@@ -108,9 +108,11 @@ public abstract class ClientCommonPacketListenerImpl implements ClientCommonPack
             final short inventoryId = (short) ((pPacket.getId() >> 16) & 0xFF);
 
             AbstractContainerMenu handler = null;
-            if (inventoryId == 0) handler = minecraft.player.inventoryMenu;
-            else if (inventoryId == minecraft.player.containerMenu.containerId) handler = minecraft.player.containerMenu;
-
+            if(minecraft.player != null) {
+               if (inventoryId == 0) handler = minecraft.player.inventoryMenu;
+               else if (inventoryId == minecraft.player.containerMenu.containerId)
+                  handler = minecraft.player.containerMenu;
+            }
             if (handler != null) {
                acks.addId(pPacket.getId());
             } else {

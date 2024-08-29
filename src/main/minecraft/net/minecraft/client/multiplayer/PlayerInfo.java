@@ -5,6 +5,11 @@ import com.mojang.authlib.GameProfile;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
+
+import com.mojang.authlib.yggdrasil.ProfileResult;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.client.resources.PlayerSkin;
@@ -45,10 +50,19 @@ public class PlayerInfo {
       Minecraft minecraft = Minecraft.getInstance();
       SkinManager skinmanager = minecraft.getSkinManager();
       CompletableFuture<PlayerSkin> completablefuture = skinmanager.getOrLoad(pProfile);
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20) && !pProfile.getProperties().containsKey("textures")) {
+        completablefuture =  CompletableFuture.supplyAsync(() -> {
+            final ProfileResult profileResult = Minecraft.getInstance().getMinecraftSessionService().fetchProfile(pProfile.getId(), true);
+            return profileResult == null ? pProfile : profileResult.profile();
+         }, Util.backgroundExecutor()).thenCompose(skinmanager::getOrLoad);
+      } else {
+         completablefuture = skinmanager.getOrLoad(pProfile);
+      }
       boolean flag = !minecraft.isLocalPlayer(pProfile.getId());
       PlayerSkin playerskin = DefaultPlayerSkin.get(pProfile);
+      CompletableFuture<PlayerSkin> finalCompletablefuture = completablefuture;
       return () -> {
-         PlayerSkin playerskin1 = completablefuture.getNow(playerskin);
+         PlayerSkin playerskin1 = finalCompletablefuture.getNow(playerskin);
          return flag && !playerskin1.secure() ? playerskin : playerskin1;
       };
    }

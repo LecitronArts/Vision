@@ -39,12 +39,12 @@ public abstract class MixinScreen {
     @Nullable
     protected Minecraft minecraft;
 
-    @Inject(method = "handleComponentClicked", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;error(Ljava/lang/String;Ljava/lang/Object;)V", shift = At.Shift.BEFORE, ordinal = 1, remap = false), cancellable = true)
+/*    @Inject(method = "handleComponentClicked", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;error(Ljava/lang/String;Ljava/lang/Object;)V", shift = At.Shift.BEFORE, ordinal = 1, remap = false), cancellable = true)
     private void allowRunCommandAction(Style style, CallbackInfoReturnable<Boolean> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19)) {
             this.minecraft.player.connection.sendChat(SharedConstants.filterText(style.getClickEvent().getValue()));
             cir.setReturnValue(true);
         }
-    }
+    }*/
 
 }

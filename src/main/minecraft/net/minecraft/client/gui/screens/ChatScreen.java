@@ -1,6 +1,11 @@
 package net.minecraft.client.gui.screens;
 
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.fixes.ClientsideFixes;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+import de.florianmichael.viafabricplus.settings.impl.VisualSettings;
 import net.minecraft.client.GuiMessageTag;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -43,7 +48,7 @@ public class ChatScreen extends Screen {
       };
       this.input.setMaxLength(256);
       this.input.setBordered(false);
-      this.input.setValue(this.initial);
+      if(ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_12_2)) this.input.setValue(this.initial);
       this.input.setResponder(this::onEdited);
       this.input.setCanLoseFocus(false);
       this.addWidget(this.input);
@@ -51,6 +56,11 @@ public class ChatScreen extends Screen {
       this.commandSuggestions.setAllowHiding(false);
       this.commandSuggestions.updateCommandInfo();
       this.setInitialFocus(this.input);
+      this.input.setMaxLength(ClientsideFixes.getChatLength());
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
+         this.input.setValue(this.initial);
+         this.commandSuggestions.updateCommandInfo();
+      }
    }
 
    public void resize(Minecraft pMinecraft, int pWidth, int pHeight) {
@@ -66,8 +76,15 @@ public class ChatScreen extends Screen {
 
    private void onEdited(String p_95611_) {
       String s = this.input.getValue();
-      this.commandSuggestions.setAllowSuggestions(!s.equals(this.initial));
-      this.commandSuggestions.updateCommandInfo();
+      boolean viafix;
+      if (this.viaFabricPlus$keepTabComplete()) {
+         viafix = s.equals(this.initial);
+      } else {
+         viafix = s.isEmpty();
+      }
+      this.commandSuggestions.setAllowSuggestions(!/*s.equals(this.initial)*/viafix);
+      if (this.viaFabricPlus$keepTabComplete())
+         this.commandSuggestions.updateCommandInfo();
    }
 
    public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
@@ -172,7 +189,13 @@ public class ChatScreen extends Screen {
       this.input.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
       super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
       this.commandSuggestions.render(pGuiGraphics, pMouseX, pMouseY);
-      GuiMessageTag guimessagetag = this.minecraft.gui.getChat().getMessageTagAt((double)pMouseX, (double)pMouseY);
+      GuiMessageTag guimessagetag;
+      if (VisualSettings.global().hideSignatureIndicator.isEnabled()) {
+         guimessagetag = null;
+      } else {
+         guimessagetag = this.minecraft.gui.getChat().getMessageTagAt((double)pMouseX, (double)pMouseY);
+      }
+
       if (guimessagetag != null && guimessagetag.text() != null) {
          pGuiGraphics.renderTooltip(this.font, this.font.split(guimessagetag.text(), 210), pMouseX, pMouseY);
       } else {
@@ -231,5 +254,9 @@ public class ChatScreen extends Screen {
 
    public String normalizeChatMessage(String pMessage) {
       return StringUtil.trimChatMessage(StringUtils.normalizeSpace(pMessage.trim()));
+   }
+
+   private boolean viaFabricPlus$keepTabComplete() {
+      return ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_12_2) || !this.input.getValue().startsWith("/");
    }
 }

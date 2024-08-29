@@ -12,6 +12,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+
+import de.florianmichael.viafabricplus.fixes.versioned.classic.GridItemSelectionScreen;
+import de.florianmichael.viafabricplus.settings.impl.VisualSettings;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.HotbarManager;
 import net.minecraft.client.Minecraft;
@@ -284,7 +287,9 @@ public class CreativeModeInventoryScreen extends EffectRenderingInventoryScreen<
       } else {
          this.minecraft.setScreen(new InventoryScreen(this.minecraft.player));
       }
-
+      if (VisualSettings.global().replaceCreativeInventory.isEnabled()) {
+         Minecraft.getInstance().setScreen(GridItemSelectionScreen.INSTANCE);
+      }
    }
 
    public void resize(Minecraft pMinecraft, int pWidth, int pHeight) {

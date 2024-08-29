@@ -151,6 +151,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
    }
 
    public void exceptionCaught(ChannelHandlerContext pContext, Throwable pException) {
+      pException.printStackTrace();
       if (pException instanceof SkipPacketException) {
          LOGGER.debug("Skipping packet due to errors", pException.getCause());
       } else {

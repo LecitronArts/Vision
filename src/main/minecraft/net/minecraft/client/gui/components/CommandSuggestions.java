@@ -107,7 +107,6 @@ public class CommandSuggestions {
    }
 
    public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
-      boolean flag = this.suggestions != null;
       if (this.viaFabricPlus$cancelTabComplete()) {
          if (pKeyCode == GLFW.GLFW_KEY_TAB && this.suggestions == null) {
             this.updateCommandInfo();
@@ -118,7 +117,9 @@ public class CommandSuggestions {
             this.input.setSuggestion(null);
             this.suggestions = null;
          }
+
       }
+      boolean flag = this.suggestions != null;
       if (flag && this.suggestions.keyPressed(pKeyCode, pScanCode, pModifiers)) {
          return true;
       } else if (this.screen.getFocused() != this.input || pKeyCode != 258 || this.allowHiding && !flag) {

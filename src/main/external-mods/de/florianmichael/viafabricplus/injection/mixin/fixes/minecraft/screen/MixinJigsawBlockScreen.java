@@ -58,7 +58,7 @@ public abstract class MixinJigsawBlockScreen extends Screen {
         super(title);
     }
 
-    @Inject(method = "init", at = @At("RETURN"))
+/*    @Inject(method = "init", at = @At("RETURN"))
     private void disableWidgets(CallbackInfo ci) {
         if (VisualSettings.global().removeNewerFeaturesFromJigsawScreen.isEnabled()) {
             if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_15_2)) {
@@ -73,13 +73,13 @@ public abstract class MixinJigsawBlockScreen extends Screen {
             selectionPriorityEdit.active = false;
             placementPriorityEdit.active = false;
         }
-    }
+    }*/
 
-    @Inject(method = "render", at = @At("HEAD"))
+/*    @Inject(method = "render", at = @At("HEAD"))
     private void copyText(GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (VisualSettings.global().removeNewerFeaturesFromJigsawScreen.isEnabled() && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_15_2)) {
             nameEdit.setValue(targetEdit.getValue());
         }
-    }
+    }*/
 
 }

@@ -31,11 +31,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(CreativeModeInventoryScreen.class)
 public abstract class MixinCreativeInventoryScreen {
 
+/*
     @Inject(method = "init", at = @At("RETURN"))
     private void replaceCreativeMenu(CallbackInfo ci) {
         if (VisualSettings.global().replaceCreativeInventory.isEnabled()) {
             Minecraft.getInstance().setScreen(GridItemSelectionScreen.INSTANCE);
         }
     }
+*/
 
 }

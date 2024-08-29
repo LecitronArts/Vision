@@ -54,7 +54,7 @@ public abstract class MixinDownloadingTerrainScreen extends Screen{
         super(title);
     }
 
-    @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
+   /* @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     private void modifyCloseCondition(CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20_2)) {
             ci.cancel();
@@ -98,5 +98,5 @@ public abstract class MixinDownloadingTerrainScreen extends Screen{
     public void viaFabricPlus$setReady() {
         this.viaFabricPlus$ready = true;
     }
-
+*/
 }

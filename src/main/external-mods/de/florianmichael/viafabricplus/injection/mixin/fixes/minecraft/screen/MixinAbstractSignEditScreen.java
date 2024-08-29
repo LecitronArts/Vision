@@ -33,7 +33,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(AbstractSignEditScreen.class)
 public abstract class MixinAbstractSignEditScreen {
 
-    @Shadow
+/*    @Shadow
     @Final
     private SignBlockEntity sign;
 
@@ -42,6 +42,6 @@ public abstract class MixinAbstractSignEditScreen {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_4)) {
             cir.setReturnValue(this.sign.getType().isValid(this.sign.getBlockState()));
         }
-    }
+    }*/
 
 }

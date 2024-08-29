@@ -32,7 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(CommandBlockEditScreen.class)
 public abstract class MixinCommandBlockScreen {
 
-    @Shadow
+   /* @Shadow
     private CycleButton<CommandBlockEntity.Mode> modeButton;
 
     @Shadow
@@ -42,9 +42,9 @@ public abstract class MixinCommandBlockScreen {
     private CycleButton<Boolean> redstoneTriggerButton;
 
     @Shadow
-    public abstract void updateCommandBlock();
+    public abstract void updateCommandBlock();*/
 
-    @Inject(method = "init", at = @At("TAIL"))
+/*    @Inject(method = "init", at = @At("TAIL"))
     private void removeWidgets(CallbackInfo ci) {
         if (VisualSettings.global().removeNewerFeaturesFromCommandBlockScreen.isEnabled()) {
             modeButton.visible = false;
@@ -53,6 +53,6 @@ public abstract class MixinCommandBlockScreen {
 
             updateCommandBlock();
         }
-    }
+    }*/
 
 }

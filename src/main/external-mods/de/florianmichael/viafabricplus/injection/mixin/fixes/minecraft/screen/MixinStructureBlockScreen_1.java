@@ -36,11 +36,11 @@ public abstract class MixinStructureBlockScreen_1 extends EditBox {
         super(textRenderer, x, y, width, height, copyFrom, text);
     }
 
-    @Inject(method = "charTyped(CI)Z", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "charTyped(CI)Z", at = @At("HEAD"), cancellable = true)
     private void removeValidation(char chr, int keyCode, CallbackInfoReturnable<Boolean> ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
             ci.setReturnValue(super.charTyped(chr, keyCode));
         }
-    }
+    }*/
 
 }

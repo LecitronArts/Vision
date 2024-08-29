@@ -1,8 +1,13 @@
 package net.minecraft.world.entity.player;
 
 import com.google.common.collect.ImmutableList;
+
+import java.util.AbstractList;
 import java.util.List;
 import java.util.function.Predicate;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
 import net.minecraft.ReportedException;
@@ -34,13 +39,36 @@ public class Inventory implements Container, Nameable {
    public static final int[] HELMET_SLOT_ONLY = new int[]{3};
    public final NonNullList<ItemStack> items = NonNullList.withSize(36, ItemStack.EMPTY);
    public final NonNullList<ItemStack> armor = NonNullList.withSize(4, ItemStack.EMPTY);
-   public final NonNullList<ItemStack> offhand = NonNullList.withSize(1, ItemStack.EMPTY);
+   public NonNullList<ItemStack> offhand = NonNullList.withSize(1, ItemStack.EMPTY);
    private final List<NonNullList<ItemStack>> compartments = ImmutableList.of(this.items, this.armor, this.offhand);
    public int selected;
    public final Player player;
    private int timesChanged;
 
    public Inventory(Player pPlayer) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+         //noinspection MixinInnerClass
+        offhand = new NonNullList<>(new AbstractList<ItemStack>() {
+            @Override
+            public ItemStack get(int index) {
+               return ItemStack.EMPTY;
+            }
+
+            @Override
+            public ItemStack set(int index, ItemStack element) {
+               return ItemStack.EMPTY;
+            }
+
+            @Override
+            public int size() {
+               return 0;
+            }
+         }, ItemStack.EMPTY) {
+         };
+      } else {
+         offhand = NonNullList.withSize(1, ItemStack.EMPTY);
+      }
+
       this.player = pPlayer;
    }
 

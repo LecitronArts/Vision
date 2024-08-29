@@ -1,5 +1,6 @@
 package net.minecraft.client.gui.screens.inventory;
 
+import de.florianmichael.viafabricplus.settings.impl.VisualSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.core.BlockPos;
@@ -62,6 +63,14 @@ public class CommandBlockEditScreen extends AbstractCommandBlockEditScreen {
          this.autoexec = p_169725_;
       }));
       this.enableControls(false);
+      if (VisualSettings.global().removeNewerFeaturesFromCommandBlockScreen.isEnabled()) {
+         modeButton.visible = false;
+         conditionalButton.visible = false;
+         autoexecButton.visible = false;
+
+         //updateCommandBlock();
+         updateGui();
+      }
    }
 
    private void enableControls(boolean pActive) {

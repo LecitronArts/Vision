@@ -1,5 +1,7 @@
 package net.minecraft.world.inventory;
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
@@ -132,12 +134,21 @@ public class BrewingStandMenu extends AbstractContainerMenu {
       }
 
       public static boolean mayPlaceItem(ItemStack pItemStack) {
+         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+            return (false);
+         }
          return pItemStack.is(Items.BLAZE_POWDER);
       }
 
       public int getMaxStackSize() {
          return 64;
       }
+
+      @Override
+      public boolean isActive() {
+         return ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_8);
+      }
+
    }
 
    static class IngredientsSlot extends Slot {
@@ -180,4 +191,6 @@ public class BrewingStandMenu extends AbstractContainerMenu {
          return pStack.is(Items.POTION) || pStack.is(Items.SPLASH_POTION) || pStack.is(Items.LINGERING_POTION) || pStack.is(Items.GLASS_BOTTLE);
       }
    }
+
+
 }

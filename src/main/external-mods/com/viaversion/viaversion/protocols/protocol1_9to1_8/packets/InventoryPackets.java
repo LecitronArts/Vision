@@ -121,7 +121,7 @@ public class InventoryPackets {
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
 
                     short slotID = wrapper.get(Type.SHORT, 0);
-                    if (inventoryTracker.getInventory() != null && inventoryTracker.getInventory().equals("minecraft:brewing_stand")) {
+                    if (inventoryTracker != null && inventoryTracker.getInventory() != null && inventoryTracker.getInventory().equals("minecraft:brewing_stand")) {
                         if (slotID >= 4) {
                             wrapper.set(Type.SHORT, 0, (short) (slotID + 1));
                         }
@@ -165,7 +165,7 @@ public class InventoryPackets {
                 // Brewing Patch
                 handler(wrapper -> {
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
-                    if (inventoryTracker.getInventory() != null && inventoryTracker.getInventory().equals("minecraft:brewing_stand")) {
+                    if (inventoryTracker != null && inventoryTracker.getInventory() != null && inventoryTracker.getInventory().equals("minecraft:brewing_stand")) {
                         Item[] oldStack = wrapper.get(Type.ITEM1_8_SHORT_ARRAY, 0);
                         Item[] newStack = new Item[oldStack.length + 1];
                         for (int i = 0; i < newStack.length; i++) {

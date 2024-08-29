@@ -4,6 +4,9 @@ import com.google.common.collect.ImmutableList;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -161,6 +164,9 @@ public class StructureBlockEditScreen extends Screen {
       }).bounds(this.width / 2 + 1 + 40 + 1 + 20, 185, 40, 20).build());
       this.nameEdit = new EditBox(this.font, this.width / 2 - 152, 40, 300, 20, Component.translatable("structure_block.structure_name")) {
          public boolean charTyped(char p_99476_, int p_99477_) {
+            if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
+               return (super.charTyped(p_99476_, p_99477_));
+            }
             return !StructureBlockEditScreen.this.isValidCharacterForName(this.getValue(), p_99476_, this.getCursorPosition()) ? false : super.charTyped(p_99476_, p_99477_);
          }
       };

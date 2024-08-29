@@ -3,7 +3,13 @@ package net.minecraft.client.gui.screens.debug;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.GameNarrator;
 import net.minecraft.client.Minecraft;
@@ -20,6 +26,7 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 
 @OnlyIn(Dist.CLIENT)
 public class GameModeSwitcherScreen extends Screen {
@@ -32,7 +39,7 @@ public class GameModeSwitcherScreen extends Screen {
    private static final int SLOT_PADDING = 5;
    private static final int SLOT_AREA_PADDED = 31;
    private static final int HELP_TIPS_OFFSET_Y = 5;
-   private static final int ALL_SLOTS_WIDTH = GameModeSwitcherScreen.GameModeIcon.values().length * 31 - 5;
+   private static /*final*/ int ALL_SLOTS_WIDTH/* = GameModeSwitcherScreen.GameModeIcon.values().length * 31 - 5*/ = 0;
    private static final Component SELECT_KEY = Component.translatable("debug.gamemodes.select_next", Component.translatable("debug.gamemodes.press_f4").withStyle(ChatFormatting.AQUA));
    private final GameModeSwitcherScreen.GameModeIcon previousHovered;
    private GameModeSwitcherScreen.GameModeIcon currentlyHovered;
@@ -40,11 +47,24 @@ public class GameModeSwitcherScreen extends Screen {
    private int firstMouseY;
    private boolean setFirstMousePos;
    private final List<GameModeSwitcherScreen.GameModeSlot> slots = Lists.newArrayList();
-
+   private GameModeSwitcherScreen.GameModeIcon[] viaFabricPlus$unwrappedGameModes;
    public GameModeSwitcherScreen() {
       super(GameNarrator.NO_TITLE);
       this.previousHovered = GameModeSwitcherScreen.GameModeIcon.getFromGameType(this.getDefaultSelected());
       this.currentlyHovered = this.previousHovered;
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_7_6)) {
+         final var gameModeSelections = new ArrayList<>(Arrays.stream(GameModeSwitcherScreen.GameModeIcon.values()).toList());
+
+         gameModeSelections.remove(GameModeSwitcherScreen.GameModeIcon.SPECTATOR);
+         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.r1_2_4tor1_2_5)) {
+            gameModeSelections.remove(GameModeSwitcherScreen.GameModeIcon.ADVENTURE);
+         }
+
+         viaFabricPlus$unwrappedGameModes = gameModeSelections.toArray(GameModeSwitcherScreen.GameModeIcon[]::new);
+         ALL_SLOTS_WIDTH = viaFabricPlus$unwrappedGameModes.length * 31 - 5;
+      } else {
+         ALL_SLOTS_WIDTH = GameModeSwitcherScreen.GameModeIcon.values().length * 31 - 5;
+      }
    }
 
    private GameType getDefaultSelected() {
@@ -58,13 +78,31 @@ public class GameModeSwitcherScreen extends Screen {
    }
 
    protected void init() {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.c0_28toc0_30)) { // survival mode was added in a1.0.15
+         this.onClose();
+      }
       super.init();
       this.currentlyHovered = this.previousHovered;
 
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_7_6)) {
+/*         return viaFabricPlus$unwrappedGameModes;*/
+         for(int i = 0; i < viaFabricPlus$unwrappedGameModes.length; ++i) {
+            GameModeSwitcherScreen.GameModeIcon gamemodeswitcherscreen$gamemodeicon = viaFabricPlus$unwrappedGameModes[i];
+            this.slots.add(new GameModeSwitcherScreen.GameModeSlot(gamemodeswitcherscreen$gamemodeicon, this.width / 2 - ALL_SLOTS_WIDTH / 2 + i * 31, this.height / 2 - 31));
+         }
+
+      } else {
+         for(int i = 0; i < GameModeSwitcherScreen.GameModeIcon.VALUES.length; ++i) {
+            GameModeSwitcherScreen.GameModeIcon gamemodeswitcherscreen$gamemodeicon = GameModeSwitcherScreen.GameModeIcon.VALUES[i];
+            this.slots.add(new GameModeSwitcherScreen.GameModeSlot(gamemodeswitcherscreen$gamemodeicon, this.width / 2 - ALL_SLOTS_WIDTH / 2 + i * 31, this.height / 2 - 31));
+         }
+
+      }
+/*
       for(int i = 0; i < GameModeSwitcherScreen.GameModeIcon.VALUES.length; ++i) {
          GameModeSwitcherScreen.GameModeIcon gamemodeswitcherscreen$gamemodeicon = GameModeSwitcherScreen.GameModeIcon.VALUES[i];
          this.slots.add(new GameModeSwitcherScreen.GameModeSlot(gamemodeswitcherscreen$gamemodeicon, this.width / 2 - ALL_SLOTS_WIDTH / 2 + i * 31, this.height / 2 - 31));
-      }
+      }*/
 
    }
 
@@ -168,11 +206,38 @@ public class GameModeSwitcherScreen extends Screen {
       }
 
       String getCommand() {
+         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.r1_2_4tor1_2_5)) {
+            return (
+                    "gamemode " + Minecraft.getInstance().getUser().getName() + ' ' + switch (((Enum<?>) (Object) this).ordinal()) {
+                       case 0, 3 -> 1;
+                       case 1, 2 -> 0;
+                       default -> throw new AssertionError();
+                    }
+            );
+         }
          return this.command;
       }
 
       GameModeSwitcherScreen.GameModeIcon getNext() {
+         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_7_6)) {
+            switch ((GameModeSwitcherScreen.GameModeIcon) (Object) this) {
+               case CREATIVE -> {
+                  return (SURVIVAL);
+               }
+               case SURVIVAL -> {
+                  if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.r1_2_4tor1_2_5)) {
+                     return (CREATIVE);
+                  } else {
+                     return (GameModeSwitcherScreen.GameModeIcon.ADVENTURE);
+                  }
+               }
+               case ADVENTURE -> {
+                  return (CREATIVE);
+               }
+            }
+         }
          GameModeSwitcherScreen.GameModeIcon gamemodeswitcherscreen$gamemodeicon;
+
          switch (this) {
             case CREATIVE:
                gamemodeswitcherscreen$gamemodeicon = SURVIVAL;

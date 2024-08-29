@@ -122,8 +122,12 @@ public class ConnectScreen extends Screen {
                   ConnectScreen.this.connection = connection;
                   pMinecraft.getDownloadedPackSource().configureForServerControl(connection, pServerData != null ? convertPackStatus(pServerData.getResourcePackStatus()) : ServerPackManager.PackPromptStatus.PENDING);
                }
-
-               ConnectScreen.this.connection.initiateServerboundPlayConnection(inetsocketaddress.getHostName(), inetsocketaddress.getPort(), new ClientHandshakePacketListenerImpl(ConnectScreen.this.connection, pMinecraft, pServerData, ConnectScreen.this.parent, false, (Duration)null, ConnectScreen.this::updateStatus));
+/*               if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_17)) {
+                  return pServerAddress.getHost();
+               } else {
+                  return instance.getHostName();
+               }*/
+               ConnectScreen.this.connection.initiateServerboundPlayConnection(ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_17) ? pServerAddress.getHost() : inetsocketaddress.getHostName(), ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_17) ? pServerAddress.getPort() : inetsocketaddress.getPort(), new ClientHandshakePacketListenerImpl(ConnectScreen.this.connection, pMinecraft, pServerData, ConnectScreen.this.parent, false, (Duration)null, ConnectScreen.this::updateStatus));
                //ConnectScreen.this.connection.send(new ServerboundHelloPacket(pMinecraft.getUser().getName(), pMinecraft.getUser().getProfileId()));
 
                String name = "";
@@ -152,7 +156,7 @@ public class ConnectScreen extends Screen {
 
                String text = exception.getMessage() != null ? exception.getMessage() : "";
 
-               String s = inetsocketaddress == null ? text : text.replaceAll(inetsocketaddress.getHostName() + ":" + inetsocketaddress.getPort(), "").replaceAll(inetsocketaddress.toString(), "");
+               String s = inetsocketaddress == null ? text : text.replaceAll(ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_17) ? pServerAddress.getHost() : inetsocketaddress.getHostName() + ":" + (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_17) ? pServerAddress.getPort() : inetsocketaddress.getPort()), "").replaceAll(inetsocketaddress.toString(), "");
                pMinecraft.execute(() -> {
                   pMinecraft.setScreen(new DisconnectedScreen(ConnectScreen.this.parent, ConnectScreen.this.connectFailedTitle, Component.translatable("disconnect.genericReason", s)));
                });

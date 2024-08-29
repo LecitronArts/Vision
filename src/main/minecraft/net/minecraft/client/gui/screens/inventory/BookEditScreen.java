@@ -1,6 +1,8 @@
 package net.minecraft.client.gui.screens.inventory;
 
 import com.google.common.collect.Lists;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import java.util.Arrays;
@@ -56,8 +58,14 @@ public class BookEditScreen extends Screen {
    private int currentPage;
    private final List<String> pages = Lists.newArrayList();
    private String title = "";
-   private final TextFieldHelper pageEdit = new TextFieldHelper(this::getCurrentPageText, this::setCurrentPageText, this::getClipboard, this::setClipboard, (p_280853_) -> {
-      return p_280853_.length() < 1024 && this.font.wordWrapHeight(p_280853_, 114) <= 128;
+   private final TextFieldHelper pageEdit = new TextFieldHelper(this::getCurrentPageText, this::setCurrentPageText, this::getClipboard, this::setClipboard, (p_280853_) ->
+   {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
+         return p_280853_.length() < 256 && this.font.wordWrapHeight(p_280853_, 114) <= 128;
+      } else {
+         return p_280853_.length() < 1024 && this.font.wordWrapHeight(p_280853_, 114) <= 128;
+      }
+      //return p_280853_.length() < 1024 && this.font.wordWrapHeight(p_280853_, 114) <= 128;
    });
    private final TextFieldHelper titleEdit = new TextFieldHelper(() -> {
       return this.title;
@@ -218,7 +226,13 @@ public class BookEditScreen extends Screen {
    }
 
    private void appendPageToBook() {
-      if (this.getNumPages() < 100) {
+      int viaFix = 0;
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
+         viaFix = 50;
+      } else {
+         viaFix = 100;
+      }
+      if (this.getNumPages() < viaFix) {
          this.pages.add("");
          this.isModified = true;
       }

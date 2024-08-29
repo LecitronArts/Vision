@@ -49,7 +49,7 @@ public abstract class MixinGameModeSelectionScreen extends Screen {
         super(title);
     }
 
-    @Inject(method = "<init>", at = @At("RETURN"))
+/*    @Inject(method = "<init>", at = @At("RETURN"))
     private void fixUIWidth(CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_7_6)) {
             final var gameModeSelections = new ArrayList<>(Arrays.stream(GameModeSwitcherScreen.GameModeIcon.values()).toList());
@@ -62,8 +62,9 @@ public abstract class MixinGameModeSelectionScreen extends Screen {
             viaFabricPlus$unwrappedGameModes = gameModeSelections.toArray(GameModeSwitcherScreen.GameModeIcon[]::new);
             ALL_SLOTS_WIDTH = viaFabricPlus$unwrappedGameModes.length * 31 - 5;
         }
-    }
+    }*/
 
+/*
     @Redirect(method = "init", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screens/debug/GameModeSwitcherScreen$GameModeIcon;VALUES:[Lnet/minecraft/client/gui/screens/debug/GameModeSwitcherScreen$GameModeIcon;"))
     private GameModeSwitcherScreen.GameModeIcon[] removeNewerGameModes() {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_7_6)) {
@@ -72,12 +73,13 @@ public abstract class MixinGameModeSelectionScreen extends Screen {
             return GameModeSwitcherScreen.GameModeIcon.values();
         }
     }
+*/
 
-    @Inject(method = "init", at = @At("HEAD"))
+/*    @Inject(method = "init", at = @At("HEAD"))
     private void disableInClassic(CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(LegacyProtocolVersion.c0_28toc0_30)) { // survival mode was added in a1.0.15
             this.onClose();
         }
-    }
+    }*/
 
 }

@@ -34,11 +34,11 @@ import java.util.Optional;
 @Mixin(ServerRedirectHandler.class)
 public interface MixinRedirectResolver {
 
-    @Inject(method = "lambda$createDnsSrvRedirectHandler$1", at = @At("HEAD"), cancellable = true)
+/*    @Inject(method = "lambda$createDnsSrvRedirectHandler$1", at = @At("HEAD"), cancellable = true)
     private static void disableSrvForPre1_3(DirContext context, ServerAddress address, CallbackInfoReturnable<Optional<ServerAddress>> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThan(LegacyProtocolVersion.r1_3_1tor1_3_2)) {
             cir.setReturnValue(Optional.empty());
         }
-    }
+    }*/
 
 }

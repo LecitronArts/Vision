@@ -92,9 +92,9 @@ public class ParticleRewriter {
         // BlockState	VarInt	The ID of the block state.
         add(41); // (47->41) totem -> minecraft:totem_of_undying
         add(38); // (48->38) spit -> minecraft:spit
-        if (FootStepParticle1_12_2.ID < particles.size()) {
+/*        if (FootStepParticle1_12_2.ID < particles.size()) {
             throw new IllegalStateException("ViaFabricPlus FootStepParticle ID overlaps with a vanilla 1.12.2 particle ID");
-        }
+        }*/
     }
 
     public static Particle rewriteParticle(int particleId, Integer[] data) {

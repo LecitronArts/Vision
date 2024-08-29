@@ -38,12 +38,12 @@ public abstract class MixinOptionsScreen extends Screen {
     protected MixinOptionsScreen(Component title) {
         super(title);
     }
-
+/*
     @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/layouts/GridLayout$RowHelper;addChild(Lnet/minecraft/client/gui/layouts/LayoutElement;)Lnet/minecraft/client/gui/layouts/LayoutElement;", ordinal = 10, shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
     private void showSuperSecretSettings(CallbackInfo ci, GridLayout gridWidget, GridLayout.RowHelper adder) {
         if (VisualSettings.global().showSuperSecretSettings.isEnabled() && Minecraft.getInstance().player != null) {
             this.addRenderableWidget(Button.builder(Component.literal("Super Secret Settings..."), button -> Minecraft.getInstance().gameRenderer.cycleEffect()).bounds(this.width / 2 + 5, this.height / 6 + 18, 150, 20).build());
         }
-    }
+    }*/
 
 }

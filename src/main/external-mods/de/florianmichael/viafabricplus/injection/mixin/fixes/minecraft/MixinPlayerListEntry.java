@@ -37,7 +37,7 @@ import net.minecraft.client.resources.SkinManager;
 @Mixin(PlayerInfo.class)
 public abstract class MixinPlayerListEntry {
 
-    @Redirect(method = "createSkinLookup", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/SkinManager;getOrLoad(Lcom/mojang/authlib/GameProfile;)Ljava/util/concurrent/CompletableFuture;"))
+/*    @Redirect(method = "createSkinLookup", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/SkinManager;getOrLoad(Lcom/mojang/authlib/GameProfile;)Ljava/util/concurrent/CompletableFuture;"))
     private static CompletableFuture<PlayerSkin> fetchGameProfileProperties(SkinManager instance, GameProfile profile) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_20) && !profile.getProperties().containsKey("textures")) {
             return CompletableFuture.supplyAsync(() -> {
@@ -47,6 +47,6 @@ public abstract class MixinPlayerListEntry {
         } else {
             return instance.getOrLoad(profile);
         }
-    }
+    }*/
 
 }

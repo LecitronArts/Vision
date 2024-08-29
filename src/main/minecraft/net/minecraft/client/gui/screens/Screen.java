@@ -22,6 +22,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
 import net.minecraft.ReportedException;
@@ -299,6 +302,10 @@ public abstract class Screen extends AbstractContainerEventHandler implements Re
                String s1 = SharedConstants.filterText(clickevent.getValue());
                if (s1.startsWith("/")) {
                   if (!this.minecraft.player.connection.sendUnsignedCommand(s1.substring(1))) {
+                     if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19)) {
+                        this.minecraft.player.connection.sendChat(SharedConstants.filterText(pStyle.getClickEvent().getValue()));
+                        return (true);
+                     }
                      LOGGER.error("Not allowed to run command with signed argument from click event: '{}'", (Object)s1);
                   }
                } else {

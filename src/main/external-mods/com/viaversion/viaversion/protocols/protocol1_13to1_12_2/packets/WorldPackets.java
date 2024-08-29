@@ -497,7 +497,12 @@ public class WorldPackets {
                     for (int i = 0; i < data.length; i++)
                         data[i] = wrapper.read(Type.VAR_INT);
 
-                    Particle particle = ParticleRewriter.rewriteParticle(particleId, data);
+                    Particle particle = null;
+                    try {
+                       particle = ParticleRewriter.rewriteParticle(particleId, data);
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
 
                     // Cancel if null or completely removed
                     if (particle == null || particle.getId() == -1) {
@@ -603,4 +608,6 @@ public class WorldPackets {
             storage.store(position, newId);
         return newId;
     }
+
+
 }

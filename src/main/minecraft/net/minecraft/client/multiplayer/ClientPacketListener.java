@@ -583,7 +583,7 @@ public class ClientPacketListener extends ClientCommonPacketListenerImpl impleme
       Entity entity = pPacket.getEntity(this.level);
       if (entity != null) {
          boolean viaFix;
-         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_3) || ProtocolTranslator.getTargetVersion().equals(BedrockProtocolVersion.bedrockLatest)) {
+         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_3)/* || ProtocolTranslator.getTargetVersion().equals(BedrockProtocolVersion.bedrockLatest)*/) {
             viaFix = entity.getControllingPassenger() instanceof Player player ? player.isLocalPlayer() : !entity.level().isClientSide;
          } else {
             viaFix = entity.isControlledByLocalInstance();

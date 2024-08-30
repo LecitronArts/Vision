@@ -123,7 +123,6 @@ public abstract class ClientCommonPacketListenerImpl implements ClientCommonPack
       PacketUtils.ensureRunningOnSameThread(pPacket, this, this.minecraft);
       this.send(new ServerboundPongPacket(pPacket.getId()));
    }
-
    public void handleCustomPayload(ClientboundCustomPayloadPacket pPacket) {
       if (pPacket.payload().id().toString().equals(ClientsideFixes.PACKET_SYNC_IDENTIFIER)) {
          ClientsideFixes.handleSyncTask((FriendlyByteBuf) pPacket.payload());
@@ -139,7 +138,6 @@ public abstract class ClientCommonPacketListenerImpl implements ClientCommonPack
          } else {
             this.handleCustomPayload(custompacketpayload);
          }
-
       }
    }
 

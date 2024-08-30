@@ -533,7 +533,7 @@ public class ClientPacketListener extends ClientCommonPacketListenerImpl impleme
          double d2 = pPacket.getZ();
          entity.syncPacketPositionCodec(d0, d1, d2);
          boolean viaFix;
-         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_3) || ProtocolTranslator.getTargetVersion().equals(BedrockProtocolVersion.bedrockLatest)) {
+         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_3) /*|| ProtocolTranslator.getTargetVersion().equals(BedrockProtocolVersion.bedrockLatest)*/) {
             viaFix = entity.getControllingPassenger() instanceof Player player ? player.isLocalPlayer() : !entity.level().isClientSide;
          } else {
             viaFix = entity.isControlledByLocalInstance();

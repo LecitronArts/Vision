@@ -2599,7 +2599,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
       }
 
       boolean viaFix;
-      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_3) || ProtocolTranslator.getTargetVersion().equals(BedrockProtocolVersion.bedrockLatest)) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_19_3) /*|| ProtocolTranslator.getTargetVersion().equals(BedrockProtocolVersion.bedrockLatest)*/) {
          viaFix = this.getControllingPassenger() instanceof Player player ? player.isLocalPlayer() : !this.level().isClientSide;
       } else {
          viaFix = this.isControlledByLocalInstance();

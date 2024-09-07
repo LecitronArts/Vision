@@ -113,12 +113,8 @@ import net.optifine.RandomEntities;
 import net.optifine.Vec3M;
 import net.optifine.override.PlayerControllerOF;
 import net.optifine.reflect.Reflector;
-import net.optifine.reflect.ReflectorForge;
 import net.optifine.shaders.Shaders;
 import org.slf4j.Logger;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 
 public class ClientLevel extends Level {
    private static final Logger LOGGER = LogUtils.getLogger();
@@ -142,7 +138,6 @@ public class ClientLevel extends Level {
       p_194169_1_.put(BiomeColors.GRASS_COLOR_RESOLVER, new BlockTintCache((p_194180_1_) -> this.calculateBlockTint(p_194180_1_, BiomeColors.GRASS_COLOR_RESOLVER)));
       p_194169_1_.put(BiomeColors.FOLIAGE_COLOR_RESOLVER, new BlockTintCache((p_194176_1_) -> this.calculateBlockTint(p_194176_1_, BiomeColors.FOLIAGE_COLOR_RESOLVER)));
       p_194169_1_.put(BiomeColors.WATER_COLOR_RESOLVER, new BlockTintCache((p_194167_1_) -> this.calculateBlockTint(p_194167_1_, BiomeColors.WATER_COLOR_RESOLVER)));
-      Reflector.ColorResolverManager_registerBlockTintCaches.call(this, p_194169_1_);
    });
    private final ClientChunkCache chunkSource;
    private final Deque<Runnable> lightUpdateQueue = Queues.newArrayDeque();
@@ -210,11 +205,7 @@ public class ClientLevel extends Level {
       this.serverSimulationDistance = pServerSimulationDistance;
       this.updateSkyBrightness();
       this.prepareWeather();
-      if (Reflector.CapabilityProvider_gatherCapabilities.exists() && Reflector.CapabilityProvider.getTargetClass().isAssignableFrom(this.getClass())) {
-         Reflector.call(this, Reflector.CapabilityProvider_gatherCapabilities);
-      }
 
-      Reflector.postForgeBusEvent(Reflector.LevelEvent_Load_Constructor, this);
       if (this.minecraft.gameMode != null && this.minecraft.gameMode.getClass() == MultiPlayerGameMode.class) {
          this.minecraft.gameMode = new PlayerControllerOF(this.minecraft, this.connection);
          CustomGuis.setPlayerControllerOF((PlayerControllerOF)this.minecraft.gameMode);
@@ -314,28 +305,22 @@ public class ClientLevel extends Level {
               || EntityCullingModBase.instance.config.skipEntityCulling) {
          return;
       }
+      EntityCullingModBase.instance.tickedEntities++;
       // Use abstract minecart instead of whitelist to also catch modded Minecarts
-      if (entity.noCulling || entity == minecraft.player || entity == minecraft.cameraEntity || entity.isPassenger()
-              || entity.isVehicle() || (entity instanceof AbstractMinecart)) {
-         EntityCullingModBase.instance.tickedEntities++;
-      }
-      if (EntityCullingModBase.instance.entityWhistelist.contains(entity.getType())) {
-          EntityCullingModBase.instance.tickedEntities++;
-      }
       if (entity.isCulled() || ((Cullable) entity).isOutOfCamera()) {
          basicTick(entity);
          EntityCullingModBase.instance.skippedEntityTicks++;
          return;
       }
-      EntityCullingModBase.instance.tickedEntities++;
+
 
 
       entity.setOldPosAndRot();
       ++entity.tickCount;
       this.getProfiler().push(() -> BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString());
-      if (ReflectorForge.canUpdate(entity)) {
-         entity.tick();
-      }
+
+      entity.tick();
+
 
       if (entity.isRemoved()) {
          this.onEntityRemoved(entity);
@@ -429,15 +414,14 @@ public class ClientLevel extends Level {
    }
 
    public void addEntity(Entity pEntity) {
-      if (!Reflector.EntityJoinLevelEvent_Constructor.exists() || !Reflector.postForgeBusEvent(Reflector.EntityJoinLevelEvent_Constructor, pEntity, this)) {
-         this.removeEntity(pEntity.getId(), Entity.RemovalReason.DISCARDED);
-         this.entityStorage.addEntity(pEntity);
-         if (Reflector.IForgeEntity_onAddedToWorld.exists()) {
-            Reflector.call(pEntity, Reflector.IForgeEntity_onAddedToWorld);
-         }
-
-         this.onEntityAdded(pEntity);
+      this.removeEntity(pEntity.getId(), Entity.RemovalReason.DISCARDED);
+      this.entityStorage.addEntity(pEntity);
+      if (Reflector.IForgeEntity_onAddedToWorld.exists()) {
+         Reflector.call(pEntity, Reflector.IForgeEntity_onAddedToWorld);
       }
+
+      this.onEntityAdded(pEntity);
+
    }
 
    public void removeEntity(int pEntityId, Entity.RemovalReason pReason) {
@@ -567,41 +551,15 @@ public class ClientLevel extends Level {
    }
 
    public void playSeededSound(@Nullable Player pPlayer, double pX, double pY, double pZ, Holder<SoundEvent> pSound, SoundSource pCategory, float pVolume, float pPitch, long pSeed) {
-      if (Reflector.ForgeEventFactory_onPlaySoundAtPosition.exists()) {
-         Object object = Reflector.ForgeEventFactory_onPlaySoundAtPosition.call(this, pX, pY, pZ, pSound, pCategory, pVolume, pPitch);
-         if (Reflector.callBoolean(object, Reflector.Event_isCanceled) || Reflector.call(object, Reflector.PlayLevelSoundEvent_getSound) == null) {
-            return;
-         }
-
-         pSound = (Holder)Reflector.call(object, Reflector.PlayLevelSoundEvent_getSound);
-         pCategory = (SoundSource)Reflector.call(object, Reflector.PlayLevelSoundEvent_getSource);
-         pVolume = Reflector.callFloat(object, Reflector.PlayLevelSoundEvent_getNewVolume);
-         pPitch = Reflector.callFloat(object, Reflector.PlayLevelSoundEvent_getNewPitch);
-      }
-
       if (pPlayer == this.minecraft.player) {
          this.playSound(pX, pY, pZ, pSound.value(), pCategory, pVolume, pPitch, false, pSeed);
       }
-
    }
 
    public void playSeededSound(@Nullable Player pPlayer, Entity pEntity, Holder<SoundEvent> pSound, SoundSource pCategory, float pVolume, float pPitch, long pSeed) {
-      if (Reflector.ForgeEventFactory_onPlaySoundAtEntity.exists()) {
-         Object object = Reflector.ForgeEventFactory_onPlaySoundAtEntity.call(pEntity, pSound, pCategory, pVolume, pPitch);
-         if (Reflector.callBoolean(object, Reflector.Event_isCanceled) || Reflector.call(object, Reflector.PlayLevelSoundEvent_getSound) == null) {
-            return;
-         }
-
-         pSound = (Holder)Reflector.call(object, Reflector.PlayLevelSoundEvent_getSound);
-         pCategory = (SoundSource)Reflector.call(object, Reflector.PlayLevelSoundEvent_getSource);
-         pVolume = Reflector.callFloat(object, Reflector.PlayLevelSoundEvent_getNewVolume);
-         pPitch = Reflector.callFloat(object, Reflector.PlayLevelSoundEvent_getNewPitch);
-      }
-
       if (pPlayer == this.minecraft.player) {
          this.minecraft.getSoundManager().play(new EntityBoundSoundInstance(pSound.value(), pCategory, pVolume, pPitch, pEntity, pSeed));
       }
-
    }
 
    public void playLocalSound(Entity pEntity, SoundEvent pSound, SoundSource pCategory, float pVolume, float pPitch) {
@@ -1187,7 +1145,6 @@ public class ClientLevel extends Level {
       }
 
       public void setDifficulty(Difficulty pDifficulty) {
-         Reflector.ForgeHooks_onDifficultyChange.callVoid(pDifficulty, this.difficulty);
          this.difficulty = pDifficulty;
       }
 
@@ -1196,7 +1153,7 @@ public class ClientLevel extends Level {
       }
 
       public double getHorizonHeight(LevelHeightAccessor pLevel) {
-         return this.isFlat ? (double)pLevel.getMinBuildHeight() : 63.0D;
+         return (double)pLevel.getMinBuildHeight() - 63.0D;
       }
 
       public float getClearColorScale() {
@@ -1223,42 +1180,11 @@ public class ClientLevel extends Level {
          if (p_171712_ instanceof AbstractClientPlayer) {
             ClientLevel.this.players.add((AbstractClientPlayer)p_171712_);
          }
-
-         if (Reflector.IForgeEntity_isMultipartEntity.exists() && Reflector.IForgeEntity_getParts.exists()) {
-            boolean flag = Reflector.callBoolean(p_171712_, Reflector.IForgeEntity_isMultipartEntity);
-            if (flag) {
-               PartEntity[] apartentity = (PartEntity[])Reflector.call(p_171712_, Reflector.IForgeEntity_getParts);
-
-               for(PartEntity partentity : apartentity) {
-                  ClientLevel.this.partEntities.put(partentity.getId(), partentity);
-               }
-            }
-         }
-
       }
 
       public void onTrackingEnd(Entity p_171716_) {
          p_171716_.unRide();
          ClientLevel.this.players.remove(p_171716_);
-         if (Reflector.IForgeEntity_onRemovedFromWorld.exists()) {
-            Reflector.call(p_171716_, Reflector.IForgeEntity_onRemovedFromWorld);
-         }
-
-         if (Reflector.EntityLeaveLevelEvent_Constructor.exists()) {
-            Reflector.postForgeBusEvent(Reflector.EntityLeaveLevelEvent_Constructor, p_171716_, ClientLevel.this);
-         }
-
-         if (Reflector.IForgeEntity_isMultipartEntity.exists() && Reflector.IForgeEntity_getParts.exists()) {
-            boolean flag = Reflector.callBoolean(p_171716_, Reflector.IForgeEntity_isMultipartEntity);
-            if (flag) {
-               PartEntity[] apartentity = (PartEntity[])Reflector.call(p_171716_, Reflector.IForgeEntity_getParts);
-
-               for(PartEntity partentity : apartentity) {
-                  ClientLevel.this.partEntities.remove(partentity.getId(), partentity);
-               }
-            }
-         }
-
          ClientLevel.this.onEntityRemoved(p_171716_);
       }
 

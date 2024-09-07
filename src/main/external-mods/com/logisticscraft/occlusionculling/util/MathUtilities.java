@@ -1,5 +1,7 @@
 package com.logisticscraft.occlusionculling.util;
 
+import net.minecraft.util.Mth;
+
 /**
  * Contains MathHelper methods
  */
@@ -9,8 +11,7 @@ public final class MathUtilities {
     }
 
     public static int floor(double d) {
-        int i = (int) d;
-        return d < (double) i ? i - 1 : i;
+        return Mth.floor(d);
     }
 
     public static int fastFloor(double d) {
@@ -18,8 +19,7 @@ public final class MathUtilities {
     }
 
     public static int ceil(double d) {
-        int i = (int) d;
-        return d > (double) i ? i + 1 : i;
+        return Mth.ceil(d);
     }
 
 }

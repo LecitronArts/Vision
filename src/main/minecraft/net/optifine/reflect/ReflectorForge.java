@@ -35,10 +35,6 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 public class ReflectorForge {
-   public static Object EVENT_RESULT_ALLOW = Reflector.getFieldValue(Reflector.Event_Result_ALLOW);
-   public static Object EVENT_RESULT_DENY = Reflector.getFieldValue(Reflector.Event_Result_DENY);
-   public static Object EVENT_RESULT_DEFAULT = Reflector.getFieldValue(Reflector.Event_Result_DEFAULT);
-   public static final boolean FORGE_ENTITY_CAN_UPDATE = Reflector.IForgeEntity_canUpdate.exists();
 
    public static void putLaunchBlackboard(String key, Object value) {
       Map map = (Map)Reflector.getFieldValue(Reflector.Launch_blackboard);
@@ -175,9 +171,6 @@ public class ReflectorForge {
       }
    }
 
-   public static boolean canUpdate(Entity entity) {
-      return FORGE_ENTITY_CAN_UPDATE ? Reflector.callBoolean(entity, Reflector.IForgeEntity_canUpdate) : true;
-   }
 
    public static boolean isDamageable(Item item, ItemStack stack) {
       return Reflector.IForgeItem_isDamageable1.exists() ? Reflector.callBoolean(item, Reflector.IForgeItem_isDamageable1, stack) : item.canBeDepleted();

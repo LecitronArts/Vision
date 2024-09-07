@@ -57,26 +57,7 @@ public class FaceBakery {
          this.recalculateWinding(aint, direction);
       }
 
-      if (Reflector.ForgeHooksClient_fillNormal.exists() && Reflector.ForgeBlockElementFace_getFaceData.exists()) {
-         ForgeFaceData forgefacedata = (ForgeFaceData)Reflector.call(pFace, Reflector.ForgeBlockElementFace_getFaceData);
-         ReflectorForge.fillNormal(aint, direction, forgefacedata);
-         BakedQuad bakedquad = new BakedQuad(aint, pFace.tintIndex, direction, pSprite, pShade, forgefacedata.ambientOcclusion());
-         if (!ForgeFaceData.DEFAULT.equals(forgefacedata)) {
-            Object object = Reflector.QuadTransformers_applyingLightmap.call(forgefacedata.blockLight(), forgefacedata.skyLight());
-            if (object != null) {
-               Reflector.call(object, Reflector.IQuadTransformer_processInPlace, bakedquad);
-            }
-
-            Object object1 = Reflector.QuadTransformers_applyingColor.call((int)forgefacedata.color());
-            if (object1 != null) {
-               Reflector.call(object1, Reflector.IQuadTransformer_processInPlace, bakedquad);
-            }
-         }
-
-         return bakedquad;
-      } else {
-         return new BakedQuad(aint, pFace.tintIndex, direction, pSprite, pShade);
-      }
+      return new BakedQuad(aint, pFace.tintIndex, direction, pSprite, pShade);
    }
 
    public static BlockFaceUV recomputeUVs(BlockFaceUV pUv, Direction pFacing, Transformation pModelRotation, ResourceLocation pModelLocation) {

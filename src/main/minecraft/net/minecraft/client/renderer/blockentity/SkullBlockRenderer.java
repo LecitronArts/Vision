@@ -58,7 +58,6 @@ public class SkullBlockRenderer implements BlockEntityRenderer<SkullBlockEntity>
          builder.put(SkullBlock.Types.CREEPER, new SkullModel(pEntityModelSet.bakeLayer(ModelLayers.CREEPER_HEAD)));
          builder.put(SkullBlock.Types.DRAGON, new DragonHeadModel(pEntityModelSet.bakeLayer(ModelLayers.DRAGON_SKULL)));
          builder.put(SkullBlock.Types.PIGLIN, new PiglinHeadModel(pEntityModelSet.bakeLayer(ModelLayers.PIGLIN_HEAD)));
-         ReflectorForge.postModLoaderEvent(Reflector.EntityRenderersEvent_CreateSkullModels_Constructor, builder, pEntityModelSet);
          Map<SkullBlock.Type, SkullModelBase> map = new HashMap<>(builder.build());
          modelSet = pEntityModelSet;
          models = map;

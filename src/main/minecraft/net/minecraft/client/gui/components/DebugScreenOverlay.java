@@ -341,14 +341,16 @@ public class DebugScreenOverlay {
          list.add("[Culling] Rendered Block Entities: " + EntityCullingModBase.instance.renderedBlockEntities
                  + " Skipped: " + EntityCullingModBase.instance.skippedBlockEntities);
       }
+
+      EntityCullingModBase.instance.renderedBlockEntities = 0;
+      EntityCullingModBase.instance.skippedBlockEntities = 0;
+
       if (!EntityCullingModBase.instance.config.skipEntityCulling) {
          list.add("[Culling] Rendered Entities: " + EntityCullingModBase.instance.renderedEntities + " Skipped: "
                  + EntityCullingModBase.instance.skippedEntities);
          list.add("[Culling] Ticked Entities: " + lastTickedEntities + " Skipped: " + lastSkippedEntityTicks);
       }
 
-      EntityCullingModBase.instance.renderedBlockEntities = 0;
-      EntityCullingModBase.instance.skippedBlockEntities = 0;
       EntityCullingModBase.instance.renderedEntities = 0;
       EntityCullingModBase.instance.skippedEntities = 0;
 
@@ -578,15 +580,6 @@ public class DebugScreenOverlay {
       long l1 = GpuMemory.getBufferAllocated();
       long i2 = GpuMemory.getTextureAllocated();
       list.set(4, "GPU: " + bytesToMegabytes(l1) + "+" + bytesToMegabytes(i2) + "MB");
-      if (Reflector.BrandingControl_getBrandings.exists()) {
-         list.add("");
-
-         for(String s1 : (Collection<String>)Reflector.call(Reflector.BrandingControl_getBrandings, true, false)) {
-            if (!s1.startsWith("Minecraft ")) {
-               list.add(s1);
-            }
-         }
-      }
 
       if (this.minecraft.showOnlyReducedInfo()) {
          return list;

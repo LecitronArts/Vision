@@ -62,11 +62,7 @@ public class CrashReport {
       if (this.uncategorizedStackTrace != null && this.uncategorizedStackTrace.length > 0) {
          pBuilder.append("-- Head --\n");
          pBuilder.append("Thread: ").append(Thread.currentThread().getName()).append("\n");
-         if (Reflector.CrashReportExtender_generateEnhancedStackTraceSTE.exists()) {
-            pBuilder.append(Reflector.CrashReportAnalyser_appendSuspectedMods.callString(this.exception, this.uncategorizedStackTrace));
-            pBuilder.append("Stacktrace:");
-            pBuilder.append(Reflector.CrashReportExtender_generateEnhancedStackTraceSTE.callString1(this.uncategorizedStackTrace));
-         } else {
+         {
             pBuilder.append("Stacktrace:\n");
 
             for(StackTraceElement stacktraceelement : this.uncategorizedStackTrace) {
@@ -83,7 +79,6 @@ public class CrashReport {
          pBuilder.append("\n\n");
       }
 
-      Reflector.CrashReportExtender_extendSystemReport.call((Object)this.systemReport);
       this.systemReport.appendToCrashReportString(pBuilder);
    }
 
@@ -101,14 +96,6 @@ public class CrashReport {
          }
 
          throwable.setStackTrace(this.exception.getStackTrace());
-      }
-
-      try {
-         if (Reflector.CrashReportExtender_generateEnhancedStackTraceT.exists()) {
-            return Reflector.CrashReportExtender_generateEnhancedStackTraceT.callString(throwable);
-         }
-      } catch (Throwable throwable1) {
-         throwable1.printStackTrace();
       }
 
       String s;

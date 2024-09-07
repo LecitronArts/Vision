@@ -653,12 +653,6 @@ public class GuiGraphics implements IForgeGuiGraphics {
    private void renderTooltipInternal(Font pFont, List<ClientTooltipComponent> pComponents, int pMouseX, int pMouseY, ClientTooltipPositioner pTooltipPositioner) {
       if (!pComponents.isEmpty()) {
          Object object = null;
-         if (Reflector.ForgeHooksClient_onRenderTooltipPre.exists()) {
-            object = Reflector.ForgeHooksClient_onRenderTooltipPre.call(this.tooltipStack, this, pMouseX, pMouseY, this.guiWidth(), this.guiHeight(), pComponents, pFont, pTooltipPositioner);
-            if (Reflector.callBoolean(object, Reflector.Event_isCanceled)) {
-               return;
-            }
-         }
 
          int i = 0;
          int j = pComponents.size() == 1 ? -2 : 0;

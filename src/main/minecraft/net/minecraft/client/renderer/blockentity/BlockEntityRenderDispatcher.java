@@ -74,14 +74,14 @@ public class BlockEntityRenderDispatcher implements ResourceManagerReloadListene
 
       if (!((Cullable) pBlockEntity).isForcedVisible() && ((Cullable) pBlockEntity).isCulled()) {
          EntityCullingModBase.instance.skippedBlockEntities++;
-         return;
-      }
-      BlockEntityRenderer<E> blockentityrenderer = this.getRenderer(pBlockEntity);
-      if (blockentityrenderer != null && pBlockEntity.hasLevel() && pBlockEntity.getType().isValid(pBlockEntity.getBlockState()) && blockentityrenderer.shouldRender(pBlockEntity, this.camera.getPosition())) {
-         tryRender(pBlockEntity, () -> {
-            setupAndRender(blockentityrenderer, pBlockEntity, pPartialTick, pPoseStack, pBufferSource);
-            EntityCullingModBase.instance.renderedBlockEntities++;
-         });
+      } else {
+         BlockEntityRenderer<E> blockentityrenderer = this.getRenderer(pBlockEntity);
+         if (blockentityrenderer != null && pBlockEntity.hasLevel() && pBlockEntity.getType().isValid(pBlockEntity.getBlockState()) && blockentityrenderer.shouldRender(pBlockEntity, this.camera.getPosition())) {
+            tryRender(pBlockEntity, () -> {
+               setupAndRender(blockentityrenderer, pBlockEntity, pPartialTick, pPoseStack, pBufferSource);
+               EntityCullingModBase.instance.renderedBlockEntities++;
+            });
+         }
       }
 
 

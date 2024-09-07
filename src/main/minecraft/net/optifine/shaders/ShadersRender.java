@@ -497,14 +497,6 @@ public class ShadersRender {
          Minecraft minecraft = Config.getMinecraft();
          GameRenderer gamerenderer = Config.getGameRenderer();
          PoseStack posestack = new PoseStack();
-         if (Reflector.ForgeHooksClient_onCameraSetup.exists()) {
-            Object object = Reflector.ForgeHooksClient_onCameraSetup.call(gamerenderer, camera, partialTicks);
-            float f = Reflector.callFloat(object, Reflector.ViewportEvent_ComputeCameraAngles_getYaw);
-            float f1 = Reflector.callFloat(object, Reflector.ViewportEvent_ComputeCameraAngles_getPitch);
-            float f2 = Reflector.callFloat(object, Reflector.ViewportEvent_ComputeCameraAngles_getRoll);
-            camera.setAnglesInternal(f, f1);
-            posestack.mulPose(Axis.ZP.rotationDegrees(f2));
-         }
 
          posestack.mulPose(Axis.XP.rotationDegrees(camera.getXRot()));
          posestack.mulPose(Axis.YP.rotationDegrees(camera.getYRot() + 180.0F));

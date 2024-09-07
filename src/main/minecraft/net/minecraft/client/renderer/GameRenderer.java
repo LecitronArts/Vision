@@ -1244,14 +1244,6 @@ public class GameRenderer implements AutoCloseable {
 
       Matrix4f matrix4f = posestack.last().pose();
       this.resetProjectionMatrix(matrix4f);
-      if (Reflector.ForgeHooksClient_onCameraSetup.exists()) {
-         Object object = Reflector.ForgeHooksClient_onCameraSetup.call(this, camera, pPartialTicks);
-         float f5 = Reflector.callFloat(object, Reflector.ViewportEvent_ComputeCameraAngles_getYaw);
-         float f6 = Reflector.callFloat(object, Reflector.ViewportEvent_ComputeCameraAngles_getPitch);
-         float f4 = Reflector.callFloat(object, Reflector.ViewportEvent_ComputeCameraAngles_getRoll);
-         camera.setAnglesInternal(f5, f6);
-         pPoseStack.mulPose(Axis.ZP.rotationDegrees(f4));
-      }
 
       pPoseStack.mulPose(Axis.XP.rotationDegrees(camera.getXRot()));
       pPoseStack.mulPose(Axis.YP.rotationDegrees(camera.getYRot() + 180.0F));

@@ -42,7 +42,6 @@ public enum DyeColor implements StringRepresentable {
    private final MapColor mapColor;
    private float[] textureDiffuseColors;
    private final int fireworkColor;
-   private final TagKey<Item> tag;
    private final int textColor;
 
    private DyeColor(int pId, String pName, int pTextureDefuseColor, MapColor pMapColor, int pFireworkColor, int pTextColor) {
@@ -53,7 +52,6 @@ public enum DyeColor implements StringRepresentable {
       int i = (pTextureDefuseColor & 16711680) >> 16;
       int j = (pTextureDefuseColor & '\uff00') >> 8;
       int k = (pTextureDefuseColor & 255) >> 0;
-      this.tag = (TagKey)Reflector.ForgeItemTags_create.call((Object)(new ResourceLocation("forge", "dyes/" + pName)));
       this.textureDiffuseColors = new float[]{(float)i / 255.0F, (float)j / 255.0F, (float)k / 255.0F};
       this.fireworkColor = pFireworkColor;
    }
@@ -108,24 +106,5 @@ public enum DyeColor implements StringRepresentable {
    public void setColorComponentValues(float[] colorComponentValues) {
       this.textureDiffuseColors = colorComponentValues;
    }
-
-   public TagKey<Item> getTag() {
-      return this.tag;
-   }
-
-   @Nullable
-   public static DyeColor getColor(ItemStack stack) {
-      if (stack.getItem() instanceof DyeItem) {
-         return ((DyeItem)stack.getItem()).getDyeColor();
-      } else {
-         for(int i = 0; i < BLACK.getId(); ++i) {
-            DyeColor dyecolor = byId(i);
-            if (stack.is(dyecolor.getTag())) {
-               return dyecolor;
-            }
-         }
-
-         return null;
-      }
-   }
+   
 }

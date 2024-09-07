@@ -1326,7 +1326,6 @@ public class Options {
 
    public void save() {
       this.saveOptions = true;
-      if (!Reflector.ClientModLoader_isLoading.exists() || !Reflector.callBoolean(Reflector.ClientModLoader_isLoading)) {
          try (final PrintWriter printwriter = new PrintWriter(new OutputStreamWriter(new FileOutputStream(this.optionsFile), StandardCharsets.UTF_8))) {
             printwriter.println("version:" + SharedConstants.getCurrentVersion().getDataVersion().getVersion());
             this.processOptions(new Options.FieldAccess() {
@@ -1386,7 +1385,7 @@ public class Options {
          this.saveOptions = false;
          this.saveOfOptions();
          this.broadcastOptions();
-      }
+
    }
 
    public ClientInformation buildPlayerInformation() {

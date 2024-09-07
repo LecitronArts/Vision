@@ -244,15 +244,7 @@ public abstract class Mob extends LivingEntity implements Targeting, IForgeLivin
    }
 
    public void setTarget(@Nullable LivingEntity pTarget) {
-      if (Reflector.ForgeHooks_onLivingChangeTarget.exists()) {
-         LivingChangeTargetEvent livingchangetargetevent = (LivingChangeTargetEvent)Reflector.ForgeHooks_onLivingChangeTarget.call(this, pTarget, LivingChangeTargetEvent.LivingTargetType.MOB_TARGET);
-         if (!livingchangetargetevent.isCanceled()) {
-            this.target = livingchangetargetevent.getNewTarget();
-         }
-
-      } else {
-         this.target = pTarget;
-      }
+      this.target = pTarget;
    }
 
    public boolean canAttackType(EntityType<?> pType) {
@@ -740,16 +732,6 @@ public abstract class Mob extends LivingEntity implements Targeting, IForgeLivin
          this.discard();
       } else if (!this.isPersistenceRequired() && !this.requiresCustomPersistence()) {
          Entity entity = this.level().getNearestPlayer(this, -1.0D);
-         if (Reflector.ForgeEventFactory_canEntityDespawn.exists()) {
-            Object object = Reflector.ForgeEventFactory_canEntityDespawn.call(this, this.level());
-            if (object == ReflectorForge.EVENT_RESULT_DENY) {
-               this.noActionTime = 0;
-               entity = null;
-            } else if (object == ReflectorForge.EVENT_RESULT_ALLOW) {
-               this.discard();
-               entity = null;
-            }
-         }
 
          if (entity != null) {
             double d0 = entity.distanceToSqr(this);

@@ -482,7 +482,7 @@ public class WalkNodeEvaluator extends NodeEvaluator {
       return pNodeType;
    }
 
-   protected static BlockPathTypes getBlockPathTypeRaw(BlockGetter pLevel, BlockPos pPos) {
+   public static BlockPathTypes getBlockPathTypeRaw(BlockGetter pLevel, BlockPos pPos) {
       BlockState blockstate = pLevel.getBlockState(pPos);
       Block block = blockstate.getBlock();
       if (blockstate.isAir()) {

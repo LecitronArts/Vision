@@ -16,11 +16,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
 public abstract class VoxelShape {
-   protected final DiscreteVoxelShape shape;
+   public final DiscreteVoxelShape shape;
    @Nullable
    private VoxelShape[] faces;
 
-   VoxelShape(DiscreteVoxelShape pShape) {
+   public VoxelShape(DiscreteVoxelShape pShape) {
       this.shape = pShape;
    }
 
@@ -50,7 +50,7 @@ public abstract class VoxelShape {
       return this.getCoords(pAxis).getDouble(pIndex);
    }
 
-   protected abstract DoubleList getCoords(Direction.Axis pAxis);
+   public abstract DoubleList getCoords(Direction.Axis pAxis);
 
    public boolean isEmpty() {
       return this.shape.isEmpty();

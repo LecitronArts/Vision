@@ -29,7 +29,7 @@ public class Mth {
    public static final Vector3f Y_AXIS = new Vector3f(0.0F, 1.0F, 0.0F);
    public static final Vector3f X_AXIS = new Vector3f(1.0F, 0.0F, 0.0F);
    public static final Vector3f Z_AXIS = new Vector3f(0.0F, 0.0F, 1.0F);
-   private static final float[] SIN = Util.make(new float[65536], (p_14076_0_) -> {
+   public static final float[] SIN = Util.make(new float[65536], (p_14076_0_) -> {
       for(int i = 0; i < p_14076_0_.length; ++i) {
          p_14076_0_[i] = (float)Math.sin((double)i * Math.PI * 2.0D / 65536.0D);
       }

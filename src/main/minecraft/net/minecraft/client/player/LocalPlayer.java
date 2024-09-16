@@ -723,7 +723,7 @@ public class LocalPlayer extends AbstractClientPlayer {
       if (!(this.minecraft.screen instanceof ReceivingLevelScreen)) {
          this.handleNetherPortalClient();
       }
-
+/*    this.isPassenger()*/
       boolean flag = this.input.jumping;
       boolean flag1 = this.input.shiftKeyDown;
       boolean flag2 = this.hasEnoughImpulseToStartSprinting(); //////
@@ -755,7 +755,7 @@ public class LocalPlayer extends AbstractClientPlayer {
          this.sprintTriggerTime = 0;
       }
 
-      boolean flag4 = ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_14_4) && this.canStartSprinting();
+      boolean flag4 = /*ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_14_4) &&*/ this.canStartSprinting();
       boolean flag5 = this.isPassenger() ? this.getVehicle().onGround() : this.onGround();
       boolean flag6 = !flag1 && !flag2;
       if ((flag5 || this.isUnderWater()) && flag6 && flag4) {

@@ -39,8 +39,8 @@ public class Inventory implements Container, Nameable {
    public static final int[] HELMET_SLOT_ONLY = new int[]{3};
    public final NonNullList<ItemStack> items = NonNullList.withSize(36, ItemStack.EMPTY);
    public final NonNullList<ItemStack> armor = NonNullList.withSize(4, ItemStack.EMPTY);
-   public NonNullList<ItemStack> offhand = NonNullList.withSize(1, ItemStack.EMPTY);
-   private final List<NonNullList<ItemStack>> compartments = ImmutableList.of(this.items, this.armor, this.offhand);
+   public NonNullList<ItemStack> offhand;
+   private final List<NonNullList<ItemStack>> compartments;
    public int selected;
    public final Player player;
    private int timesChanged;
@@ -68,7 +68,7 @@ public class Inventory implements Container, Nameable {
       } else {
          offhand = NonNullList.withSize(1, ItemStack.EMPTY);
       }
-
+      compartments = ImmutableList.of(this.items, this.armor, this.offhand);
       this.player = pPlayer;
    }
 
@@ -453,7 +453,7 @@ public class Inventory implements Container, Nameable {
          int j = compoundtag.getByte("Slot") & 255;
          ItemStack itemstack = ItemStack.of(compoundtag);
          if (!itemstack.isEmpty()) {
-            if (j >= 0 && j < this.items.size()) {
+            if (j < this.items.size()) {
                this.items.set(j, itemstack);
             } else if (j >= 100 && j < this.armor.size() + 100) {
                this.armor.set(j - 100, itemstack);

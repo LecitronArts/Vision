@@ -1246,7 +1246,7 @@ public class ClientLevel extends Level {
       }
 
       public double getHorizonHeight(LevelHeightAccessor pLevel) {
-         return this.isFlat ? (double)pLevel.getMinBuildHeight() : 63.0D;
+         return (double)pLevel.getMinBuildHeight() - 63.0D;
       }
 
       public float getClearColorScale() {

@@ -20,6 +20,8 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage.InventoryAcknowledgements;
 import de.florianmichael.viafabricplus.fixes.ClientsideFixes;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+import net.fabricmc.fabric.impl.networking.payload.ResolvablePayload;
+import net.fabricmc.fabric.impl.networking.payload.UntypedPayload;
 import net.minecraft.ChatFormatting;
 import net.minecraft.CrashReportCategory;
 import net.minecraft.Util;
@@ -102,6 +104,7 @@ public abstract class ClientCommonPacketListenerImpl implements ClientCommonPack
    }
 
    public void handlePing(ClientboundPingPacket pPacket) {
+      PacketUtils.ensureRunningOnSameThread(pPacket, this, this.minecraft);
       if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4)) {
          final InventoryAcknowledgements acks = (this.connection).viaFabricPlus$getUserConnection().get(InventoryAcknowledgements.class);
          if (acks.removeId(pPacket.getId())) {
@@ -120,10 +123,14 @@ public abstract class ClientCommonPacketListenerImpl implements ClientCommonPack
             }
          }
       }
-      PacketUtils.ensureRunningOnSameThread(pPacket, this, this.minecraft);
       this.send(new ServerboundPongPacket(pPacket.getId()));
    }
+
    public void handleCustomPayload(ClientboundCustomPayloadPacket pPacket) {
+      if (pPacket.payload().id().toString().equals(ClientsideFixes.PACKET_SYNC_IDENTIFIER) && pPacket.payload() instanceof ResolvablePayload payload) {
+         ClientsideFixes.handleSyncTask(((UntypedPayload) payload.resolve(null)).buffer());
+         return;
+      }
       if (pPacket.payload().id().toString().equals(ClientsideFixes.PACKET_SYNC_IDENTIFIER)) {
          ClientsideFixes.handleSyncTask((FriendlyByteBuf) pPacket.payload());
          return; // Cancel the packet, so it doesn't get processed by the client

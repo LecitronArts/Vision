@@ -5,11 +5,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 
 public final class CubeVoxelShape extends VoxelShape {
-   protected CubeVoxelShape(DiscreteVoxelShape pShape) {
+   CubeVoxelShape(DiscreteVoxelShape pShape) {
       super(pShape);
    }
 
-   protected DoubleList getCoords(Direction.Axis pAxis) {
+   public DoubleList getCoords(Direction.Axis pAxis) {
       return new CubePointRange(this.shape.getSize(pAxis));
    }
 

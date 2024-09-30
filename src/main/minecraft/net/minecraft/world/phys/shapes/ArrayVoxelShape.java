@@ -29,16 +29,12 @@ public class ArrayVoxelShape extends VoxelShape {
       }
    }
 
-   protected DoubleList getCoords(Direction.Axis pAxis) {
-      switch (pAxis) {
-         case X:
-            return this.xs;
-         case Y:
-            return this.ys;
-         case Z:
-            return this.zs;
-         default:
-            throw new IllegalArgumentException();
-      }
+   public DoubleList getCoords(Direction.Axis pAxis) {
+       return switch (pAxis) {
+           case X -> this.xs;
+           case Y -> this.ys;
+           case Z -> this.zs;
+           default -> throw new IllegalArgumentException();
+       };
    }
 }

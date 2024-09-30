@@ -26,17 +26,18 @@ public class ServerNameResolver {
    public Optional<ResolvedServerAddress> resolveAddress(ServerAddress pServerAddress) {
       if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_16_4) /*|| ProtocolTranslator.getTargetVersion().equals(BedrockProtocolVersion.bedrockLatest)*/) {
          return (this.resolver.resolve(pServerAddress));
-      }
-      Optional<ResolvedServerAddress> optional = this.resolver.resolve(pServerAddress);
-      if ((!optional.isPresent() || this.addressCheck.isAllowed(optional.get())) && this.addressCheck.isAllowed(pServerAddress)) {
-         Optional<ServerAddress> optional1 = this.redirectHandler.lookupRedirect(pServerAddress);
-         if (optional1.isPresent()) {
-            optional = this.resolver.resolve(optional1.get()).filter(this.addressCheck::isAllowed);
-         }
-
-         return optional;
       } else {
-         return Optional.empty();
+         Optional<ResolvedServerAddress> optional = this.resolver.resolve(pServerAddress);
+         if ((!optional.isPresent() || this.addressCheck.isAllowed(optional.get())) && this.addressCheck.isAllowed(pServerAddress)) {
+            Optional<ServerAddress> optional1 = this.redirectHandler.lookupRedirect(pServerAddress);
+            if (optional1.isPresent()) {
+               optional = this.resolver.resolve(optional1.get()).filter(this.addressCheck::isAllowed);
+            }
+
+            return optional;
+         } else {
+            return Optional.empty();
+         }
       }
    }
 }

@@ -1,5 +1,8 @@
 package net.minecraft.client.player;
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -21,6 +24,7 @@ public class KeyboardInput extends Input {
    }
 
    public void tick(boolean pIsSneaking, float pSneakingSpeedMultiplier) {
+      //pIsSneaking = changeSneakSlowdownCondition(pIsSneaking);
       this.up = this.options.keyUp.isDown();
       this.down = this.options.keyDown.isDown();
       this.left = this.options.keyLeft.isDown();
@@ -29,10 +33,19 @@ public class KeyboardInput extends Input {
       this.leftImpulse = calculateImpulse(this.left, this.right);
       this.jumping = this.options.keyJump.isDown();
       this.shiftKeyDown = this.options.keyShift.isDown();
-      if (pIsSneaking) {
+      if (changeSneakSlowdownCondition(pIsSneaking)) {
          this.leftImpulse *= pSneakingSpeedMultiplier;
          this.forwardImpulse *= pSneakingSpeedMultiplier;
       }
 
+   }
+   private boolean changeSneakSlowdownCondition(boolean slowDown) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
+         return this.shiftKeyDown;
+      } else if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_14_4)) {
+         return !Minecraft.getInstance().player.isSpectator() && (this.shiftKeyDown || slowDown);
+      } else {
+         return slowDown;
+      }
    }
 }

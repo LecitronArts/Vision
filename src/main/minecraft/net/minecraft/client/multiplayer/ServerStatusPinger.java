@@ -132,13 +132,13 @@ public class ServerStatusPinger {
 
                   });
                   this.pingStart = Util.getMillis();
+                  connection.send(new ServerboundPingRequestPacket(this.pingStart));
                   final ProtocolVersion version = (connection).viaFabricPlus$getTargetVersion();
 
                   // If the server is compatible with the client, we set the protocol version to the client version
                   if (version != null && version.getVersion() == pServer.protocol) {
                      pServer.protocol = SharedConstants.getProtocolVersion();
                   }
-                  connection.send(new ServerboundPingRequestPacket(this.pingStart));
                   this.success = true;
                }
             }

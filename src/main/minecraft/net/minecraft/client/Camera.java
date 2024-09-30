@@ -2,6 +2,8 @@ package net.minecraft.client;
 
 import java.util.Arrays;
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -67,7 +69,7 @@ public class Camera {
 
    public void tick() {
       if (this.entity != null) {
-         if (DebugSettings.global().replaceSneaking.isEnabled()) {
+         if (DebugSettings.global().replaceSneaking.isEnabled() && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_14_4)) {
             this.eyeHeightOld = this.eyeHeight;
 
             if (this.entity instanceof Player player && !player.isSleeping()) {
@@ -83,10 +85,10 @@ public class Camera {
             } else {
                eyeHeight = entity.getEyeHeight();
             }
-            return;
+         } else {
+            this.eyeHeightOld = this.eyeHeight;
+            this.eyeHeight += (this.entity.getEyeHeight() - this.eyeHeight) * 0.5F;
          }
-         this.eyeHeightOld = this.eyeHeight;
-         this.eyeHeight += (this.entity.getEyeHeight() - this.eyeHeight) * 0.5F;
       }
 
    }

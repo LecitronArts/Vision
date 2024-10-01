@@ -33,10 +33,7 @@ public class EndPortalFrameBlock extends Block {
    protected static final VoxelShape EYE_SHAPE = Block.box(4.0D, 13.0D, 4.0D, 12.0D, 16.0D, 12.0D);
    protected static final VoxelShape FULL_SHAPE = Shapes.or(BASE_SHAPE, EYE_SHAPE);
    private static BlockPattern portalShape;
-   @Unique
    private static final VoxelShape viaFabricPlus$eye_shape_r1_12_2 = Block.box(5.0D, 13.0D, 5.0D, 11.0D, 16.0D, 11.0D);
-
-   @Unique
    private static final VoxelShape viaFabricPlus$frame_with_eye_shape_r1_12_2 = Shapes.or(FULL_SHAPE, viaFabricPlus$eye_shape_r1_12_2);
 
    public MapCodec<EndPortalFrameBlock> codec() {
@@ -54,14 +51,13 @@ public class EndPortalFrameBlock extends Block {
 
    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
       if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
-         return (FULL_SHAPE);
-      }
-      return pState.getValue(HAS_EYE) ? FULL_SHAPE : BASE_SHAPE;
+         return pState.getValue(HAS_EYE) ? viaFabricPlus$eye_shape_r1_12_2 : BASE_SHAPE;
+      } else return pState.getValue(HAS_EYE) ? FULL_SHAPE : BASE_SHAPE;
    }
    @Override
    public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
       if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_12_2)) {
-         return state.getValue(HAS_EYE) ? viaFabricPlus$frame_with_eye_shape_r1_12_2 : FULL_SHAPE;
+         return state.getValue(HAS_EYE) ? viaFabricPlus$frame_with_eye_shape_r1_12_2 : BASE_SHAPE;
       } else {
          return super.getCollisionShape(state, world, pos, context);
       }

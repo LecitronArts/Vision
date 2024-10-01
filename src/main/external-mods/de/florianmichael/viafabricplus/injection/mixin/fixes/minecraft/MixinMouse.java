@@ -69,9 +69,11 @@ public abstract class MixinMouse implements IMouseKeyboard {
         }
     }
 
-    @Override
+    /*@Override
     public Queue<Runnable> viaFabricPlus$getPendingScreenEvents() {
         return this.viaFabricPlus$pendingScreenEvents;
     }
+
+     */
 
 }

@@ -35,11 +35,11 @@ import net.minecraft.WorldVersion;
 @Mixin(targets = "net.minecraft.client.resources.server.DownloadedPackSource$4")
 public abstract class MixinServerResourcePackLoader_4 {
 
-    @Redirect(method = "createDownloadHeaders", at = @At(value = "INVOKE", target = "Lnet/minecraft/SharedConstants;getCurrentVersion()Lnet/minecraft/WorldVersion;"))
+    /*@Redirect(method = "createDownloadHeaders", at = @At(value = "INVOKE", target = "Lnet/minecraft/SharedConstants;getCurrentVersion()Lnet/minecraft/WorldVersion;"))
     private WorldVersion editHeaders() {
         return ResourcePackHeaderDiff.get(ProtocolTranslator.getTargetVersion());
     }
-/*
+
     @Inject(method = "createDownloadHeaders", at = @At("TAIL"), cancellable = true)
     private void removeHeaders(CallbackInfoReturnable<Map<String, String>> cir) {
         final LinkedHashMap<String, String> modifiableMap = new LinkedHashMap<>(cir.getReturnValue());

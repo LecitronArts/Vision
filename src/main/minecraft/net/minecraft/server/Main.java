@@ -103,9 +103,9 @@ public class Main {
 
          Bootstrap.bootStrap();
          Bootstrap.validate();
-         LoadCallback.EVENT.invoker().onLoad(LoadCallback.State.PRE);
-         ViaFabricPlus.global().init();
-         LoadCallback.EVENT.invoker().onLoad(LoadCallback.State.POST);
+        // LoadCallback.EVENT.invoker().onLoad(LoadCallback.State.PRE);
+         //ViaFabricPlus.global().init();
+         //LoadCallback.EVENT.invoker().onLoad(LoadCallback.State.POST);
          Util.startTimerHackThread();
          Path path1 = Paths.get("server.properties");
          DedicatedServerSettings dedicatedserversettings = new DedicatedServerSettings(path1);

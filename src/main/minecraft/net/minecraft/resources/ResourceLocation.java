@@ -37,7 +37,7 @@ public class ResourceLocation implements Comparable<ResourceLocation> {
    }
 
    public ResourceLocation(String pNamespace, String pPath) {
-      this(assertValidNamespace(pNamespace, pPath), assertValidPath(pNamespace, pPath), (ResourceLocation.Dummy)null);
+      this(assertValidNamespace(pNamespace, pPath), assertValidPath(pNamespace, pPath), null);
    }
 
    private ResourceLocation(String[] pDecomposedLocation) {
@@ -87,9 +87,7 @@ public class ResourceLocation implements Comparable<ResourceLocation> {
       try {
          return DataResult.success(new ResourceLocation(p_135838_));
       } catch (ResourceLocationException resourcelocationexception) {
-         return DataResult.error(() -> {
-            return "Not a valid resource location: " + p_135838_ + " " + resourcelocationexception.getMessage();
-         });
+         return DataResult.error(() -> "Not a valid resource location: " + p_135838_ + " " + resourcelocationexception.getMessage());
       }
    }
 
@@ -124,11 +122,10 @@ public class ResourceLocation implements Comparable<ResourceLocation> {
    public boolean equals(Object pOther) {
       if (this == pOther) {
          return true;
-      } else if (!(pOther instanceof ResourceLocation)) {
+      } else if (!(pOther instanceof ResourceLocation resourcelocation)) {
          return false;
       } else {
-         ResourceLocation resourcelocation = (ResourceLocation)pOther;
-         return this.namespace.equals(resourcelocation.namespace) && this.path.equals(resourcelocation.path);
+          return this.namespace.equals(resourcelocation.namespace) && this.path.equals(resourcelocation.path);
       }
    }
 

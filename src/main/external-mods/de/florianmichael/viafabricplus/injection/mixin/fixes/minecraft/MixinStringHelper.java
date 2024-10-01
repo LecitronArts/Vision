@@ -28,9 +28,11 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 @Mixin(StringUtil.class)
 public abstract class MixinStringHelper {
 
-    @ModifyConstant(method = "trimChatMessage", constant = @Constant(intValue = 256))
+    /*@ModifyConstant(method = "trimChatMessage", constant = @Constant(intValue = 256))
     private static int modifyMaxChatLength(int constant) {
         return ClientsideFixes.getChatLength();
     }
+
+     */
 
 }

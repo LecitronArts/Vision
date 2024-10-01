@@ -6,6 +6,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.access.IMouseKeyboard;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+import de.florianmichael.viafabricplus.protocoltranslator.util.MathUtil;
+import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.util.Mth;
 import net.minecraft.util.SmoothDouble;
@@ -14,7 +22,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.glfw.GLFWDropCallback;
 
 @OnlyIn(Dist.CLIENT)
-public class MouseHandler {
+public class MouseHandler implements IMouseKeyboard {
    private final Minecraft minecraft;
    private boolean isLeftPressed;
    private boolean isMiddlePressed;
@@ -34,6 +42,7 @@ public class MouseHandler {
    private double accumulatedScrollY;
    private double lastMouseEventTime = Double.MIN_VALUE;
    private boolean mouseGrabbed;
+   private final Queue<Runnable> viaFabricPlus$pendingScreenEvents = new ConcurrentLinkedQueue<>();
 
    public MouseHandler(Minecraft pMinecraft) {
       this.minecraft = pMinecraft;
@@ -180,13 +189,31 @@ public class MouseHandler {
             this.onMove(p_91591_, p_91592_, p_91593_);
          });
       }, (p_91566_, p_91567_, p_91568_, p_91569_) -> {
-         this.minecraft.execute(() -> {
-            this.onPress(p_91566_, p_91567_, p_91568_, p_91569_);
-         });
+         if (this.minecraft.getConnection() != null && this.minecraft.screen != null && DebugSettings.global().executeInputsSynchronously.isEnabled()) {
+            this.viaFabricPlus$pendingScreenEvents.offer(() -> {
+               this.onPress(p_91566_, p_91567_, p_91568_, p_91569_);
+            });
+         } else {
+            minecraft.execute(() -> {
+               this.onPress(p_91566_, p_91567_, p_91568_, p_91569_);
+            });
+         }
+         //this.minecraft.execute(() -> {
+         //   this.onPress(p_91566_, p_91567_, p_91568_, p_91569_);
+         //});
       }, (p_91576_, p_91577_, p_91578_) -> {
-         this.minecraft.execute(() -> {
-            this.onScroll(p_91576_, p_91577_, p_91578_);
-         });
+         if (this.minecraft.getConnection() != null && this.minecraft.screen != null && DebugSettings.global().executeInputsSynchronously.isEnabled()) {
+            this.viaFabricPlus$pendingScreenEvents.offer(() -> {
+               this.onScroll(p_91576_, p_91577_, p_91578_);
+            });
+         } else {
+            minecraft.execute(() -> {
+               this.onScroll(p_91576_, p_91577_, p_91578_);
+            });
+         }
+         //this.minecraft.execute(() -> {
+         //   this.onScroll(p_91576_, p_91577_, p_91578_);
+         //});
       }, (p_91536_, p_91537_, p_91538_) -> {
          Path[] apath = new Path[p_91537_];
 
@@ -244,7 +271,7 @@ public class MouseHandler {
       double d1 = d0 - this.lastMouseEventTime;
       this.lastMouseEventTime = d0;
       if (this.isMouseGrabbed() && this.minecraft.isWindowActive()) {
-         double d4 = this.minecraft.options.sensitivity().get() * (double)0.6F + (double)0.2F;
+         double d4 = adjustMouseSensitivity1_13_2() * (double)0.6F + (double)0.2F;
          double d5 = d4 * d4 * d4;
          double d6 = d5 * 8.0D;
          double d2;
@@ -281,6 +308,15 @@ public class MouseHandler {
       } else {
          this.accumulatedDX = 0.0D;
          this.accumulatedDY = 0.0D;
+      }
+   }
+   private Double adjustMouseSensitivity1_13_2() {
+      final Double value = this.minecraft.options.sensitivity().get();
+
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
+         return (double) MathUtil.get1_13SliderValue(value.floatValue()).keyFloat();
+      } else {
+         return value;
       }
    }
 
@@ -341,5 +377,10 @@ public class MouseHandler {
 
    public void cursorEntered() {
       this.ignoreFirstMove = true;
+   }
+
+   @Override
+   public Queue<Runnable> viaFabricPlus$getPendingScreenEvents() {
+      return this.viaFabricPlus$pendingScreenEvents;
    }
 }

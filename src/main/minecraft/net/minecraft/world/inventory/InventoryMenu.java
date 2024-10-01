@@ -1,6 +1,9 @@
 package net.minecraft.world.inventory;
 
 import com.mojang.datafixers.util.Pair;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.fixes.data.recipe.Recipes1_11_2;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -121,6 +124,9 @@ public class InventoryMenu extends RecipeBookMenu<CraftingContainer> {
    }
 
    public void slotsChanged(Container pInventory) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_11_1)) {
+         Recipes1_11_2.setCraftingResultSlot(containerId, this, craftSlots);
+      }
       CraftingMenu.slotChangedCraftingGrid(this, this.owner.level(), this.owner, this.craftSlots, this.resultSlots);
    }
 

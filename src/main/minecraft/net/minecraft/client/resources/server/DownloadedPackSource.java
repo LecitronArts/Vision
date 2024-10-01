@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.fixes.data.ResourcePackHeaderDiff;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.SharedConstants;
 import net.minecraft.WorldVersion;
@@ -158,7 +159,7 @@ public class DownloadedPackSource implements AutoCloseable {
          private static final HashFunction CACHE_HASHING_FUNCTION = Hashing.sha1();
 
          private Map<String, String> createDownloadHeaders() {
-            WorldVersion worldversion = SharedConstants.getCurrentVersion();
+            WorldVersion worldversion = ResourcePackHeaderDiff.get(ProtocolTranslator.getTargetVersion());//SharedConstants.getCurrentVersion();
 
             final LinkedHashMap<String, String> modifiableMap = new LinkedHashMap<>(Map.of("X-Minecraft-Username", pUser.getName(), "X-Minecraft-UUID", UndashedUuid.toString(pUser.getProfileId()), "X-Minecraft-Version", worldversion.getName(), "X-Minecraft-Version-ID", worldversion.getId(), "X-Minecraft-Pack-Format", String.valueOf(worldversion.getPackVersion(PackType.CLIENT_RESOURCES)), "User-Agent", "Minecraft Java/" + worldversion.getName()));
             if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_14_3)) {

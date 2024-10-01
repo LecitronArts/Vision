@@ -72,10 +72,11 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
-import com.velum.videotape.event.ClientEventHandler;
-import de.florianmichael.viafabricplus.ViaFabricPlus;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.access.IMouseKeyboard;
 import de.florianmichael.viafabricplus.event.PostGameLoadCallback;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
 import dev.vision.Vision;
 import dev.tr7zw.entityculling.EntityCullingMod;
 import net.minecraft.ChatFormatting;
@@ -1869,6 +1870,14 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
          this.missTime = 10000;
       }
 
+      if (DebugSettings.global().executeInputsSynchronously.isEnabled()) {
+         Queue<Runnable> inputEvents = ((IMouseKeyboard) this.mouseHandler).viaFabricPlus$getPendingScreenEvents();
+         while (!inputEvents.isEmpty()) inputEvents.poll().run();
+
+         inputEvents = ((IMouseKeyboard) this.keyboardHandler).viaFabricPlus$getPendingScreenEvents();
+         while (!inputEvents.isEmpty()) inputEvents.poll().run();
+      }
+
       if (this.screen != null) {
          Screen.wrapScreenError(() -> {
             this.screen.tick();
@@ -1881,6 +1890,11 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
 
       if (this.overlay == null && passEvents(this) == null) {
          this.profiler.popPush("Keybindings");
+         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+            if (this.missTime > 0) {
+               --this.missTime;
+            }
+         }
          this.handleKeybinds();
          if (this.missTime > 0) {
             --this.missTime;
@@ -1958,7 +1972,6 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
          this.profiler.popPush("pendingConnection");
          this.pendingConnection.tick();
       }
-      ClientEventHandler.onClientTick();
       this.profiler.popPush("keyboard");
       this.keyboardHandler.tick();
       this.profiler.pop();

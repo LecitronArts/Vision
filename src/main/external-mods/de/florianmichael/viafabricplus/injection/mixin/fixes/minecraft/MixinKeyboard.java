@@ -43,7 +43,7 @@ public abstract class MixinKeyboard implements IMouseKeyboard {
     @Unique
     private final Queue<Runnable> viaFabricPlus$pendingScreenEvents = new ConcurrentLinkedQueue<>();
 
-    @Redirect(method = {"lambda$setup$9", "lambda$setup$11"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;execute(Ljava/lang/Runnable;)V"))
+    /*@Redirect(method = {"lambda$setup$9", "lambda$setup$11"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;execute(Ljava/lang/Runnable;)V"))
     private void storeEvent(Minecraft instance, Runnable runnable) {
         if (this.minecraft.getConnection() != null && this.minecraft.screen != null && DebugSettings.global().executeInputsSynchronously.isEnabled()) {
             this.viaFabricPlus$pendingScreenEvents.offer(runnable);
@@ -52,9 +52,13 @@ public abstract class MixinKeyboard implements IMouseKeyboard {
         }
     }
 
-    @Override
+
+     */
+   /* @Override
     public Queue<Runnable> viaFabricPlus$getPendingScreenEvents() {
         return this.viaFabricPlus$pendingScreenEvents;
     }
+
+    */
 
 }

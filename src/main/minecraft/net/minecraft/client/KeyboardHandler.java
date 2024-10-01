@@ -8,7 +8,12 @@ import com.mojang.blaze3d.platform.TextureUtil;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Locale;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.annotation.Nullable;
+
+import de.florianmichael.viafabricplus.access.IMouseKeyboard;
+import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
 import net.minecraft.ChatFormatting;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
@@ -51,7 +56,7 @@ import net.optifine.shaders.Shaders;
 import net.optifine.shaders.gui.GuiShaderOptions;
 import net.optifine.util.RandomUtils;
 
-public class KeyboardHandler {
+public class KeyboardHandler implements IMouseKeyboard {
    public static final int DEBUG_CRASH_TIME = 10000;
    private final Minecraft minecraft;
    private final ClipboardManager clipboardManager = new ClipboardManager();
@@ -60,6 +65,7 @@ public class KeyboardHandler {
    private long debugCrashKeyReportedCount = -1L;
    private boolean handledDebugKey;
    private static boolean chunkDebugKeys = Boolean.getBoolean("chunk.debug.keys");
+   private final Queue<Runnable> viaFabricPlus$pendingScreenEvents = new ConcurrentLinkedQueue<>();
 
    public KeyboardHandler(Minecraft pMinecraft) {
       this.minecraft = pMinecraft;
@@ -578,13 +584,31 @@ public class KeyboardHandler {
 
    public void setup(long pWindow) {
       InputConstants.setupKeyboardCallbacks(pWindow, (p_90938_1_, p_90938_3_, p_90938_4_, p_90938_5_, p_90938_6_) -> {
-         this.minecraft.execute(() -> {
-            this.keyPress(p_90938_1_, p_90938_3_, p_90938_4_, p_90938_5_, p_90938_6_);
-         });
+         if (this.minecraft.getConnection() != null && this.minecraft.screen != null && DebugSettings.global().executeInputsSynchronously.isEnabled()) {
+            this.viaFabricPlus$pendingScreenEvents.offer(() -> {
+               this.keyPress(p_90938_1_, p_90938_3_, p_90938_4_, p_90938_5_, p_90938_6_);
+            });
+         } else {
+            this.minecraft.execute(() -> {
+               this.keyPress(p_90938_1_, p_90938_3_, p_90938_4_, p_90938_5_, p_90938_6_);
+            });
+         }
+         //this.minecraft.execute(() -> {
+         //   this.keyPress(p_90938_1_, p_90938_3_, p_90938_4_, p_90938_5_, p_90938_6_);
+         //});
       }, (p_90934_1_, p_90934_3_, p_90934_4_) -> {
-         this.minecraft.execute(() -> {
-            this.charTyped(p_90934_1_, p_90934_3_, p_90934_4_);
-         });
+         if (this.minecraft.getConnection() != null && this.minecraft.screen != null && DebugSettings.global().executeInputsSynchronously.isEnabled()) {
+            this.viaFabricPlus$pendingScreenEvents.offer(() -> {
+               this.charTyped(p_90934_1_, p_90934_3_, p_90934_4_);
+            });
+         } else {
+            this.minecraft.execute(() -> {
+               this.charTyped(p_90934_1_, p_90934_3_, p_90934_4_);
+            });
+         }
+         //this.minecraft.execute(() -> {
+         //   this.charTyped(p_90934_1_, p_90934_3_, p_90934_4_);
+         //});
       });
    }
 
@@ -633,5 +657,10 @@ public class KeyboardHandler {
          }
       }
 
+   }
+
+   @Override
+   public Queue<Runnable> viaFabricPlus$getPendingScreenEvents() {
+      return this.viaFabricPlus$pendingScreenEvents;
    }
 }

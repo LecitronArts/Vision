@@ -12,11 +12,9 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexSorting;
 import java.nio.IntBuffer;
 
-import com.velum.videotape.event.ClientEventHandler;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ShaderInstance;
-import net.minecraft.core.Vec3i;
 import net.optifine.reflect.ReflectorForge;
 import net.optifine.render.GLConst;
 import org.joml.Matrix4f;
@@ -54,16 +52,6 @@ public abstract class RenderTarget {
          });
       } else {
          this._resize(pWidth, pHeight, pClearError);
-      }
-
-   }
-   public void finalize() throws Throwable {
-      try {
-         if (this.depthBufferId > -1 || this.colorTextureId > -1 || this.frameBufferId > -1) {
-            ClientEventHandler.queue.add(new Vec3i(this.depthBufferId, this.colorTextureId, this.frameBufferId));
-         }
-      } finally {
-         super.finalize();
       }
 
    }

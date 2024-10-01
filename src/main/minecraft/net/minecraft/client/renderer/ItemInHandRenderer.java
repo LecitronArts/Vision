@@ -439,13 +439,14 @@ public class ItemInHandRenderer {
                         case BLOCK:
                            this.applyItemArmTransform(pPoseStack, humanoidarm, pEquippedProgress);
                            final boolean blockHitAnimation = VisualSettings.global().enableBlockHitAnimation.isEnabled();
-
                            if (VisualSettings.global().enableSwordBlocking.isEnabled() || blockHitAnimation) {
                               final HumanoidArm arm = pHand == InteractionHand.MAIN_HAND ? pPlayer.getMainArm() : pPlayer.getMainArm().getOpposite();
-                              pPoseStack.translate(arm == HumanoidArm.RIGHT ? -0.1F : 0.1F, 0.05F, 0.0F);
 
                               if (blockHitAnimation) {
-                                 applyItemArmAttackTransform( pPoseStack, arm, pSwingProgress);
+                                 applyItemArmAttackTransform(pPoseStack, arm, pSwingProgress);
+                                 pPoseStack.translate(arm == HumanoidArm.RIGHT ? -0.14F : 0.14F, 0.12F, 0.12F);
+                              } else {
+                                 pPoseStack.translate(arm == HumanoidArm.RIGHT ? -0.15F : 0.15F, 0.07F, 0.12F);
                               }
                               pPoseStack.mulPose(Axis.XP.rotationDegrees(-102.25f));
                               pPoseStack.mulPose((arm == HumanoidArm.RIGHT ? Axis.YP : Axis.YN).rotationDegrees(13.365f));

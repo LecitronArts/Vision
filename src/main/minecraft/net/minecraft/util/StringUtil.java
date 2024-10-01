@@ -4,6 +4,8 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
+
+import de.florianmichael.viafabricplus.fixes.ClientsideFixes;
 import org.apache.commons.lang3.StringUtils;
 
 public class StringUtil {
@@ -55,6 +57,9 @@ public class StringUtil {
    }
 
    public static String trimChatMessage(String pString) {
-      return truncateStringIfNecessary(pString, 256, false);
+      return truncateStringIfNecessary(pString,
+              //256
+              ClientsideFixes.getChatLength(),
+              false);
    }
 }

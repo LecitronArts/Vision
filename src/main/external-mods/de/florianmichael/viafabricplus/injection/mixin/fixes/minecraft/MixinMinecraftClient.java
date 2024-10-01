@@ -102,7 +102,7 @@ public abstract class MixinMinecraftClient {
         return ProtocolTranslator.getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_15);
     }
 
-    @Inject(method = "tick",
+    /*@Inject(method = "tick",
             at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;screen:Lnet/minecraft/client/gui/screens/Screen;", ordinal = 0, shift = At.Shift.BEFORE),
             slice = @Slice(
                     from = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;missTime:I", ordinal = 0),
@@ -118,6 +118,8 @@ public abstract class MixinMinecraftClient {
             while (!inputEvents.isEmpty()) inputEvents.poll().run();
         }
     }
+
+     */
 
     @Inject(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/tutorial/Tutorial;onOpenInventory()V", shift = At.Shift.AFTER))
     private void sendOpenInventoryPacket(CallbackInfo ci) throws Exception {
@@ -149,14 +151,14 @@ public abstract class MixinMinecraftClient {
         }
     }
 
-    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;handleKeybinds()V", shift = At.Shift.BEFORE))
+    /*@Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;handleKeybinds()V", shift = At.Shift.BEFORE))
     private void moveCooldownIncrement(CallbackInfo ci) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             if (this.missTime > 0) {
                 --this.missTime;
             }
         }
-    }
+    }*/
 
     @ModifyExpressionValue(method = "continueAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUsingItem()Z"))
     private boolean allowBlockBreakAndItemUsageAtTheSameTime(boolean original) {

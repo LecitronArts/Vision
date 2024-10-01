@@ -1,6 +1,5 @@
 package dev.vision;
 
-import baritone.BaritoneProvider;
 import de.florianmichael.viafabricplus.ViaFabricPlus;
 import de.florianmichael.viafabricplus.event.LoadCallback;
 import dev.tr7zw.entityculling.EntityCullingMod;
@@ -24,7 +23,6 @@ public class Vision {
     public Path CLIENT_PATH = mc.gameDirectory.toPath().resolve(CLIENT_NAME);
     public final Logger LOGGER = LoggerFactory.getLogger(CLIENT_NAME);
     public IEventBus EVENT_BUS = new EventBus();
-    public BaritoneProvider BARITONE;
     public void setupClient() {
         try {
             EntityCullingMod.INSTANCE.init();
@@ -32,14 +30,13 @@ public class Vision {
             LoadCallback.EVENT.invoker().onLoad(LoadCallback.State.PRE);
             ViaFabricPlus.global().init();
             LoadCallback.EVENT.invoker().onLoad(LoadCallback.State.POST);
-            //ViaFabricPlus.global().init();
-            //BARITONE = new BaritoneProvider(); already registered by it self.
+            //see at net.minecraft.client.main.Main
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
         EVENT_BUS.registerLambdaFactory(CLIENT_PACKAGE , (lookupInMethod, klass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, klass, MethodHandles.lookup()));
         EVENT_BUS.subscribe(this);
-        LOGGER.info("Registered factory.");
+        LOGGER.info("Registered event factory.");
     }
 }

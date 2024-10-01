@@ -21,9 +21,6 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.UUID;
 import javax.annotation.Nullable;
-
-import de.florianmichael.viafabricplus.ViaFabricPlus;
-import de.florianmichael.viafabricplus.event.LoadCallback;
 import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;

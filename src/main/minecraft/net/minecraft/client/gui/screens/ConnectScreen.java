@@ -54,7 +54,7 @@ public class ConnectScreen extends Screen {
    private Component status = Component.translatable("connect.connecting");
    private long lastNarration = -1L;
    final Component connectFailedTitle;
-
+   private int initHeight;
    //via
    private boolean viaFabricPlus$useClassiCubeAccount;
 
@@ -227,6 +227,7 @@ public class ConnectScreen extends Screen {
    }
 
    protected void init() {
+      initHeight = this.height;
       this.addRenderableWidget(Button.builder(CommonComponents.GUI_CANCEL, (p_289624_) -> {
          synchronized(this) {
             this.aborted = true;
@@ -241,7 +242,7 @@ public class ConnectScreen extends Screen {
          }
 
          this.minecraft.setScreen(this.parent);
-      }).bounds(this.width / 2 - 100, this.height / 4 + 120 + 12, 200, 20).build());
+      }).bounds(this.width / 2 - 100, initHeight / 2 + 20, 200, 20).build());
    }
 
    public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
@@ -252,6 +253,6 @@ public class ConnectScreen extends Screen {
          this.minecraft.getNarrator().sayNow(Component.translatable("narrator.joining"));
       }
 
-      pGuiGraphics.drawCenteredString(this.font, this.status, this.width / 2, this.height / 2 - 50, 16777215);
+      pGuiGraphics.drawCenteredString(this.font, this.status, this.width / 2, initHeight / 2 - 25, 16777215);
    }
 }

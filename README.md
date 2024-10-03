@@ -47,9 +47,11 @@ LecitronArts - LecitronsArt@gmail.com
 - [BetterBiomeBlend](https://github.com/UntitledModGroup/better-biome-blend-reblend)
 - [EntityCulling](https://github.com/tr7zw/EntityCulling)
 - [MeteorClient](https://meteorclient.com)
+- [ModernUI-MC](https://github.com/BloCamLimb/ModernUI-MC)
 - [ViaVersion](https://github.com/ViaVersion)
 - [AccountsX](https://github.com/burningtnt/AccountsX)
 - [Baritone](https://github.com/cabaletta/baritone)
+- [ModernUI](https://github.com/BloCamLimb/ModernUI)
 - [Optifine](https://optifine.net/)
 - [Fabric](https://fabricmc.net/)
 

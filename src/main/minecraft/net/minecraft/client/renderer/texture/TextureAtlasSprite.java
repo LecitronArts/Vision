@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
+
+import net.mehvahdjukaar.modelfix.ModelFixGeom;
 import net.minecraft.client.renderer.SpriteCoordinateExpander;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import net.minecraft.client.resources.metadata.animation.FrameSize;
@@ -239,7 +241,10 @@ public class TextureAtlasSprite {
    }
 
    public float uvShrinkRatio() {
-      return 4.0F / this.atlasSize();
+      var newS = ModelFixGeom.getShrinkRatio(this.atlasLocation(), 4.0F / this.atlasSize(), 4.0F / this.atlasSize());
+      if (newS != -1) {
+         return (newS);
+      } else return 4.0F / this.atlasSize();
    }
 
    public VertexConsumer wrap(VertexConsumer pConsumer) {

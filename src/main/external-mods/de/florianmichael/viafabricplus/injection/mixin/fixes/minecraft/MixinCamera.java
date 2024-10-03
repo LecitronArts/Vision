@@ -49,7 +49,7 @@ public abstract class MixinCamera {
         }
     }*/
 
-/*    @Inject(method = "tick", at = @At(value = "HEAD"), cancellable = true)
+  /*    @Inject(method = "tick", at = @At(value = "HEAD"), cancellable = true)
     private void onUpdateEyeHeight(CallbackInfo ci) {
         if (this.entity == null) return;
 

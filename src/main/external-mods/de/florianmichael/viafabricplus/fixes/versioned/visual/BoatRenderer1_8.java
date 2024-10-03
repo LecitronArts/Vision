@@ -29,6 +29,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.vehicle.Boat;
+import org.slf4j.LoggerFactory;
 
 /**
  * Renderer for boats in 1.8 and lower.

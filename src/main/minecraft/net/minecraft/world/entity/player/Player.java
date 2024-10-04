@@ -374,7 +374,7 @@ public abstract class Player extends LivingEntity {
             pose = Pose.SWIMMING;
          } else if (this.isAutoSpinAttack()) {
             pose = Pose.SPIN_ATTACK;
-         } else if (this.isShiftKeyDown() && !this.abilities.flying) {
+         } else if (this.isShiftKeyDown()) {
             pose = Pose.CROUCHING;
          } else {
             pose = Pose.STANDING;

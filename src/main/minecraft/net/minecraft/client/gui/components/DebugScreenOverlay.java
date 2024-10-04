@@ -14,6 +14,7 @@ import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import de.florianmichael.viafabricplus.settings.impl.GeneralSettings;
 import de.florianmichael.viafabricplus.util.ChatUtil;
 import dev.tr7zw.entityculling.EntityCullingModBase;
+import dev.vision.Vision;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.longs.LongSets;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -379,7 +380,7 @@ public class DebugScreenOverlay {
          return "";
       }
       final UserConnection userConnection = ProtocolTranslator.getPlayNetworkUserConnection();
-      if (userConnection == null) { // Only show if ViaVersion is active
+      if (userConnection != null) { // Only show if ViaVersion is active
          return "";
       }
 
@@ -387,7 +388,7 @@ public class DebugScreenOverlay {
       information.add("");
 
       // Title
-      information.add(ChatUtil.PREFIX + ChatFormatting.RESET + " " + ViaFabricPlusMixinPlugin.VFP_VERSION);
+      information.add(ChatUtil.PREFIX + ChatFormatting.RESET + " " + "Vision Edit - " + Vision.INSTANCE.CLIENT_VERSION);
 
       // Connection
       final ProtocolInfo info = userConnection.getProtocolInfo();

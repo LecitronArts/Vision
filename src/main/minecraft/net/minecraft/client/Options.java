@@ -47,6 +47,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.ViaFabricPlus;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import fionathemortal.betterbiomeblend.BetterBiomeBlendClient;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
@@ -1429,7 +1432,10 @@ public class Options {
    }
 
    public boolean useNativeTransport() {
-      return this.useNativeTransport;
+      if (!this.useNativeTransport) {
+         ViaFabricPlus.global().getLogger().error("Native transport is disabled, but enabling it anyway since we use it as an indicator if the client wants to pingLegacyServer a server or connect to a server.");
+      }
+      return true;
    }
 
    public void setOptionFloatValueOF(OptionInstance option, double val) {
@@ -2861,7 +2867,12 @@ public class Options {
    }
 
    public void setServerRenderDistance(int pServerRenderDistance) {
-      this.serverRenderDistance = pServerRenderDistance;
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_17_1)) {
+         this.serverRenderDistance = 0;
+      } else {
+         this.serverRenderDistance = pServerRenderDistance;
+      }
+      //this.serverRenderDistance = pServerRenderDistance;
    }
 
    public int getEffectiveRenderDistance() {

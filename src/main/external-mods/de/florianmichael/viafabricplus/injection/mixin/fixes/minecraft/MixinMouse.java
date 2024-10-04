@@ -42,7 +42,7 @@ import net.minecraft.client.OptionInstance;
 @Mixin(MouseHandler.class)
 public abstract class MixinMouse implements IMouseKeyboard {
 
-    @Shadow
+    /*@Shadow
     @Final
     private Minecraft minecraft;
 

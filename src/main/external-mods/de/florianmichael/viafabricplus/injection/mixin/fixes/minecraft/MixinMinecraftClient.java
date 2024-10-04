@@ -70,22 +70,26 @@ public abstract class MixinMinecraftClient {
     @Final
     public KeyboardHandler keyboardHandler;
 
-    @Redirect(method = "pickBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Inventory;setPickedItem(Lnet/minecraft/world/item/ItemStack;)V"))
+    /*@Redirect(method = "pickBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Inventory;setPickedItem(Lnet/minecraft/world/item/ItemStack;)V"))
     private void filterItem(Inventory instance, ItemStack stack) {
         if (ItemRegistryDiff.keepItem(stack.getItem())) {
             instance.setPickedItem(stack);
         }
     }
 
+     */
+
     /**
      * Never happens in Vanilla, this is only for {@link ItemRegistryDiff} to work
      */
-    @Redirect(method = "pickBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;handleCreativeModeItemAdd(Lnet/minecraft/world/item/ItemStack;I)V"))
+    /*@Redirect(method = "pickBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;handleCreativeModeItemAdd(Lnet/minecraft/world/item/ItemStack;I)V"))
     private void dontSendEmptyItem(MultiPlayerGameMode instance, ItemStack stack, int slotId) {
         if (!stack.isEmpty()) {
             instance.handleCreativeModeItemAdd(stack, slotId);
         }
     }
+
+
 
     @Redirect(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/InteractionResult;shouldSwing()Z", ordinal = 0))
     private boolean disableSwing(InteractionResult instance) {
@@ -101,6 +105,8 @@ public abstract class MixinMinecraftClient {
     private boolean disableSwing(LocalPlayer instance, InteractionHand hand) {
         return ProtocolTranslator.getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_15);
     }
+
+     */
 
     /*@Inject(method = "tick",
             at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;screen:Lnet/minecraft/client/gui/screens/Screen;", ordinal = 0, shift = At.Shift.BEFORE),
@@ -119,7 +125,7 @@ public abstract class MixinMinecraftClient {
         }
     }
 
-     */
+
 
     @Inject(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/tutorial/Tutorial;onOpenInventory()V", shift = At.Shift.AFTER))
     private void sendOpenInventoryPacket(CallbackInfo ci) throws Exception {
@@ -130,7 +136,9 @@ public abstract class MixinMinecraftClient {
         }
     }
 
-    @Inject(method = "startAttack", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;hitResult:Lnet/minecraft/world/phys/HitResult;", shift = At.Shift.BEFORE, ordinal = 0))
+     */
+
+   /* @Inject(method = "startAttack", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;hitResult:Lnet/minecraft/world/phys/HitResult;", shift = At.Shift.BEFORE, ordinal = 0))
     private void fixSwingPacketOrder(CallbackInfoReturnable<Boolean> cir) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             this.player.swing(InteractionHand.MAIN_HAND);
@@ -142,7 +150,9 @@ public abstract class MixinMinecraftClient {
         return ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_8);
     }
 
-    @Redirect(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;missTime:I", ordinal = 1))
+    */
+
+    /*@Redirect(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;missTime:I", ordinal = 1))
     private int moveCooldownIncrement(Minecraft instance) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             return 0;
@@ -150,6 +160,8 @@ public abstract class MixinMinecraftClient {
             return missTime;
         }
     }
+
+     */
 
     /*@Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;handleKeybinds()V", shift = At.Shift.BEFORE))
     private void moveCooldownIncrement(CallbackInfo ci) {
@@ -160,9 +172,11 @@ public abstract class MixinMinecraftClient {
         }
     }*/
 
-    @ModifyExpressionValue(method = "continueAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUsingItem()Z"))
+    /*@ModifyExpressionValue(method = "continueAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUsingItem()Z"))
     private boolean allowBlockBreakAndItemUsageAtTheSameTime(boolean original) {
         return ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_7_6) && original;
     }
+
+     */
 
 }

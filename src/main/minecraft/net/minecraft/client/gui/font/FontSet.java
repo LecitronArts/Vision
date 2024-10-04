@@ -5,6 +5,9 @@ import com.google.common.collect.Sets;
 import com.mojang.blaze3d.font.GlyphInfo;
 import com.mojang.blaze3d.font.GlyphProvider;
 import com.mojang.blaze3d.font.SheetGlyphInfo;
+import de.florianmichael.viafabricplus.fixes.data.RenderableGlyphDiff;
+import de.florianmichael.viafabricplus.fixes.versioned.visual.BuiltinEmptyGlyph1_12_2;
+import de.florianmichael.viafabricplus.settings.impl.VisualSettings;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -13,12 +16,15 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.List;
 import java.util.Set;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.font.glyphs.BakedGlyph;
 import net.minecraft.client.gui.font.glyphs.SpecialGlyphs;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import org.spongepowered.asm.mixin.Unique;
 
 public class FontSet implements AutoCloseable {
    private static final RandomSource RANDOM = RandomSource.create();
@@ -40,6 +46,7 @@ public class FontSet implements AutoCloseable {
    });
    private final Int2ObjectMap<IntList> glyphsByWidth = new Int2ObjectOpenHashMap<>();
    private final List<FontTexture> textures = Lists.newArrayList();
+   private BakedGlyph viaFabricPlus$blankGlyphRenderer1_12_2;
 
    public FontSet(TextureManager pTextureManager, ResourceLocation pName) {
       this.textureManager = pTextureManager;
@@ -52,6 +59,7 @@ public class FontSet implements AutoCloseable {
       this.glyphs.clear();
       this.glyphInfos.clear();
       this.glyphsByWidth.clear();
+      this.viaFabricPlus$blankGlyphRenderer1_12_2 = BuiltinEmptyGlyph1_12_2.INSTANCE.bake(this::stitch);
       this.missingGlyph = SpecialGlyphs.MISSING.bake(this::stitch);
       this.whiteGlyph = SpecialGlyphs.WHITE.bake(this::stitch);
       IntSet intset = new IntOpenHashSet();
@@ -125,7 +133,16 @@ public class FontSet implements AutoCloseable {
             }
          }
       }
-
+      if (this.viaFabricPlus$shouldBeInvisible(p_243321_)) {
+         return this.viaFabricPlus$getBlankGlyphPair();
+      }
+      //TODO: Test it!
+      //if (VisualSettings.global().changeFontRendererBehaviour.isEnabled()) {
+      //   final FontSet.GlyphInfoFilter glyphPair = this.computeGlyphInfo(p_243321_);
+      //   final GlyphInfo glyph1 = glyphPair.glyphInfo();
+      //   final GlyphInfo glyph2 = glyphPair.glyphInfoNotFishy();
+      //   return new FontSet.GlyphInfoFilter(glyph1 == SpecialGlyphs.MISSING ? BuiltinEmptyGlyph1_12_2.INSTANCE : glyph1, glyph2 == SpecialGlyphs.MISSING ? BuiltinEmptyGlyph1_12_2.INSTANCE : glyph2);
+      //}
       return glyphinfo != null ? new FontSet.GlyphInfoFilter(glyphinfo, SpecialGlyphs.MISSING) : FontSet.GlyphInfoFilter.MISSING;
    }
 
@@ -141,8 +158,10 @@ public class FontSet implements AutoCloseable {
             return glyphinfo.bake(this::stitch);
          }
       }
-
-      return this.missingGlyph;
+      if (this.viaFabricPlus$shouldBeInvisible(p_232565_)) {
+         return this.viaFabricPlus$getBlankGlyphRenderer();
+      }
+      return this.viaFabricPlus$getBlankGlyphRenderer();
    }
 
    public BakedGlyph getGlyph(int pCharacter) {
@@ -190,6 +209,25 @@ public class FontSet implements AutoCloseable {
 
       public GlyphInfo glyphInfoNotFishy() {
          return this.glyphInfoNotFishy;
+      }
+   }
+   private boolean viaFabricPlus$shouldBeInvisible(final int codePoint) {
+      return (this.name.equals(Minecraft.DEFAULT_FONT) || this.name.equals(Minecraft.UNIFORM_FONT)) && !RenderableGlyphDiff.isGlyphRenderable(codePoint);
+   }
+
+   private FontSet.GlyphInfoFilter viaFabricPlus$getBlankGlyphPair() {
+      if (VisualSettings.global().changeFontRendererBehaviour.isEnabled()) {
+         return new FontSet.GlyphInfoFilter(BuiltinEmptyGlyph1_12_2.INSTANCE, BuiltinEmptyGlyph1_12_2.INSTANCE);
+      } else {
+         return FontSet.GlyphInfoFilter.MISSING;
+      }
+   }
+
+   private BakedGlyph viaFabricPlus$getBlankGlyphRenderer() {
+      if (VisualSettings.global().changeFontRendererBehaviour.isEnabled()) {
+         return this.viaFabricPlus$blankGlyphRenderer1_12_2;
+      } else {
+         return this.missingGlyph;
       }
    }
 }

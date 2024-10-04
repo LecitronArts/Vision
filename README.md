@@ -30,7 +30,8 @@ A utility tweak system based on Minecraft Moder Pack version 1.20.4
 
 - [x] 内置账户管理器
 - [x] 内置Baritone
-- [ ] 内置ViaVersion
+- [x] 内置ViaVersion
+- [ ] ModernUI支持
 
 ### 作者
 

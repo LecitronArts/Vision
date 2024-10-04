@@ -72,9 +72,14 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.Protocol1_12To1_11_1;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
 import de.florianmichael.viafabricplus.access.IMouseKeyboard;
 import de.florianmichael.viafabricplus.event.PostGameLoadCallback;
+import de.florianmichael.viafabricplus.fixes.data.ItemRegistryDiff;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
 import dev.vision.Vision;
@@ -1666,7 +1671,7 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
          this.missTime = 0;
       }
 
-      if (this.missTime <= 0 && !this.player.isUsingItem()) {
+      if (this.missTime <= 0 && !this.player.isUsingItem() && ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_7_6)) {
          if (pLeftClick && this.hitResult != null && this.hitResult.getType() == HitResult.Type.BLOCK) {
             BlockHitResult blockhitresult = (BlockHitResult)this.hitResult;
             BlockPos blockpos = blockhitresult.getBlockPos();
@@ -1702,6 +1707,9 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
             return false;
          } else {
             boolean flag = false;
+            if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+               this.player.swing(InteractionHand.MAIN_HAND);
+            }
             switch (this.hitResult.getType()) {
                case ENTITY:
                   this.gameMode.attack(this.player, ((EntityHitResult)this.hitResult).getEntity());
@@ -1723,8 +1731,9 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
 
                   this.player.resetAttackStrengthTicker();
             }
-
-            this.player.swing(InteractionHand.MAIN_HAND);
+            if (ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_8)){
+               this.player.swing(InteractionHand.MAIN_HAND);
+            }
             return flag;
          }
       }
@@ -1759,7 +1768,7 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
                         }
 
                         if (interactionresult.consumesAction()) {
-                           if (interactionresult.shouldSwing()) {
+                           if (interactionresult.shouldSwing() && ProtocolTranslator.getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_15)) {
                               this.player.swing(interactionhand);
                            }
 
@@ -1790,7 +1799,7 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
                if (!itemstack.isEmpty()) {
                   InteractionResult interactionresult2 = this.gameMode.useItem(this.player, interactionhand);
                   if (interactionresult2.consumesAction()) {
-                     if (interactionresult2.shouldSwing()) {
+                     if (interactionresult2.shouldSwing() && ProtocolTranslator.getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_15)) {
                         this.player.swing(interactionhand);
                      }
 
@@ -1813,6 +1822,14 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
          return null;
       }
       return instance.screen;
+   }
+   private float handleMissTime(){
+      //MoveCooldownIncrement
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+         return 0;
+      } else {
+         return missTime;
+      }
    }
 
    public void tick() {
@@ -1891,12 +1908,12 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
       if (this.overlay == null && passEvents(this) == null) {
          this.profiler.popPush("Keybindings");
          if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
-            if (this.missTime > 0) {
+            if (this.handleMissTime() > 0) {
                --this.missTime;
             }
          }
          this.handleKeybinds();
-         if (this.missTime > 0) {
+         if (this.handleMissTime() > 0) {
             --this.missTime;
          }
       }
@@ -2036,6 +2053,15 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
             this.player.sendOpenInventory();
          } else {
             this.tutorial.onOpenInventory();
+            if (DebugSettings.global().sendOpenInventoryPacket.isEnabled()) {
+               final PacketWrapper clientStatus = PacketWrapper.create(ServerboundPackets1_9_3.CLIENT_STATUS, ProtocolTranslator.getPlayNetworkUserConnection());
+               clientStatus.write(Type.VAR_INT, 2); // Open Inventory Achievement
+               try {
+                  clientStatus.scheduleSendToServer(Protocol1_12To1_11_1.class);
+               } catch (Exception e) {
+                  LOGGER.error("Failed to send via client status", e);
+               }
+            }
             this.setScreen(new InventoryScreen(this.player));
          }
       }
@@ -2051,7 +2077,7 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
       }
 
       while(this.options.keyDrop.consumeClick()) {
-         if (!this.player.isSpectator() && this.player.drop(Screen.hasControlDown())) {
+         if (!this.player.isSpectator() && this.player.drop(Screen.hasControlDown()) && ProtocolTranslator.getTargetVersion().newerThanOrEqualTo(ProtocolVersion.v1_15)) {
             this.player.swing(InteractionHand.MAIN_HAND);
          }
       }
@@ -2445,8 +2471,14 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
 
             int i = inventory.findSlotMatchingItem(itemstack);
             if (flag) {
-               inventory.setPickedItem(itemstack);
-               this.gameMode.handleCreativeModeItemAdd(this.player.getItemInHand(InteractionHand.MAIN_HAND), 36 + inventory.selected);
+               if (ItemRegistryDiff.keepItem(itemstack.getItem())) {
+                  inventory.setPickedItem(itemstack);
+               }
+               //inventory.setPickedItem(itemstack);
+               if (!itemstack.isEmpty()) {
+                  gameMode.handleCreativeModeItemAdd(this.player.getItemInHand(InteractionHand.MAIN_HAND), 36 + inventory.selected);
+               }
+               //this.gameMode.handleCreativeModeItemAdd(this.player.getItemInHand(InteractionHand.MAIN_HAND), 36 + inventory.selected);
             } else if (i != -1) {
                if (Inventory.isHotbarSlot(i)) {
                   inventory.selected = i;

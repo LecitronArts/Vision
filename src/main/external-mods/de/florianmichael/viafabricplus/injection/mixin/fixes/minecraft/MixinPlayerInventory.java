@@ -33,7 +33,7 @@ import net.minecraft.world.entity.player.Inventory;
 @Mixin(Inventory.class)
 public abstract class MixinPlayerInventory {
 
-    @Redirect(method = "<init>", slice = @Slice(from = @At(value = "CONSTANT", args = "intValue=1")), at = @At(value = "INVOKE", target = "Lnet/minecraft/core/NonNullList;withSize(ILjava/lang/Object;)Lnet/minecraft/core/NonNullList;", ordinal = 0))
+    /*@Redirect(method = "<init>", slice = @Slice(from = @At(value = "CONSTANT", args = "intValue=1")), at = @At(value = "INVOKE", target = "Lnet/minecraft/core/NonNullList;withSize(ILjava/lang/Object;)Lnet/minecraft/core/NonNullList;", ordinal = 0))
     private <T> NonNullList<T> redirectOffhandInventory(int size, T def) {
         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             //noinspection MixinInnerClass
@@ -58,5 +58,7 @@ public abstract class MixinPlayerInventory {
             return NonNullList.withSize(size, def);
         }
     }
+
+     */
 
 }

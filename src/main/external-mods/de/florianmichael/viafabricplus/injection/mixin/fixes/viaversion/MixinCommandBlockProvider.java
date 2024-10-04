@@ -27,9 +27,9 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 @Mixin(value = CommandBlockProvider.class, remap = false)
 public abstract class MixinCommandBlockProvider {
 
-    @ModifyConstant(method = "sendPermission", constant = @Constant(intValue = 26))
-    private int modifyPermissionLevel(int constant) {
-        return 28; // OP level 4
-    }
+   //@ModifyConstant(method = "sendPermission", constant = @Constant(intValue = 26))
+   // private int modifyPermissionLevel(int constant) {
+    //    return 28; // OP level 4
+    //}
 
 }

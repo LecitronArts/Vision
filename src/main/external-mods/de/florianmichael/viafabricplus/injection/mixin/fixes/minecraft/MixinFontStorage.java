@@ -46,7 +46,7 @@ import java.util.List;
 @Mixin(FontSet.class)
 public abstract class MixinFontStorage {
 
-    @Shadow
+    /*@Shadow
     private BakedGlyph missingGlyph;
 
     @Shadow
@@ -115,5 +115,7 @@ public abstract class MixinFontStorage {
             return this.missingGlyph;
         }
     }
+
+     */
 
 }

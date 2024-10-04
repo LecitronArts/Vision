@@ -32,7 +32,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 @Mixin(Options.class)
 public abstract class MixinGameOptions {
 
-    @Shadow
+    /*@Shadow
     public boolean useNativeTransport;
 
     @ModifyVariable(method = "setServerRenderDistance", at = @At("HEAD"), ordinal = 0, argsOnly = true)
@@ -44,10 +44,12 @@ public abstract class MixinGameOptions {
         }
     }
 
-    /**
-     * @author RK_01
-     * @reason Needed as an indicator if the client wants to pingLegacyServer a server or connect to a server
      */
+
+    /*
+      @author RK_01
+      @reason Needed as an indicator if the client wants to pingLegacyServer a server or connect to a server
+
     @Overwrite
     public boolean useNativeTransport() {
         if (!this.useNativeTransport) {
@@ -55,5 +57,7 @@ public abstract class MixinGameOptions {
         }
         return true;
     }
+
+     */
 
 }

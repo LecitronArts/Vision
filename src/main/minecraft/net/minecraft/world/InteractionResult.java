@@ -15,11 +15,11 @@ public enum InteractionResult {
    }
 
    public boolean shouldSwing() {
-      //if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_14_4)) {
-      //   return (this.consumesAction());
-      //} else {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_14_4)) {
+         return (this.consumesAction());
+      } else {
          return this == SUCCESS;
-      //}
+      }
    }
 
    public boolean shouldAwardStats() {

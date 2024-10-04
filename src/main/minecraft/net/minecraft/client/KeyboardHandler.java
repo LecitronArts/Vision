@@ -14,6 +14,8 @@ import javax.annotation.Nullable;
 
 import de.florianmichael.viafabricplus.access.IMouseKeyboard;
 import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
+import dev.vision.events.EventKeyPress;
+import me.empty.api.event.handler.EventManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
@@ -55,6 +57,7 @@ import net.optifine.reflect.Reflector;
 import net.optifine.shaders.Shaders;
 import net.optifine.shaders.gui.GuiShaderOptions;
 import net.optifine.util.RandomUtils;
+import org.lwjgl.glfw.GLFW;
 
 public class KeyboardHandler implements IMouseKeyboard {
    public static final int DEBUG_CRASH_TIME = 10000;
@@ -349,6 +352,9 @@ public class KeyboardHandler implements IMouseKeyboard {
    }
 
    public void keyPress(long pWindowPointer, int pKey, int pScanCode, int pAction, int pModifiers) {
+      if (pAction == GLFW.GLFW_PRESS && pKey != GLFW.GLFW_KEY_UNKNOWN) {
+         EventManager.call(new EventKeyPress(pKey));
+      }
       if (pWindowPointer == this.minecraft.getWindow().getWindow()) {
          boolean flag = InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), 292);
          if (this.debugCrashKeyTime > 0L) {

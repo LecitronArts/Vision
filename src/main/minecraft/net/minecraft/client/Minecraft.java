@@ -84,6 +84,8 @@ import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
 import dev.vision.Vision;
 import dev.tr7zw.entityculling.EntityCullingMod;
+import dev.vision.events.EventTick;
+import me.empty.api.event.handler.EventManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
@@ -1187,6 +1189,7 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
    }
 
    private void runTick(boolean pRenderLevel) {
+      EventManager.call(new EventTick());
       this.window.setErrorSection("Pre render");
       long i = Util.getNanos();
       if (this.window.shouldClose()) {

@@ -3,6 +3,7 @@ package dev.vision;
 import de.florianmichael.viafabricplus.ViaFabricPlus;
 import de.florianmichael.viafabricplus.event.LoadCallback;
 import dev.tr7zw.entityculling.EntityCullingMod;
+import dev.vision.module.ModuleManager;
 import meteordevelopment.orbit.EventBus;
 import meteordevelopment.orbit.IEventBus;
 import net.burningtnt.accountsx.AccountsX;
@@ -23,6 +24,9 @@ public class Vision {
     public Path CLIENT_PATH = mc.gameDirectory.toPath().resolve(CLIENT_NAME);
     public final Logger LOGGER = LoggerFactory.getLogger(CLIENT_NAME);
     public IEventBus EVENT_BUS = new EventBus();
+
+    public ModuleManager moduleManager = new ModuleManager();
+
     public void setupClient() {
         try {
             EntityCullingMod.INSTANCE.init();
@@ -34,6 +38,8 @@ public class Vision {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        moduleManager.init();
 
         EVENT_BUS.registerLambdaFactory(CLIENT_PACKAGE , (lookupInMethod, klass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, klass, MethodHandles.lookup()));
         EVENT_BUS.subscribe(this);

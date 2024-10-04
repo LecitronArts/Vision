@@ -1,5 +1,10 @@
 package net.minecraft.world.inventory;
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
@@ -99,7 +104,7 @@ public class MerchantMenu extends AbstractContainerMenu {
    }
 
    public boolean canTakeItemForPickAll(ItemStack pStack, Slot pSlot) {
-      return false;
+      return ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2);
    }
 
    public ItemStack quickMoveStack(Player pPlayer, int pIndex) {
@@ -174,7 +179,34 @@ public class MerchantMenu extends AbstractContainerMenu {
    }
 
    public void tryMoveItems(int pSelectedMerchantRecipe) {
-      if (pSelectedMerchantRecipe >= 0 && this.getOffers().size() > pSelectedMerchantRecipe) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
+         //ci.cancel();
+
+         if (pSelectedMerchantRecipe >= this.getOffers().size()) return;
+
+         final MultiPlayerGameMode interactionManager = Minecraft.getInstance().gameMode;
+         final LocalPlayer player = Minecraft.getInstance().player;
+
+         // move 1st input slot to inventory
+         if (!this.tradeContainer.getItem(0).isEmpty()) {
+            final int count = this.tradeContainer.getItem(0).getCount();
+            interactionManager.handleInventoryMouseClick(containerId, 0, 0, ClickType.QUICK_MOVE, player);
+            if (count == this.tradeContainer.getItem(0).getCount()) return;
+         }
+
+         // move 2nd input slot to inventory
+         if (!this.tradeContainer.getItem(1).isEmpty()) {
+            final int count = this.tradeContainer.getItem(1).getCount();
+            interactionManager.handleInventoryMouseClick(containerId, 1, 0, ClickType.QUICK_MOVE, player);
+            if (count == this.tradeContainer.getItem(1).getCount()) return;
+         }
+
+         // refill the slots
+         if (this.tradeContainer.getItem(0).isEmpty() && this.tradeContainer.getItem(1).isEmpty()) {
+            this.viaFabricPlus$autofill(interactionManager, player, 0, this.getOffers().get(pSelectedMerchantRecipe).getCostA());
+            this.viaFabricPlus$autofill(interactionManager, player, 1, this.getOffers().get(pSelectedMerchantRecipe).getCostB());
+         }
+      } else if (pSelectedMerchantRecipe >= 0 && this.getOffers().size() > pSelectedMerchantRecipe) {
          ItemStack itemstack = this.tradeContainer.getItem(0);
          if (!itemstack.isEmpty()) {
             if (!this.moveItemStackTo(itemstack, 3, 39, true)) {
@@ -223,6 +255,24 @@ public class MerchantMenu extends AbstractContainerMenu {
          }
       }
 
+   }
+   private void viaFabricPlus$autofill(MultiPlayerGameMode interactionManager, LocalPlayer player, int inputSlot, ItemStack stackNeeded) {
+      if (stackNeeded.isEmpty()) return;
+
+      int slot;
+      for (slot = 3; slot < 39; slot++) {
+         final ItemStack stack = slots.get(slot).getItem();
+         if (ItemStack.isSameItemSameTags(stack, stackNeeded)) {
+            break;
+         }
+      }
+      if (slot == 39) return;
+
+      final boolean wasHoldingItem = !player.containerMenu.getCarried().isEmpty();
+      interactionManager.handleInventoryMouseClick(containerId, slot, 0, ClickType.PICKUP, player);
+      interactionManager.handleInventoryMouseClick(containerId, slot, 0, ClickType.PICKUP_ALL, player);
+      interactionManager.handleInventoryMouseClick(containerId, inputSlot, 0, ClickType.PICKUP, player);
+      if (wasHoldingItem) interactionManager.handleInventoryMouseClick(containerId, slot, 0, ClickType.PICKUP, player);
    }
 
    public void setOffers(MerchantOffers pOffers) {

@@ -1,5 +1,7 @@
 package net.minecraft.world.item;
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -17,6 +19,9 @@ public class FishingRodItem extends Item implements Vanishable {
    }
 
    public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pHand) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_14_4)) {
+         pPlayer.swing(pHand);
+      }
       ItemStack itemstack = pPlayer.getItemInHand(pHand);
       if (pPlayer.fishing != null) {
          if (!pLevel.isClientSide) {

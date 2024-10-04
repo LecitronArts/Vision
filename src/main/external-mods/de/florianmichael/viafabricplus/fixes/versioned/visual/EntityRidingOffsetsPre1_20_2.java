@@ -103,7 +103,7 @@ public class EntityRidingOffsetsPre1_20_2 {
                     if (passenger instanceof Animal) xOffset += 0.2F;
                 }
 
-                return new Vector3f(xOffset, yOffset, 0F);
+                return new Vector3f(xOffset, yOffset, 0F).rotateY(-(float) (Math.PI / 2));
             }
         } else if (entity instanceof Camel camelEntity) {
             if (!camelEntity.hasPassenger(passenger)) return new Vector3f();

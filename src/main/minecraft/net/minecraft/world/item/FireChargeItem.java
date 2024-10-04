@@ -1,5 +1,7 @@
 package net.minecraft.world.item;
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -22,6 +24,9 @@ public class FireChargeItem extends Item {
    }
 
    public InteractionResult useOn(UseOnContext pContext) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_14_4) && pContext.getLevel().isClientSide) {
+         return InteractionResult.SUCCESS;
+      }
       Level level = pContext.getLevel();
       BlockPos blockpos = pContext.getClickedPos();
       BlockState blockstate = level.getBlockState(blockpos);

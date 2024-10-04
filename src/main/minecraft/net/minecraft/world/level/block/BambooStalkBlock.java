@@ -80,9 +80,6 @@ public class BambooStalkBlock extends Block implements BonemealableBlock {
    }
 
    public boolean isCollisionShapeFullBlock(BlockState pState, BlockGetter pLevel, BlockPos pPos) {
-      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_17)) {
-          return (true);
-      }
       return false;
    }
 

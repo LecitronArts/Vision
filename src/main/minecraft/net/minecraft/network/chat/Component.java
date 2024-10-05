@@ -141,7 +141,7 @@ public interface Component extends Message, FormattedText {
    }
 
    static Component nullToEmpty(@Nullable String pText) {
-      return (Component)(pText != null ? literal(pText) : CommonComponents.EMPTY);
+      return pText != null ? literal(pText) : CommonComponents.EMPTY;
    }
 
    static MutableComponent literal(String pText) {

@@ -2,6 +2,8 @@ package dev.vision.module;
 
 import dev.vision.events.EventKeyPress;
 import dev.vision.module.modules.movement.Sprint;
+import dev.vision.module.modules.movement.Test;
+import dev.vision.module.modules.screen.ClickGUI;
 import me.empty.api.event.component.EventTarget;
 import me.empty.api.event.handler.EventManager;
 
@@ -13,13 +15,22 @@ public class ModuleManager {
 
     public void init() {
         modules.clear();
+
+        // Movement
         add(new Sprint());
+        add(new Test());
+
+        // Screen
+        add(new ClickGUI());
 
         EventManager.register(this);
     }
 
     private void add(BasicModule module) {
         modules.add(module);
+        if (module.enableOnStartUp()) {
+            module.setEnabled(true);
+        }
     }
 
     public List<BasicModule> getModules() {

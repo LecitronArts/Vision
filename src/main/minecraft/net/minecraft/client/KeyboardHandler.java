@@ -352,9 +352,6 @@ public class KeyboardHandler implements IMouseKeyboard {
    }
 
    public void keyPress(long pWindowPointer, int pKey, int pScanCode, int pAction, int pModifiers) {
-      if (pAction == GLFW.GLFW_PRESS && pKey != GLFW.GLFW_KEY_UNKNOWN) {
-         EventManager.call(new EventKeyPress(pKey));
-      }
       if (pWindowPointer == this.minecraft.getWindow().getWindow()) {
          boolean flag = InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), 292);
          if (this.debugCrashKeyTime > 0L) {
@@ -383,6 +380,10 @@ public class KeyboardHandler implements IMouseKeyboard {
                case 264:
                case 265:
                   this.minecraft.setLastInputType(InputType.KEYBOARD_ARROW);
+            }
+         } else {
+            if (pAction == GLFW.GLFW_PRESS && pKey != GLFW.GLFW_KEY_UNKNOWN) {
+               EventManager.call(new EventKeyPress(pKey));
             }
          }
 

@@ -14,6 +14,9 @@ public class BasicModule implements InstanceToggle {
 
     @Override
     public void setEnabled(boolean enabled) {
+        if (this.enabled == enabled) {
+            return;
+        }
         this.enabled = enabled;
         if (enabled) {
             EventManager.register(this);
@@ -71,5 +74,9 @@ public class BasicModule implements InstanceToggle {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public boolean enableOnStartUp() {
+        return moduleInfo.enableOnStartUp();
     }
 }

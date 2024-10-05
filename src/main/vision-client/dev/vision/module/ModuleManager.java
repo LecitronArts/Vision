@@ -1,6 +1,7 @@
 package dev.vision.module;
 
 import dev.vision.events.EventKeyPress;
+import dev.vision.module.modules.hud.WaterMark;
 import dev.vision.module.modules.movement.NoSlow;
 import dev.vision.module.modules.movement.Sprint;
 import dev.vision.module.modules.screen.ClickGUI;
@@ -20,6 +21,9 @@ public class ModuleManager {
         // Movement
         add(new NoSlow());
         add(new Sprint());
+
+        // HUD
+        add(new WaterMark());
 
         // Screen
         add(new ClickGUI());

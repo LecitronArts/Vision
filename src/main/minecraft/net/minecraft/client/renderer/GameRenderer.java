@@ -29,6 +29,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
+
+import dev.vision.events.EventRender2D;
+import me.empty.api.event.handler.EventManager;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
 import net.minecraft.ReportedException;
@@ -1009,6 +1012,9 @@ public class GameRenderer implements AutoCloseable {
                   this.renderConfusionOverlay(guigraphics, f3 * (1.0F - f4));
                }
             }
+
+            EventRender2D eventRender2D = new EventRender2D(posestack, pPartialTicks);
+            EventManager.call(eventRender2D);
 
             if (!this.minecraft.options.hideGui || this.minecraft.screen != null) {
                this.renderItemActivationAnimation(this.minecraft.getWindow().getGuiScaledWidth(), this.minecraft.getWindow().getGuiScaledHeight(), f);

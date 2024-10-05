@@ -63,7 +63,7 @@ public class ClickGuiScreen extends Screen {
 
         // Category
         float categoryY = 0;
-        NanoRender2DUtil.drawRound(x + 8, this.categoryY, 104, 18, 5, new Color(255, 255, 255, 40));
+        NanoRender2DUtil.drawRound(x + 8, this.categoryY, 104, 18, 3, new Color(255, 255, 255, 40));
         for (Category category : Category.values()) {
             if (category == this.category) {
                 this.categoryY = y + 48 + categoryY;

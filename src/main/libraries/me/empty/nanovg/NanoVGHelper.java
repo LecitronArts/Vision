@@ -1,5 +1,6 @@
 package me.empty.nanovg;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.nanovg.NanoVG;
 import org.lwjgl.nanovg.NanoVGGL3;
@@ -25,11 +26,13 @@ public class NanoVGHelper {
 
     public void begin() {
         Minecraft mc = Minecraft.getInstance();
+        GlStateManager.disableAlphaTest();
         this.begin(mc.getWindow().getWidth(), mc.getWindow().getHeight(), (float) mc.getWindow().getGuiScale());
     }
 
     public void end() {
         NanoVG.nvgEndFrame(nvgContext);
+        GlStateManager.enableAlphaTest();
     }
 
     public long getContext() {

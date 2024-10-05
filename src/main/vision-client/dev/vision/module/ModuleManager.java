@@ -1,12 +1,14 @@
 package dev.vision.module;
 
 import dev.vision.events.EventKeyPress;
+import dev.vision.module.modules.movement.NoSlow;
 import dev.vision.module.modules.movement.Sprint;
 import dev.vision.module.modules.movement.Test;
 import dev.vision.module.modules.screen.ClickGUI;
 import me.empty.api.event.component.EventTarget;
 import me.empty.api.event.handler.EventManager;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +19,7 @@ public class ModuleManager {
         modules.clear();
 
         // Movement
+        add(new NoSlow());
         add(new Sprint());
         add(new Test());
 
@@ -27,6 +30,17 @@ public class ModuleManager {
     }
 
     private void add(BasicModule module) {
+        for (Field field : module.getClass().getDeclaredFields()) {
+            try {
+                field.setAccessible(true);
+                Object obj = field.get(module);
+                if (obj instanceof Value<?>) {
+                    module.getValues().add((Value) obj);
+                }
+            } catch (IllegalAccessException exception) {
+                throw new RuntimeException(exception);
+            }
+        }
         modules.add(module);
         if (module.enableOnStartUp()) {
             module.setEnabled(true);

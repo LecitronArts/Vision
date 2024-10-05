@@ -42,7 +42,7 @@ public class CategoryWindow {
             if (moduleIndex > moduleIndex / 2) {
                 NanoRender2DUtil.drawRound(x + 16 + moduleWindowWidth, y + 18 + rightModuleY, moduleWindowWidth, 24, 4, new Color(63,63,63));
                 NanoRender2DUtil.drawRound(x + 16.5F + moduleWindowWidth, y + 18.5F + rightModuleY, moduleWindowWidth - 1, 23, 4, new Color(13,13,13));
-                FontLoaders.neverlose_16.drawString(name, x + 22 + moduleWindowWidth, y + 8, new Color(69,69,69));
+                FontLoaders.neverlose_16.drawString(name, x + 22 + moduleWindowWidth, y + 8 + rightModuleY, new Color(69,69,69));
 
                 FontLoaders.pingfang_bold_18.drawString("Enabled", x + 24 + moduleWindowWidth, y + rightModuleY + 26, new Color(-1));
                 NanoRender2DUtil.drawRound(x + moduleWindowWidth * 2 - 16, y + 23 + rightModuleY, 22, 14, 6, new Color(34,34,36));
@@ -51,11 +51,11 @@ public class CategoryWindow {
                 } else {
                     NanoRender2DUtil.drawCircle(x + moduleWindowWidth * 2 - 8, y + 30 + rightModuleY, 5, new Color(55,55,55));
                 }
-                rightModuleY += 22;
+                rightModuleY += 38;
             } else {
                 NanoRender2DUtil.drawRound(x + 8, y + 18 + leftModuleY, moduleWindowWidth, 24, 4, new Color(63,63,63));
                 NanoRender2DUtil.drawRound(x + 8.5F, y + 18.5F + leftModuleY, moduleWindowWidth - 1, 23, 4, new Color(13,13,13));
-                FontLoaders.neverlose_16.drawString(name, x + 14, y + 8, new Color(69,69,69));
+                FontLoaders.neverlose_16.drawString(name, x + 14, y + 8 + leftModuleY, new Color(69,69,69));
 
                 FontLoaders.pingfang_bold_18.drawString("Enabled", x + 16, y + leftModuleY + 26, new Color(-1));
                 NanoRender2DUtil.drawRound(x + moduleWindowWidth - 24, y + 23 + leftModuleY, 22, 14, 6.5F, new Color(34,34,36));
@@ -64,7 +64,7 @@ public class CategoryWindow {
                 } else {
                     NanoRender2DUtil.drawCircle(x + moduleWindowWidth - 16, y + 30 + leftModuleY, 5, new Color(55,55,55));
                 }
-                leftModuleY += 22;
+                leftModuleY += 38;
             }
             moduleIndex += 1;
         }
@@ -92,12 +92,12 @@ public class CategoryWindow {
                 if (HoveringUtils.isHovering(x + moduleWindowWidth * 2 - 16, y + 23 + rightModuleY, 22, 14, mouseX, mouseY) && button == 0) {
                     module.toggle();
                 }
-                rightModuleY += 22;
+                rightModuleY += 38;
             } else {
                 if (HoveringUtils.isHovering(x + moduleWindowWidth - 24, y + 23 + leftModuleY, 22, 14, mouseX, mouseY) && button == 0) {
                     module.toggle();
                 }
-                leftModuleY += 22;
+                leftModuleY += 38;
             }
             moduleIndex += 1;
         }

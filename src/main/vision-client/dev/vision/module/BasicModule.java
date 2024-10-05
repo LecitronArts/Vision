@@ -4,12 +4,16 @@ import dev.vision.interfaces.InstanceToggle;
 import me.empty.api.event.handler.EventManager;
 import net.minecraft.client.Minecraft;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class BasicModule implements InstanceToggle {
     private final ModuleInfo moduleInfo = getClass().getAnnotation(ModuleInfo.class);
     private String suffix = "";
     private int key = moduleInfo.keyBind();
     private boolean enabled = false;
+    private final List<Value<?>> values = new ArrayList<>();
     public Minecraft mc = Minecraft.getInstance();
 
     @Override
@@ -78,5 +82,9 @@ public class BasicModule implements InstanceToggle {
 
     public boolean enableOnStartUp() {
         return moduleInfo.enableOnStartUp();
+    }
+
+    public List<Value<?>> getValues() {
+        return values;
     }
 }

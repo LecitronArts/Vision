@@ -19,6 +19,9 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Type;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
+import dev.vision.events.EventSlow;
+import dev.vision.events.EventSlowChange;
+import me.empty.api.event.handler.EventManager;
 import net.minecraft.client.ClientRecipeBook;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -731,10 +734,18 @@ public class LocalPlayer extends AbstractClientPlayer {
       float f = Mth.clamp(0.3F + EnchantmentHelper.getSneakingSpeedBonus(this), 0.0F, 1.0F);
       this.input.tick(this.isMovingSlowly(), f);
       this.minecraft.getTutorial().onInput(this.input);
-      if (this.isUsingItem() && !this.isPassenger()) {
-         this.input.leftImpulse *= 0.2F;
-         this.input.forwardImpulse *= 0.2F;
-         this.sprintTriggerTime = 0;
+
+      if (!this.isPassenger()) {
+         EventSlow slow = new EventSlow();
+         EventManager.call(slow);
+
+         if (this.isUsingItem() || slow.isCancel()) {
+            EventSlowChange change = new EventSlowChange(0.2F, 0.2F);
+            EventManager.call(change);
+            this.input.leftImpulse *= change.getMoveStrafe();
+            this.input.forwardImpulse *= change.getMoveForward();
+            this.sprintTriggerTime = 0;
+         }
       }
 
       boolean flag3 = false;

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
+import de.florianmichael.viafabricplus.settings.impl.VisualSettings;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
@@ -49,7 +50,7 @@ public class Camera {
       this.detached = pDetached;
       this.partialTickTime = pPartialTick;
       this.setRotation(pEntity.getViewYRot(pPartialTick), pEntity.getViewXRot(pPartialTick));
-      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_14_4)) {
+      if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_13_2)) {
          eyeHeight = eyeHeightOld = pEntity.getEyeHeight();
       }
       this.setPosition(Mth.lerp((double)pPartialTick, pEntity.xo, pEntity.getX()), Mth.lerp((double)pPartialTick, pEntity.yo, pEntity.getY()) + (double)Mth.lerp(pPartialTick, this.eyeHeightOld, this.eyeHeight), Mth.lerp((double)pPartialTick, pEntity.zo, pEntity.getZ()));
@@ -69,22 +70,8 @@ public class Camera {
 
    public void tick() {
       if (this.entity != null) {
-         if (DebugSettings.global().replaceSneaking.isEnabled() && ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_14_4)) {
-            this.eyeHeightOld = this.eyeHeight;
-
-            if (this.entity instanceof Player player && !player.isSleeping()) {
-               if (player.isShiftKeyDown()) {
-                  eyeHeight = 1.54F;
-               } else if (!DebugSettings.global().longSneaking.isEnabled()) {
-                  eyeHeight = 1.62F;
-               } else if (eyeHeight < 1.62F) {
-                  float delta = 1.62F - eyeHeight;
-                  delta *= 0.4F;
-                  eyeHeight = 1.62F - delta;
-               }
-            } else {
-               eyeHeight = entity.getEyeHeight();
-            }
+         if (DebugSettings.global().replaceSneaking.isEnabled() ) {
+            eyeHeight = eyeHeightOld = entity.getEyeHeight();
          } else {
             this.eyeHeightOld = this.eyeHeight;
             this.eyeHeight += (this.entity.getEyeHeight() - this.eyeHeight) * 0.5F;

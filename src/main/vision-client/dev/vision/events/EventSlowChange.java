@@ -7,32 +7,32 @@ package dev.vision.events;
 import me.empty.api.event.Cancelable;
 
 public class EventSlowChange extends Cancelable {
-    private float moveStrafe;
-    private float moveForward;
+    private float leftImpulse;
+    private float forwardImpulse;
 
-    public EventSlowChange(float moveStrafe, float moveForward) {
-        this.moveStrafe = moveStrafe;
-        this.moveForward = moveForward;
+    public EventSlowChange(float leftImpulse, float forwardImpulse) {
+        this.leftImpulse = leftImpulse;
+        this.forwardImpulse = forwardImpulse;
     }
 
-    public float getMoveStrafe() {
-        return moveStrafe;
+    public float getLeftImpulse() {
+        return leftImpulse;
     }
 
-    public void setMoveStrafe(float moveStrafe) {
-        this.moveStrafe = moveStrafe;
+    public void setLeftImpulse(float leftImpulse) {
+        this.leftImpulse = leftImpulse;
     }
 
-    public float getMoveForward() {
-        return moveForward;
+    public float getForwardImpulse() {
+        return forwardImpulse;
     }
 
-    public void setMoveForward(float moveForward) {
-        this.moveForward = moveForward;
+    public void setForwardImpulse(float forwardImpulse) {
+        this.forwardImpulse = forwardImpulse;
     }
 
     public void setSlow(float speed) {
-        this.moveStrafe = speed;
-        this.moveForward = speed;
+        this.leftImpulse = speed;
+        this.forwardImpulse = speed;
     }
 }

@@ -48,6 +48,7 @@ public class ClickGuiScreen extends Screen {
 
         NanoVGHelper.INSTANCE.begin();
         // Background-Start
+        NanoRender2DUtil.drawDropShadow(x, y, 510, 374, 10, 0, 5, new Color(17, 17, 17, 80));
         NanoRender2DUtil.drawRound(x, y, 120, 337, 5, 0, 0, 0, new Color(17,17,17, 240));
         NanoRender2DUtil.drawRect(x, y + 337, 120, 1, new Color(54,54,54, 240));
         NanoRender2DUtil.drawRound(x, y + 338, 120, 36, 0, 5, 0, 0, new Color(17,17,17, 240));

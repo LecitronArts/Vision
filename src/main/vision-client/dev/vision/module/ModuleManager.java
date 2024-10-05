@@ -3,7 +3,6 @@ package dev.vision.module;
 import dev.vision.events.EventKeyPress;
 import dev.vision.module.modules.movement.NoSlow;
 import dev.vision.module.modules.movement.Sprint;
-import dev.vision.module.modules.movement.Test;
 import dev.vision.module.modules.screen.ClickGUI;
 import me.empty.api.event.component.EventTarget;
 import me.empty.api.event.handler.EventManager;
@@ -21,7 +20,6 @@ public class ModuleManager {
         // Movement
         add(new NoSlow());
         add(new Sprint());
-        add(new Test());
 
         // Screen
         add(new ClickGUI());

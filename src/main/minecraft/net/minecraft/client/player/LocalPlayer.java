@@ -19,8 +19,10 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Type;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
+import dev.vision.events.EventMotion;
 import dev.vision.events.EventSlow;
 import dev.vision.events.EventSlowChange;
+import dev.vision.events.EventType;
 import me.empty.api.event.handler.EventManager;
 import net.minecraft.client.ClientRecipeBook;
 import net.minecraft.client.KeyMapping;
@@ -261,77 +263,83 @@ public class LocalPlayer extends AbstractClientPlayer {
    }
 
    private void sendPosition() {
-      this.sendIsSprintingIfNeeded();
-      boolean flag = this.isShiftKeyDown();
-      if (flag != this.wasShiftKeyDown) {
-         ServerboundPlayerCommandPacket.Action serverboundplayercommandpacket$action = flag ? ServerboundPlayerCommandPacket.Action.PRESS_SHIFT_KEY : ServerboundPlayerCommandPacket.Action.RELEASE_SHIFT_KEY;
-         this.connection.send(new ServerboundPlayerCommandPacket(this, serverboundplayercommandpacket$action));
-         this.wasShiftKeyDown = flag;
+      EventMotion eventMotion = new EventMotion(this.getYRot(), this.getXRot(), this.getX(), this.getY(), this.getZ(), this.onGround(), EventType.Pre);
+      EventManager.call(eventMotion);
+
+      if (!eventMotion.isCancel()) {
+         this.sendIsSprintingIfNeeded();
+         boolean flag = this.isShiftKeyDown();
+         if (flag != this.wasShiftKeyDown) {
+            ServerboundPlayerCommandPacket.Action serverboundplayercommandpacket$action = flag ? ServerboundPlayerCommandPacket.Action.PRESS_SHIFT_KEY : ServerboundPlayerCommandPacket.Action.RELEASE_SHIFT_KEY;
+            this.connection.send(new ServerboundPlayerCommandPacket(this, serverboundplayercommandpacket$action));
+            this.wasShiftKeyDown = flag;
+         }
+
+         if (this.isControlledCamera()) {
+            double d4 = eventMotion.getX() - this.xLast;
+            double d0 = eventMotion.getY() - this.yLast1;
+            double d1 = eventMotion.getZ() - this.zLast;
+            double d2 = eventMotion.getYaw() - this.yRotLast;
+            double d3 = eventMotion.getPitch() - this.xRotLast;
+
+            ++this.positionReminder;
+            if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+               this.positionReminder = positionReminder - 1; // Reverting original operation
+            }
+
+            double viaFixDouble ;
+            if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_18)) {
+               viaFixDouble = 9.0E-4D;
+            } else {
+               viaFixDouble = Mth.square(2.0E-4D);
+            }
+            boolean flag1 = Mth.lengthSquared(d4, d0, d1) > /*Mth.square(2.0E-4D)*/ viaFixDouble || this.positionReminder >= 20;
+            boolean flag2 = d2 != 0.0D || d3 != 0.0D;
+            if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+               this.positionReminder++;
+            }
+
+            boolean viaFix1_8C03s; //1.8玩家每tick都有c03
+
+            if (DebugSettings.global().sendIdlePacket.isEnabled()) {
+               viaFix1_8C03s = !onGround();
+            } else {
+               viaFix1_8C03s = lastOnGround;
+            }
+
+            if (this.isPassenger()) {
+               Vec3 vec3 = this.getDeltaMovement();
+               this.connection.send(new ServerboundMovePlayerPacket.PosRot(vec3.x, -999.0D, vec3.z, eventMotion.getYaw(), eventMotion.getPitch(), eventMotion.onGround()));
+               flag1 = false;
+            } else if (flag1 && flag2) {
+               this.connection.send(new ServerboundMovePlayerPacket.PosRot(eventMotion.getX(), eventMotion.getY(), eventMotion.getZ(), eventMotion.getYaw(), eventMotion.getPitch(), eventMotion.onGround()));
+            } else if (flag1) {
+               this.connection.send(new ServerboundMovePlayerPacket.Pos(eventMotion.getX(), eventMotion.getY(), eventMotion.getZ(), eventMotion.onGround()));
+            } else if (flag2) {
+               this.connection.send(new ServerboundMovePlayerPacket.Rot(eventMotion.getYaw(), eventMotion.getPitch(), eventMotion.onGround()));
+            } else if (viaFix1_8C03s != onGround()) {
+
+               this.connection.send(new ServerboundMovePlayerPacket.StatusOnly(eventMotion.onGround()));
+            }
+
+            if (flag1) {
+               this.xLast = eventMotion.getX();
+               this.yLast1 = eventMotion.getY();
+               this.zLast = eventMotion.getZ();
+               this.positionReminder = 0;
+            }
+
+            if (flag2) {
+               this.yRotLast = eventMotion.getYaw();
+               this.xRotLast = eventMotion.getYaw();
+            }
+
+            this.lastOnGround = eventMotion.onGround();
+            this.autoJumpEnabled = this.minecraft.options.autoJump().get();
+         }
       }
-
-      if (this.isControlledCamera()) {
-         double d4 = this.getX() - this.xLast;
-         double d0 = this.getY() - this.yLast1;
-         double d1 = this.getZ() - this.zLast;
-         double d2 = (double)(this.getYRot() - this.yRotLast);
-         double d3 = (double)(this.getXRot() - this.xRotLast);
-
-         ++this.positionReminder;
-         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
-            this.positionReminder = positionReminder - 1; // Reverting original operation
-         }
-
-         double viaFixDouble ;
-         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_18)) {
-            viaFixDouble = 9.0E-4D;
-         } else {
-            viaFixDouble = Mth.square(2.0E-4D);
-         }
-         boolean flag1 = Mth.lengthSquared(d4, d0, d1) > /*Mth.square(2.0E-4D)*/ viaFixDouble || this.positionReminder >= 20;
-         boolean flag2 = d2 != 0.0D || d3 != 0.0D;
-         if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
-            this.positionReminder++;
-         }
-
-         boolean viaFix1_8C03s; //1.8玩家每tick都有c03
-
-         if (DebugSettings.global().sendIdlePacket.isEnabled()) {
-            viaFix1_8C03s = !onGround();
-         } else {
-            viaFix1_8C03s = lastOnGround;
-         }
-
-         if (this.isPassenger()) {
-            Vec3 vec3 = this.getDeltaMovement();
-            this.connection.send(new ServerboundMovePlayerPacket.PosRot(vec3.x, -999.0D, vec3.z, this.getYRot(), this.getXRot(), this.onGround()));
-            flag1 = false;
-         } else if (flag1 && flag2) {
-            this.connection.send(new ServerboundMovePlayerPacket.PosRot(this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot(), this.onGround()));
-         } else if (flag1) {
-            this.connection.send(new ServerboundMovePlayerPacket.Pos(this.getX(), this.getY(), this.getZ(), this.onGround()));
-         } else if (flag2) {
-            this.connection.send(new ServerboundMovePlayerPacket.Rot(this.getYRot(), this.getXRot(), this.onGround()));
-         } else if (viaFix1_8C03s != onGround()) {
-
-            this.connection.send(new ServerboundMovePlayerPacket.StatusOnly(this.onGround()));
-         }
-
-         if (flag1) {
-            this.xLast = this.getX();
-            this.yLast1 = this.getY();
-            this.zLast = this.getZ();
-            this.positionReminder = 0;
-         }
-
-         if (flag2) {
-            this.yRotLast = this.getYRot();
-            this.xRotLast = this.getXRot();
-         }
-
-         this.lastOnGround = this.onGround();
-         this.autoJumpEnabled = this.minecraft.options.autoJump().get();
-      }
-
+      EventMotion post = new EventMotion(this.getYRot(), getXRot(), this.getX(), this.getY(), this.getZ(), this.onGround(), EventType.Post);
+      EventManager.call(post);
    }
 
    private void sendIsSprintingIfNeeded() {
@@ -742,8 +750,14 @@ public class LocalPlayer extends AbstractClientPlayer {
          if (this.isUsingItem() || slow.isCancel()) {
             EventSlowChange change = new EventSlowChange(0.2F, 0.2F);
             EventManager.call(change);
-            this.input.leftImpulse *= change.getMoveStrafe();
-            this.input.forwardImpulse *= change.getMoveForward();
+            float leftImpulse = change.getLeftImpulse();
+            float forwardImpulse = change.getForwardImpulse();
+            if (change.isCancel()) {
+               leftImpulse = 1.0F;
+               forwardImpulse = 1.0F;
+            }
+            this.input.leftImpulse *= leftImpulse;
+            this.input.forwardImpulse *= forwardImpulse;
             this.sprintTriggerTime = 0;
          }
       }

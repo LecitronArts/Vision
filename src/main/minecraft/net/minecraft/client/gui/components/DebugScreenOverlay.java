@@ -380,7 +380,7 @@ public class DebugScreenOverlay {
          return "";
       }
       final UserConnection userConnection = ProtocolTranslator.getPlayNetworkUserConnection();
-      if (userConnection != null) { // Only show if ViaVersion is active
+      if (userConnection == null) { // Only show if ViaVersion is active
          return "";
       }
 

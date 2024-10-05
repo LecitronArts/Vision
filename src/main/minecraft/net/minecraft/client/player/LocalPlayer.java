@@ -730,7 +730,7 @@ public class LocalPlayer extends AbstractClientPlayer {
       boolean flag = this.input.jumping;
       boolean flag1 = this.input.shiftKeyDown;
       boolean flag2 = this.hasEnoughImpulseToStartSprinting(); //////
-      this.crouching = !this.getAbilities().flying && ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_13_2) && !( ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_14_1) && this.isSwimming()) && !( ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_20) && this.isPassenger()) && this.canPlayerFitWithinBlocksAndEntitiesWhen(Pose.CROUCHING) && (this.isShiftKeyDown() || !this.isSleeping() && !this.canPlayerFitWithinBlocksAndEntitiesWhen(Pose.STANDING));
+      this.crouching = !(this.getAbilities().flying && ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_13_2)) && !( ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_14_1) && this.isSwimming()) && !( ProtocolTranslator.getTargetVersion().newerThan(ProtocolVersion.v1_20) && this.isPassenger()) && this.canPlayerFitWithinBlocksAndEntitiesWhen(Pose.CROUCHING) && (this.isShiftKeyDown() || !this.isSleeping() && !this.canPlayerFitWithinBlocksAndEntitiesWhen(Pose.STANDING));
       float f = Mth.clamp(0.3F + EnchantmentHelper.getSneakingSpeedBonus(this), 0.0F, 1.0F);
       this.input.tick(this.isMovingSlowly(), f);
       this.minecraft.getTutorial().onInput(this.input);

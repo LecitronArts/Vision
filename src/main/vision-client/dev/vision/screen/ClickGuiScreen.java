@@ -93,7 +93,7 @@ public class ClickGuiScreen extends Screen {
             categoryWindowMap.get(this.category).clicked(x + 121, y + 45, 390, 329, this.mouseX, this.mouseY, button);
         }
 
-        return false;
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
@@ -115,7 +115,7 @@ public class ClickGuiScreen extends Screen {
             moveY = 0;
         }
 
-        return false;
+        return super.mouseDragged(pMouseX, pMouseY, pButton, pDragX, pDragY);
     }
 
     @Override

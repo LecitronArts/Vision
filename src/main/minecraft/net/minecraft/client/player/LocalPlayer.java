@@ -274,18 +274,15 @@ public class LocalPlayer extends AbstractClientPlayer {
             this.connection.send(new ServerboundPlayerCommandPacket(this, serverboundplayercommandpacket$action));
             this.wasShiftKeyDown = flag;
          }
-
          if (this.isControlledCamera()) {
             double d4 = eventMotion.getX() - this.xLast;
             double d0 = eventMotion.getY() - this.yLast1;
             double d1 = eventMotion.getZ() - this.zLast;
             double d2 = eventMotion.getYaw() - this.yRotLast;
             double d3 = eventMotion.getPitch() - this.xRotLast;
-
             ++this.positionReminder;
-            if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
-               this.positionReminder = positionReminder - 1; // Reverting original operation
-            }
+            if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8))
+               this.positionReminder = positionReminder - 1;
 
             double viaFixDouble ;
             if (ProtocolTranslator.getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_18)) {
@@ -302,7 +299,7 @@ public class LocalPlayer extends AbstractClientPlayer {
             boolean viaFix1_8C03s; //1.8玩家每tick都有c03
 
             if (DebugSettings.global().sendIdlePacket.isEnabled()) {
-               viaFix1_8C03s = !onGround();
+               viaFix1_8C03s = !eventMotion.onGround();
             } else {
                viaFix1_8C03s = lastOnGround;
             }
@@ -317,8 +314,7 @@ public class LocalPlayer extends AbstractClientPlayer {
                this.connection.send(new ServerboundMovePlayerPacket.Pos(eventMotion.getX(), eventMotion.getY(), eventMotion.getZ(), eventMotion.onGround()));
             } else if (flag2) {
                this.connection.send(new ServerboundMovePlayerPacket.Rot(eventMotion.getYaw(), eventMotion.getPitch(), eventMotion.onGround()));
-            } else if (viaFix1_8C03s != onGround()) {
-
+            } else if (viaFix1_8C03s != eventMotion.onGround()) {
                this.connection.send(new ServerboundMovePlayerPacket.StatusOnly(eventMotion.onGround()));
             }
 
@@ -331,7 +327,7 @@ public class LocalPlayer extends AbstractClientPlayer {
 
             if (flag2) {
                this.yRotLast = eventMotion.getYaw();
-               this.xRotLast = eventMotion.getYaw();
+               this.xRotLast = eventMotion.getPitch();
             }
 
             this.lastOnGround = eventMotion.onGround();

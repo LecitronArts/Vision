@@ -39,11 +39,7 @@ public class BlockRenderDispatcher implements ResourceManagerReloadListener {
       this.blockModelShaper = pBlockModelShaper;
       this.blockEntityRenderer = pBlockEntityRenderer;
       this.blockColors = pBlockColors;
-      if (Reflector.ForgeModelBlockRenderer_Constructor.exists()) {
-         this.modelRenderer = (ModelBlockRenderer)Reflector.newInstance(Reflector.ForgeModelBlockRenderer_Constructor, this.blockColors);
-      } else {
-         this.modelRenderer = new ModelBlockRenderer(this.blockColors);
-      }
+      this.modelRenderer = new ModelBlockRenderer(this.blockColors);
 
       this.liquidBlockRenderer = new LiquidBlockRenderer();
    }

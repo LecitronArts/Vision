@@ -1553,18 +1553,17 @@ public class LevelRenderer implements ResourceManagerReloadListener, AutoCloseab
             pPoseStack.popPose();
          }
          EntityCullingModBase.instance.skippedEntities++;
-         return;
+      } else {
+         EntityCullingModBase.instance.renderedEntities++;
+         ((Cullable) pEntity).setOutOfCamera(false);
+
+
+         double d0 = Mth.lerp(pPartialTick, pEntity.xOld, pEntity.getX());
+         double d1 = Mth.lerp(pPartialTick, pEntity.yOld, pEntity.getY());
+         double d2 = Mth.lerp(pPartialTick, pEntity.zOld, pEntity.getZ());
+         float f = Mth.lerp(pPartialTick, pEntity.yRotO, pEntity.getYRot());
+         this.entityRenderDispatcher.render(pEntity, d0 - pCamX, d1 - pCamY, d2 - pCamZ, f, pPartialTick, pPoseStack, pBufferSource, this.entityRenderDispatcher.getPackedLightCoords(pEntity, pPartialTick));
       }
-      EntityCullingModBase.instance.renderedEntities++;
-      ((Cullable) pEntity).setOutOfCamera(false);
-
-
-
-      double d0 = Mth.lerp(pPartialTick, pEntity.xOld, pEntity.getX());
-      double d1 = Mth.lerp(pPartialTick, pEntity.yOld, pEntity.getY());
-      double d2 = Mth.lerp(pPartialTick, pEntity.zOld, pEntity.getZ());
-      float f = Mth.lerp(pPartialTick, pEntity.yRotO, pEntity.getYRot());
-      this.entityRenderDispatcher.render(pEntity, d0 - pCamX, d1 - pCamY, d2 - pCamZ, f, pPartialTick, pPoseStack, pBufferSource, this.entityRenderDispatcher.getPackedLightCoords(pEntity, pPartialTick));
    }
 
 
@@ -3263,9 +3262,6 @@ public class LevelRenderer implements ResourceManagerReloadListener, AutoCloseab
             BlockState blockstate = Block.stateById(pData);
             if (!blockstate.isAir()) {
                SoundType soundtype = blockstate.getSoundType();
-               if (Reflector.IForgeBlockState_getSoundType3.exists()) {
-                  soundtype = (SoundType)Reflector.call(blockstate, Reflector.IForgeBlockState_getSoundType3, this.level, pPos, null);
-               }
 
                this.level.playLocalSound(pPos, soundtype.getBreakSound(), SoundSource.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F, false);
             }

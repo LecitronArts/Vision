@@ -94,16 +94,6 @@ public class Screenshot {
       }
 
       Object object = null;
-      if (Reflector.ForgeHooksClient_onScreenshot.exists()) {
-         object = Reflector.call(Reflector.ForgeHooksClient_onScreenshot, nativeimage, file2);
-         if (Reflector.callBoolean(object, Reflector.Event_isCanceled)) {
-            Component component = (Component)Reflector.call(object, Reflector.ScreenshotEvent_getCancelMessage);
-            pMessageConsumer.accept(component);
-            return;
-         }
-
-         file2 = (File)Reflector.call(object, Reflector.ScreenshotEvent_getScreenshotFile);
-      }
 
       File file3 = file2;
       Object object1 = object;

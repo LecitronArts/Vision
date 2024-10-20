@@ -40,11 +40,7 @@ public class BossHealthOverlay {
             int k = i / 2 - 91;
             boolean flag = true;
             int l = 19;
-            if (Reflector.ForgeHooksClient_onCustomizeBossEventProgress.exists()) {
-               Object object = Reflector.ForgeHooksClient_onCustomizeBossEventProgress.call(pGuiGraphics, this.minecraft.getWindow(), lerpingbossevent, k, j, 10 + 9);
-               flag = !Reflector.callBoolean(object, Reflector.Event_isCanceled);
-               l = Reflector.callInt(object, Reflector.CustomizeGuiOverlayEvent_BossEventProgress_getIncrement);
-            }
+
 
             if (flag) {
                this.drawBar(pGuiGraphics, k, j, lerpingbossevent);

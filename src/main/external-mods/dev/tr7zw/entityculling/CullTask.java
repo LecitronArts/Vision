@@ -82,7 +82,7 @@ public class CullTask implements Runnable {
         if (disableEntityCulling) {
             return;
         }
-        Entity entity = null;
+        Entity entity;
         Iterator<Entity> iterable = client.level.entitiesForRendering().iterator();
         while (iterable.hasNext()) {
             try {

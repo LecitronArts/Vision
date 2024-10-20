@@ -335,19 +335,13 @@ public class LiquidBlockRenderer {
                   float f44 = 0.0F;
                   float f45 = 0.0F;
                   boolean flag9 = !flag;
-                  if (Reflector.IForgeBlockState_shouldDisplayFluidOverlay.exists()) {
-                     flag9 = atextureatlassprite[2] != null;
-                  }
+
 
                   if (flag9) {
                      BlockState blockstate7 = pLevel.getBlockState(blockpos4);
                      Block block = blockstate7.getBlock();
-                     boolean flag10 = false;
-                     if (Reflector.IForgeBlockState_shouldDisplayFluidOverlay.exists()) {
-                        flag10 = Reflector.callBoolean(blockstate7, Reflector.IForgeBlockState_shouldDisplayFluidOverlay, pLevel, blockpos4, pFluidState);
-                     }
 
-                     if (flag10 || block instanceof HalfTransparentBlock || block instanceof LeavesBlock || block == Blocks.BEACON) {
+                      if (block instanceof HalfTransparentBlock || block instanceof LeavesBlock || block == Blocks.BEACON) {
                         textureatlassprite2 = this.waterOverlay;
                      }
 

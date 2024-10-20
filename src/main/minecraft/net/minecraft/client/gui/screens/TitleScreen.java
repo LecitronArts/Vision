@@ -305,23 +305,7 @@ public class TitleScreen extends Screen {
             s = s + I18n.get("menu.modded");
          }
 
-         if (Reflector.BrandingControl.exists()) {
-            if (Reflector.BrandingControl_forEachLine.exists()) {
-               BiConsumer<Integer, String> biconsumer = (brdline, brd) -> {
-                  pGuiGraphics.drawString(this.font, brd, 2, this.height - (10 + brdline * (9 + 1)), 16777215 | i);
-               };
-               Reflector.call(Reflector.BrandingControl_forEachLine, true, true, biconsumer);
-            }
-
-            if (Reflector.BrandingControl_forEachAboveCopyrightLine.exists()) {
-               BiConsumer<Integer, String> biconsumer1 = (brdline, brd) -> {
-                  pGuiGraphics.drawString(this.font, brd, this.width - this.font.width(brd), this.height - (10 + (brdline + 1) * (9 + 1)), 16777215 | i);
-               };
-               Reflector.call(Reflector.BrandingControl_forEachAboveCopyrightLine, biconsumer1);
-            }
-         } else {
-            pGuiGraphics.drawString(this.font, s, 2, this.height - 10, 16777215 | i);
-         }
+         pGuiGraphics.drawString(this.font, s, 2, this.height - 10, 16777215 | i);
 
          for(GuiEventListener guieventlistener : this.children()) {
             if (guieventlistener instanceof AbstractWidget) {

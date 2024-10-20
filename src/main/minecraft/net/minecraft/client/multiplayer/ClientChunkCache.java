@@ -63,10 +63,6 @@ public class ClientChunkCache extends ChunkSource implements IClientChunkProvide
          int i = this.storage.getIndex(pChunkPos.x, pChunkPos.z);
          LevelChunk levelchunk = this.storage.getChunk(i);
          if (isValidChunk(levelchunk, pChunkPos.x, pChunkPos.z)) {
-            if (Reflector.ChunkEvent_Unload_Constructor.exists()) {
-               Reflector.postForgeBusEvent(Reflector.ChunkEvent_Unload_Constructor, levelchunk);
-            }
-
             levelchunk.setLoaded(false);
             this.storage.replace(i, levelchunk, (LevelChunk)null);
          }
@@ -127,9 +123,6 @@ public class ClientChunkCache extends ChunkSource implements IClientChunkProvide
          }
 
          this.level.onChunkLoaded(chunkpos);
-         if (Reflector.ChunkEvent_Load_Constructor.exists()) {
-            Reflector.postForgeBusEvent(Reflector.ChunkEvent_Load_Constructor, levelchunk, false);
-         }
 
          levelchunk.setLoaded(true);
          return levelchunk;

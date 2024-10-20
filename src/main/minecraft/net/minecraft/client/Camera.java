@@ -214,12 +214,7 @@ public class Camera {
       if (!this.initialized) {
          return Blocks.AIR.defaultBlockState();
       } else {
-         BlockState blockstate = this.level.getBlockState(this.blockPosition);
-         if (Reflector.IForgeBlockState_getStateAtViewpoint.exists()) {
-            blockstate = (BlockState)Reflector.call(blockstate, Reflector.IForgeBlockState_getStateAtViewpoint, this.level, this.blockPosition, this.position);
-         }
-
-         return blockstate;
+         return this.level.getBlockState(this.blockPosition);
       }
    }
 

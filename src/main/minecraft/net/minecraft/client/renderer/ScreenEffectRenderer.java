@@ -34,16 +34,7 @@ public class ScreenEffectRenderer {
    public static void renderScreenEffect(Minecraft pMinecraft, PoseStack pPoseStack) {
       Player player = pMinecraft.player;
       if (!player.noPhysics) {
-         if (Reflector.ForgeHooksClient_renderBlockOverlay.exists() && Reflector.ForgeBlockModelShapes_getTexture3.exists()) {
-            Pair<BlockState, BlockPos> pair = getOverlayBlock(player);
-            if (pair != null) {
-               Object object = Reflector.getFieldValue(Reflector.RenderBlockScreenEffectEvent_OverlayType_BLOCK);
-               if (!Reflector.ForgeHooksClient_renderBlockOverlay.callBoolean(player, pPoseStack, object, pair.getLeft(), pair.getRight())) {
-                  TextureAtlasSprite textureatlassprite = (TextureAtlasSprite)Reflector.call(pMinecraft.getBlockRenderer().getBlockModelShaper(), Reflector.ForgeBlockModelShapes_getTexture3, pair.getLeft(), pMinecraft.level, pair.getRight());
-                  renderTex(textureatlassprite, pPoseStack);
-               }
-            }
-         } else {
+         {
             BlockState blockstate = getViewBlockingState(player);
             if (blockstate != null) {
                renderTex(pMinecraft.getBlockRenderer().getBlockModelShaper().getParticleIcon(blockstate), pPoseStack);

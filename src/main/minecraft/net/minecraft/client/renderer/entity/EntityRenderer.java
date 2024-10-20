@@ -71,20 +71,8 @@ public abstract class EntityRenderer<T extends Entity> implements IEntityRendere
    }
 
    public void render(T pEntity, float pEntityYaw, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
-      if (!Reflector.RenderNameTagEvent_Constructor.exists()) {
-         if (this.shouldShowName(pEntity)) {
-            this.renderNameTag(pEntity, pEntity.getDisplayName(), pPoseStack, pBuffer, pPackedLight);
-         }
-
-      } else {
-         Object object = Reflector.newInstance(Reflector.RenderNameTagEvent_Constructor, pEntity, pEntity.getDisplayName(), this, pPoseStack, pBuffer, pPackedLight, pPartialTick);
-         Reflector.postForgeBusEvent(object);
-         Object object1 = Reflector.call(object, Reflector.Event_getResult);
-         if (object1 != ReflectorForge.EVENT_RESULT_DENY && (object1 == ReflectorForge.EVENT_RESULT_ALLOW || this.shouldShowName(pEntity))) {
-            Component component = (Component)Reflector.call(object, Reflector.RenderNameTagEvent_getContent);
-            this.renderNameTag(pEntity, component, pPoseStack, pBuffer, pPackedLight);
-         }
-
+      if (this.shouldShowName(pEntity)) {
+         this.renderNameTag(pEntity, pEntity.getDisplayName(), pPoseStack, pBuffer, pPackedLight);
       }
    }
 

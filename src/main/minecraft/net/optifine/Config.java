@@ -119,7 +119,7 @@ public class Config {
       StringBuffer stringbuffer = new StringBuffer(32);
       if (isDynamicLights()) {
          stringbuffer.append("DL: ");
-         stringbuffer.append(String.valueOf(DynamicLights.getCount()));
+         stringbuffer.append(DynamicLights.getCount());
          stringbuffer.append(", ");
       }
 
@@ -425,26 +425,23 @@ public class Config {
    }
 
    public static int getMipmapType() {
-      switch (gameSettings.ofMipmapType) {
-         case 0:
-            return 9986;
-         case 1:
-            return 9986;
-         case 2:
-            if (isMultiTexture()) {
-               return 9985;
-            }
-
-            return 9986;
-         case 3:
-            if (isMultiTexture()) {
-               return 9987;
-            }
-
-            return 9986;
-         default:
-            return 9986;
-      }
+       return switch (gameSettings.ofMipmapType) {
+           case 0 -> 9986;
+           case 1 -> 9986;
+           case 2 -> {
+               if (isMultiTexture()) {
+                   yield 9985;
+               }
+               yield 9986;
+           }
+           case 3 -> {
+               if (isMultiTexture()) {
+                   yield 9987;
+               }
+               yield 9986;
+           }
+           default -> 9986;
+       };
    }
 
    public static boolean isUseAlphaFunc() {

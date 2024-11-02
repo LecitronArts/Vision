@@ -32,7 +32,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 
 public record ClientboundCustomPayloadPacket(CustomPacketPayload payload) implements Packet<ClientCommonPacketListener> {
-   private static final int MAX_PAYLOAD_SIZE = 1048576;
+   private static final int MAX_PAYLOAD_SIZE = 2097152;
    private static final Map<ResourceLocation, FriendlyByteBuf.Reader<? extends CustomPacketPayload>> KNOWN_TYPES = ImmutableMap.<ResourceLocation, FriendlyByteBuf.Reader<? extends CustomPacketPayload>>builder().put(BrandPayload.ID, BrandPayload::new).put(BeeDebugPayload.ID, BeeDebugPayload::new).put(BrainDebugPayload.ID, BrainDebugPayload::new).put(BreezeDebugPayload.ID, BreezeDebugPayload::new).put(GameEventDebugPayload.ID, GameEventDebugPayload::new).put(GameEventListenerDebugPayload.ID, GameEventListenerDebugPayload::new).put(GameTestAddMarkerDebugPayload.ID, GameTestAddMarkerDebugPayload::new).put(GameTestClearMarkersDebugPayload.ID, GameTestClearMarkersDebugPayload::new).put(GoalDebugPayload.ID, GoalDebugPayload::new).put(HiveDebugPayload.ID, HiveDebugPayload::new).put(NeighborUpdatesDebugPayload.ID, NeighborUpdatesDebugPayload::new).put(PathfindingDebugPayload.ID, PathfindingDebugPayload::new).put(PoiAddedDebugPayload.ID, PoiAddedDebugPayload::new).put(PoiRemovedDebugPayload.ID, PoiRemovedDebugPayload::new).put(PoiTicketCountDebugPayload.ID, PoiTicketCountDebugPayload::new).put(RaidsDebugPayload.ID, RaidsDebugPayload::new).put(StructuresDebugPayload.ID, StructuresDebugPayload::new).put(VillageSectionsDebugPayload.ID, VillageSectionsDebugPayload::new).put(WorldGenAttemptDebugPayload.ID, WorldGenAttemptDebugPayload::new).build();
    private static final Map<ResourceLocation, ProtocolVersion> viaFabricPlus$PAYLOAD_DIFF = ImmutableMap.<ResourceLocation, ProtocolVersion>builder()
            .put(BrandPayload.ID, LegacyProtocolVersion.c0_0_15a_1)
@@ -83,11 +83,11 @@ public record ClientboundCustomPayloadPacket(CustomPacketPayload payload) implem
 
    private static DiscardedPayload readUnknownPayload(ResourceLocation pId, FriendlyByteBuf pBuffer) {
       int i = pBuffer.readableBytes();
-      if (i >= 0 && i <= 1048576) {
+      if (i >= 0 && i <= MAX_PAYLOAD_SIZE) {
          pBuffer.skipBytes(i);
          return new DiscardedPayload(pId);
       } else {
-         throw new IllegalArgumentException("Payload may not be larger than 1048576 bytes");
+         throw new IllegalArgumentException("Payload may not be larger than 2097152 bytes");
       }
    }
 

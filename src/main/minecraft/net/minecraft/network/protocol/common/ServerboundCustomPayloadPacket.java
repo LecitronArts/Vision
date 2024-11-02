@@ -10,7 +10,7 @@ import net.minecraft.network.protocol.common.custom.DiscardedPayload;
 import net.minecraft.resources.ResourceLocation;
 
 public record ServerboundCustomPayloadPacket(CustomPacketPayload payload) implements Packet<ServerCommonPacketListener> {
-   private static final int MAX_PAYLOAD_SIZE = 32767;
+   private static final int MAX_PAYLOAD_SIZE = 65536;
    private static final Map<ResourceLocation, FriendlyByteBuf.Reader<? extends CustomPacketPayload>> KNOWN_TYPES = ImmutableMap.<ResourceLocation, FriendlyByteBuf.Reader<? extends CustomPacketPayload>>builder().put(BrandPayload.ID, BrandPayload::new).build();
 
    public ServerboundCustomPayloadPacket(FriendlyByteBuf pBuffer) {
@@ -24,7 +24,7 @@ public record ServerboundCustomPayloadPacket(CustomPacketPayload payload) implem
 
    private static DiscardedPayload readUnknownPayload(ResourceLocation pId, FriendlyByteBuf pBuffer) {
       int i = pBuffer.readableBytes();
-      if (i >= 0 && i <= 32767) {
+      if (i >= 0 && i <= MAX_PAYLOAD_SIZE) {
          pBuffer.skipBytes(i);
          return new DiscardedPayload(pId);
       } else {

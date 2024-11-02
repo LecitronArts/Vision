@@ -496,7 +496,7 @@ public class FriendlyByteBuf extends ByteBuf {
    }
 
    public Component readComponent() {
-      return this.readWithCodec(NbtOps.INSTANCE, ComponentSerialization.CODEC, NbtAccounter.create(2097152L));
+      return this.readWithCodec(NbtOps.INSTANCE, ComponentSerialization.CODEC, NbtAccounter.create(4194304L));
    }
 
    public Component readComponentTrusted() {
@@ -568,7 +568,7 @@ public class FriendlyByteBuf extends ByteBuf {
 
    @Nullable
    public CompoundTag readNbt() {
-      Tag tag = this.readNbt(NbtAccounter.create(2097152L));
+      Tag tag = this.readNbt(NbtAccounter.create(4194304L));
       if (tag != null && !(tag instanceof CompoundTag)) {
          throw new DecoderException("Not a compound tag: " + tag);
       } else {

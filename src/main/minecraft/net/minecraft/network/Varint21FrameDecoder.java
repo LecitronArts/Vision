@@ -9,21 +9,22 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 public class Varint21FrameDecoder extends ByteToMessageDecoder {
-   private static final int MAX_VARINT21_BYTES = 3;
+   private static final int MAX_VARINT21_BYTES = 8;
    private final ByteBuf helperBuf = Unpooled.directBuffer(3);
    @Nullable
    private final BandwidthDebugMonitor monitor;
+   private final ByteBuf packetFixer$helperBuf = Unpooled.directBuffer(MAX_VARINT21_BYTES);
 
    public Varint21FrameDecoder(@Nullable BandwidthDebugMonitor pMonitor) {
       this.monitor = pMonitor;
    }
 
    protected void handlerRemoved0(ChannelHandlerContext pContext) {
-      this.helperBuf.release();
+      this.packetFixer$helperBuf.release();
    }
 
    private static boolean copyVarint(ByteBuf pIn, ByteBuf pOut) {
-      for(int i = 0; i < 3; ++i) {
+      for(int i = 0; i < MAX_VARINT21_BYTES; ++i) {
          if (!pIn.isReadable()) {
             return false;
          }
@@ -38,21 +39,21 @@ public class Varint21FrameDecoder extends ByteToMessageDecoder {
       throw new CorruptedFrameException("length wider than 21-bit");
    }
 
-   protected void decode(ChannelHandlerContext pContext, ByteBuf pIn, List<Object> pOut) {
-      pIn.markReaderIndex();
-      this.helperBuf.clear();
-      if (!copyVarint(pIn, this.helperBuf)) {
-         pIn.resetReaderIndex();
+   protected void decode(ChannelHandlerContext context, ByteBuf byteBuf, List<Object> list) {
+      byteBuf.markReaderIndex();
+      this.packetFixer$helperBuf.clear();
+      if (!copyVarint(byteBuf, this.packetFixer$helperBuf)) {
+         byteBuf.resetReaderIndex();
       } else {
-         int i = VarInt.read(this.helperBuf);
-         if (pIn.readableBytes() < i) {
-            pIn.resetReaderIndex();
+         int i = VarInt.read(this.packetFixer$helperBuf);
+         if (byteBuf.readableBytes() < i) {
+            byteBuf.resetReaderIndex();
          } else {
             if (this.monitor != null) {
                this.monitor.onReceive(i + VarInt.getByteSize(i));
             }
 
-            pOut.add(pIn.readBytes(i));
+            list.add(byteBuf.readBytes(i));
          }
       }
    }

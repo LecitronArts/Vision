@@ -11,7 +11,7 @@ import java.util.zip.Inflater;
 
 public class CompressionDecoder extends ByteToMessageDecoder {
    public static final int MAXIMUM_COMPRESSED_LENGTH = 2097152;
-   public static final int MAXIMUM_UNCOMPRESSED_LENGTH = 8388608;
+   public static final int MAXIMUM_UNCOMPRESSED_LENGTH = 33554432;
    private final Inflater inflater;
    private int threshold;
    private boolean validateDecompressed;
@@ -33,7 +33,7 @@ public class CompressionDecoder extends ByteToMessageDecoder {
                   throw new DecoderException("Badly compressed packet - size of " + i + " is below server threshold of " + this.threshold);
                }
 
-               if (i > 8388608) {
+               if (i > MAXIMUM_UNCOMPRESSED_LENGTH) {
                   throw new DecoderException("Badly compressed packet - size of " + i + " is larger than protocol maximum of 8388608");
                }
             }

@@ -40,8 +40,8 @@ public class PacketEncoder extends MessageToByteEncoder<Packet<?>> {
                int j = friendlybytebuf.writerIndex();
                p_130546_.write(friendlybytebuf);
                int k = friendlybytebuf.writerIndex() - j;
-               if (k > 8388608) {
-                  throw new IllegalArgumentException("Packet too big (is " + k + ", should be less than 8388608): " + p_130546_);
+               if (k > 33554432) {
+                  throw new IllegalArgumentException("Packet too big (is " + k + ", should be less than 33554432): " + p_130546_);
                }
 
                JvmProfiler.INSTANCE.onPacketSent(codecdata.protocol(), i, p_130545_.channel().remoteAddress(), k);

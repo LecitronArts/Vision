@@ -8,13 +8,13 @@ import io.netty.handler.codec.MessageToByteEncoder;
 
 @Sharable
 public class Varint21LengthFieldPrepender extends MessageToByteEncoder<ByteBuf> {
-   public static final int MAX_VARINT21_BYTES = 3;
+   public static final int MAX_VARINT21_BYTES = 8;
 
    protected void encode(ChannelHandlerContext pContext, ByteBuf pEncoder, ByteBuf pDecoder) {
       int i = pEncoder.readableBytes();
       int j = VarInt.getByteSize(i);
-      if (j > 3) {
-         throw new EncoderException("unable to fit " + i + " into 3");
+      if (j > MAX_VARINT21_BYTES) {
+         throw new EncoderException("unable to fit " + i + " into 8");
       } else {
          pDecoder.ensureWritable(j + i);
          VarInt.write(pDecoder, i);

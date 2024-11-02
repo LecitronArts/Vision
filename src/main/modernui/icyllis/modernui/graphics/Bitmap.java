@@ -437,7 +437,7 @@ public final class Bitmap implements AutoCloseable {
         if (mPixels == null) {
             throw new IllegalStateException("Can't call getRowStride() on a recycled bitmap");
         }
-        return mPixmap.getRowStride();
+        return mPixmap.getRowBytes();
     }
 
     /**

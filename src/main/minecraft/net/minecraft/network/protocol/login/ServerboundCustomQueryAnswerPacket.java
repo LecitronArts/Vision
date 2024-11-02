@@ -7,7 +7,7 @@ import net.minecraft.network.protocol.login.custom.CustomQueryAnswerPayload;
 import net.minecraft.network.protocol.login.custom.DiscardedQueryAnswerPayload;
 
 public record ServerboundCustomQueryAnswerPacket(int transactionId, @Nullable CustomQueryAnswerPayload payload) implements Packet<ServerLoginPacketListener> {
-   private static final int MAX_PAYLOAD_SIZE = 1048576;
+   private static final int MAX_PAYLOAD_SIZE = 2097152;
 
    public static ServerboundCustomQueryAnswerPacket read(FriendlyByteBuf pBuffer) {
       int i = pBuffer.readVarInt();
@@ -20,11 +20,11 @@ public record ServerboundCustomQueryAnswerPacket(int transactionId, @Nullable Cu
 
    private static CustomQueryAnswerPayload readUnknownPayload(FriendlyByteBuf pBuffer) {
       int i = pBuffer.readableBytes();
-      if (i >= 0 && i <= 1048576) {
+      if (i >= 0 && i <= MAX_PAYLOAD_SIZE) {
          pBuffer.skipBytes(i);
          return DiscardedQueryAnswerPayload.INSTANCE;
       } else {
-         throw new IllegalArgumentException("Payload may not be larger than 1048576 bytes");
+         throw new IllegalArgumentException("Payload may not be larger than 2097152 bytes");
       }
    }
 

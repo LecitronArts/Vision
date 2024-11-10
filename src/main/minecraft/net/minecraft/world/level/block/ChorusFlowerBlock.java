@@ -236,4 +236,8 @@ public class ChorusFlowerBlock extends Block {
       }
 
    }
+
+   public boolean skipRendering(BlockState state, BlockState adjacentState, Direction direction) {
+      return adjacentState.is(this) || super.skipRendering(state, adjacentState, direction);
+   }
 }

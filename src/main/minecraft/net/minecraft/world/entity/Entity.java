@@ -160,7 +160,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
    protected int boardingCooldown;
    @Nullable
    private Entity vehicle;
-   private Level level;
+   public Level level;
    public double xo;
    public double yo;
    public double zo;

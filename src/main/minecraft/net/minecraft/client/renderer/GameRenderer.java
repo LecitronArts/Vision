@@ -649,7 +649,6 @@ public class GameRenderer implements AutoCloseable {
          list1.add(Pair.of(new ShaderInstance(pResourceProvider, "rendertype_breeze_wind", DefaultVertexFormat.NEW_ENTITY), (p_304052_0_) -> {
             rendertypeBreezeWindShader = p_304052_0_;
          }));
-         ReflectorForge.postModLoaderEvent(Reflector.RegisterShadersEvent_Constructor, pResourceProvider, list1);
       } catch (IOException ioexception) {
          list1.forEach((p_172728_0_) -> {
             p_172728_0_.getFirst().close();

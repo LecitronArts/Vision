@@ -113,23 +113,11 @@ public class BlockRenderDispatcher implements ResourceManagerReloadListener {
                float f = (float)(i >> 16 & 255) / 255.0F;
                float f1 = (float)(i >> 8 & 255) / 255.0F;
                float f2 = (float)(i & 255) / 255.0F;
-               if (Reflector.ForgeHooksClient.exists()) {
-                  for(RenderType rendertype : bakedmodel.getRenderTypes(blockStateIn, RandomSource.create(42L), modelData)) {
-                     this.modelRenderer.renderModel(matrixStackIn.last(), bufferTypeIn.getBuffer(renderType != null ? renderType : RenderTypeHelper.getEntityRenderType(rendertype, false)), blockStateIn, bakedmodel, f, f1, f2, combinedLightIn, combinedOverlayIn, modelData, rendertype);
-                  }
-               } else {
-                  this.modelRenderer.renderModel(matrixStackIn.last(), bufferTypeIn.getBuffer(ItemBlockRenderTypes.getRenderType(blockStateIn, false)), blockStateIn, bakedmodel, f, f1, f2, combinedLightIn, combinedOverlayIn);
-               }
+               this.modelRenderer.renderModel(matrixStackIn.last(), bufferTypeIn.getBuffer(ItemBlockRenderTypes.getRenderType(blockStateIn, false)), blockStateIn, bakedmodel, f, f1, f2, combinedLightIn, combinedOverlayIn);
+
                break;
             case ENTITYBLOCK_ANIMATED:
-               if (Reflector.MinecraftForge.exists()) {
-                  ItemStack itemstack = new ItemStack(blockStateIn.getBlock());
-                  IClientItemExtensions iclientitemextensions = IClientItemExtensions.of(itemstack);
-                  BlockEntityWithoutLevelRenderer blockentitywithoutlevelrenderer = iclientitemextensions.getCustomRenderer();
-                  blockentitywithoutlevelrenderer.renderByItem(itemstack, ItemDisplayContext.NONE, matrixStackIn, bufferTypeIn, combinedLightIn, combinedOverlayIn);
-               } else {
-                  this.blockEntityRenderer.renderByItem(new ItemStack(blockStateIn.getBlock()), ItemDisplayContext.NONE, matrixStackIn, bufferTypeIn, combinedLightIn, combinedOverlayIn);
-               }
+               this.blockEntityRenderer.renderByItem(new ItemStack(blockStateIn.getBlock()), ItemDisplayContext.NONE, matrixStackIn, bufferTypeIn, combinedLightIn, combinedOverlayIn);
          }
       }
 

@@ -76,7 +76,6 @@ import net.optifine.CustomColors;
 import net.optifine.reflect.Reflector;
 import net.optifine.render.RenderEnv;
 import org.slf4j.Logger;
-import org.spongepowered.asm.mixin.gen.Accessor;
 
 public class ParticleEngine implements PreparableReloadListener {
     private static final Logger LOGGER = LogUtils.getLogger();

@@ -218,4 +218,7 @@ public class BambooStalkBlock extends Block implements BonemealableBlock {
 
       return i;
    }
+   public boolean skipRendering(BlockState state, BlockState adjacentState, Direction direction) {
+      return adjacentState.is(this) || super.skipRendering(state, adjacentState, direction);
+   }
 }

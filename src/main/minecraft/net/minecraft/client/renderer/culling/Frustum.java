@@ -1,7 +1,6 @@
 package net.minecraft.client.renderer.culling;
 
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.common.extensions.IForgeBlockEntity;
 import net.optifine.util.MathUtils;
 import org.joml.FrustumIntersection;
 import org.joml.Matrix4f;
@@ -87,10 +86,10 @@ public class Frustum {
    }
 
    public boolean isVisible(AABB pAabb) {
-      return pAabb == IForgeBlockEntity.INFINITE_EXTENT_AABB ? true : this.cubeInFrustum(pAabb.minX, pAabb.minY, pAabb.minZ, pAabb.maxX, pAabb.maxY, pAabb.maxZ);
+      return this.cubeInFrustum(pAabb.minX, pAabb.minY, pAabb.minZ, pAabb.maxX, pAabb.maxY, pAabb.maxZ);
    }
 
-   private boolean cubeInFrustum(double pMinX, double pMinY, double pMinZ, double pMaxX, double pMaxY, double pMaxZ) {
+   public boolean cubeInFrustum(double pMinX, double pMinY, double pMinZ, double pMaxX, double pMaxY, double pMaxZ) {
       if (this.disabled) {
          return true;
       } else {

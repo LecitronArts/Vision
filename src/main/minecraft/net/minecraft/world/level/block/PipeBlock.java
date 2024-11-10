@@ -88,4 +88,8 @@ public abstract class PipeBlock extends Block {
 
       return i;
    }
+
+   public boolean skipRendering(BlockState state, BlockState adjacentState, Direction direction) {
+      return adjacentState.is(this) || super.skipRendering(state, adjacentState, direction);
+   }
 }

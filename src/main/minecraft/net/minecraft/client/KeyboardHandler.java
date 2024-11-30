@@ -556,7 +556,6 @@ public class KeyboardHandler implements IMouseKeyboard {
          }
       }
 
-      Reflector.ForgeHooksClient_onKeyInput.call(pKey, pScanCode, pAction, pModifiers);
    }
 
    private void charTyped(long pWindowPointer, int pCodePoint, int pModifiers) {

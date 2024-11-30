@@ -6,10 +6,17 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 
+import com.ibm.icu.text.BreakIterator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import icyllis.modernui.core.UndoManager;
+import icyllis.modernui.core.UndoOwner;
+import icyllis.modernui.mc.EditBoxEditAction;
+import icyllis.modernui.mc.IModernEditBox;
+import icyllis.modernui.mc.MuiModApi;
 import icyllis.modernui.mc.text.TextLayout;
 import icyllis.modernui.mc.text.TextLayoutEngine;
 import icyllis.modernui.mc.text.VanillaTextWrapper;
+import icyllis.modernui.text.method.WordIterator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.Util;
@@ -32,9 +39,11 @@ import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.joml.Matrix4f;
+import org.lwjgl.glfw.GLFW;
+import org.spongepowered.asm.mixin.Unique;
 
 @OnlyIn(Dist.CLIENT)
-public class EditBox extends AbstractWidget implements Renderable {
+public class EditBox extends AbstractWidget implements Renderable, IModernEditBox {
    private static final WidgetSprites SPRITES = new WidgetSprites(new ResourceLocation("widget/text_field"), new ResourceLocation("widget/text_field_highlighted"));
    public static final int BACKWARDS = -1;
    public static final int FORWARDS = 1;
@@ -66,6 +75,10 @@ public class EditBox extends AbstractWidget implements Renderable {
    @Nullable
    private Component hint;
    private long focusedTime = Util.getMillis();
+
+   private WordIterator modernUI_MC$wordIterator;
+   private long modernUI_MC$lastInsertTextNanos;
+   private final UndoManager modernUI_MC$undoManager = new UndoManager();
 
    public EditBox(Font pFont, int pWidth, int pHeight, Component pMessage) {
       this(pFont, 0, 0, pWidth, pHeight, pMessage);
@@ -101,8 +114,38 @@ public class EditBox extends AbstractWidget implements Renderable {
    public void setValue(String pText) {
       if (this.filter.test(pText)) {
          if (pText.length() > this.maxLength) {
+            if (modernUI_MC$undoManager.isInUndo()) {
+               return;
+            }
+            if (value.isEmpty() && pText.isEmpty()) {
+               return;
+            }
+            // we see this operation as Replace
+            EditBoxEditAction edit = new EditBoxEditAction(
+                    modernUI_MC$undoOwner(),
+                    cursorPos,
+                    /*oldText*/ value,
+                    0,
+                    /*newText*/ pText
+            );
+            modernUI_MC$addEdit(edit, false);
             this.value = pText.substring(0, this.maxLength);
          } else {
+            if (modernUI_MC$undoManager.isInUndo()) {
+               return;
+            }
+            if (value.isEmpty() && pText.isEmpty()) {
+               return;
+            }
+            // we see this operation as Replace
+            EditBoxEditAction edit = new EditBoxEditAction(
+                    modernUI_MC$undoOwner(),
+                    cursorPos,
+                    /*oldText*/ value,
+                    0,
+                    /*newText*/ pText
+            );
+            modernUI_MC$addEdit(edit, false);
             this.value = pText;
          }
 
@@ -148,6 +191,31 @@ public class EditBox extends AbstractWidget implements Renderable {
 
          String s1 = (new StringBuilder(this.value)).replace(i, j, s).toString();
          if (this.filter.test(s1)) {
+            if (modernUI_MC$undoManager.isInUndo()) {
+               return;
+            }
+            String oldText = value.substring(i, j);
+            if (oldText.isEmpty() && pTextToWrite.isEmpty()) {
+               return;
+            }
+            EditBoxEditAction edit = new EditBoxEditAction(
+                    modernUI_MC$undoOwner(),
+                    cursorPos,
+                    oldText,
+                    i,
+                    /*newText*/ pTextToWrite
+            );
+            final long nanos = Util.getNanos();
+            final boolean mergeInsert;
+            // Minecraft split IME batch commit and even a single code point into code units,
+            // if two charTyped() occur at the same time (<= 3ms), try to merge (concat) them.
+            if (modernUI_MC$lastInsertTextNanos >= nanos - 3_000_000) {
+               mergeInsert = true;
+            } else {
+               modernUI_MC$lastInsertTextNanos = nanos;
+               mergeInsert = false;
+            }
+            modernUI_MC$addEdit(edit, mergeInsert);
             this.value = s1;
             this.setCursorPosition(i + l);
             this.setHighlightPos(this.cursorPos);
@@ -196,12 +264,43 @@ public class EditBox extends AbstractWidget implements Renderable {
             if (i != j) {
                String s = (new StringBuilder(this.value)).delete(i, j).toString();
                if (this.filter.test(s)) {
+                  if (modernUI_MC$undoManager.isInUndo()) {
+                     return;
+                  }
+                  String oldText = value.substring(j, pNum);
+                  if (oldText.isEmpty()) {
+                     return;
+                  }
+                  EditBoxEditAction edit = new EditBoxEditAction(
+                          modernUI_MC$undoOwner(),
+                          /*cursorPos*/ cursorPos,
+                          oldText,
+                          j,
+                          ""
+                  );
+                  modernUI_MC$addEdit(edit, false);
                   this.value = s;
                   this.moveCursorTo(i, false);
                }
             }
          }
       }
+   }
+   public void modernUI_MC$addEdit(EditBoxEditAction edit, boolean mergeInsert) {
+      final UndoManager mgr = modernUI_MC$undoManager;
+      mgr.beginUpdate("addEdit");
+      EditBoxEditAction lastEdit = mgr.getLastOperation(
+              EditBoxEditAction.class,
+              edit.getOwner(),
+              UndoManager.MERGE_MODE_UNIQUE
+      );
+      if (lastEdit == null) {
+         mgr.addOperation(edit, UndoManager.MERGE_MODE_NONE);
+      } else if (!mergeInsert || !lastEdit.mergeInsertWith(edit)) {
+         mgr.commitState(edit.getOwner());
+         mgr.addOperation(edit, UndoManager.MERGE_MODE_NONE);
+      }
+      mgr.endUpdate();
    }
 
    public int getWordPosition(int pNumWords) {
@@ -212,10 +311,28 @@ public class EditBox extends AbstractWidget implements Renderable {
       return this.getWordPosition(pNumWords, pPos, true);
    }
 
-   private int getWordPosition(int pNumWords, int pPos, boolean pSkipConsecutiveSpaces) {
-      int i = pPos;
-      boolean flag = pNumWords < 0;
-      int j = Math.abs(pNumWords);
+   private int getWordPosition(int dir, int cursor, boolean pSkipConsecutiveSpaces) {
+      if ((dir == -1 || dir == 1) && !value.startsWith("/")) {
+         WordIterator wordIterator = modernUI_MC$wordIterator;
+         if (wordIterator == null) {
+            modernUI_MC$wordIterator = wordIterator = new WordIterator();
+         }
+         wordIterator.setCharSequence(value, cursor, cursor);
+         int offset;
+         if (dir == -1) {
+            offset = wordIterator.preceding(cursor);
+         } else {
+            offset = wordIterator.following(cursor);
+         }
+         if (offset != BreakIterator.DONE) {
+            return (offset);
+         } else {
+            return (cursor);
+         }
+      }
+      int i = cursor;
+      boolean flag = dir < 0;
+      int j = Math.abs(dir);
 
       for(int k = 0; k < j; ++k) {
          if (!flag) {
@@ -247,7 +364,7 @@ public class EditBox extends AbstractWidget implements Renderable {
    }
 
    private int getCursorPos(int pDelta) {
-      return Util.offsetByCodepoints(this.value, this.cursorPos, pDelta);
+      return MuiModApi.offsetByGrapheme(value, cursorPos, pDelta);
    }
 
    public void moveCursorTo(int pDelta, boolean pSelect) {
@@ -262,6 +379,7 @@ public class EditBox extends AbstractWidget implements Renderable {
    public void setCursorPosition(int pPos) {
       this.cursorPos = Mth.clamp(pPos, 0, this.value.length());
       this.scrollTo(this.cursorPos);
+      focusedTime = Util.getMillis();
    }
 
    public void moveCursorToStart(boolean pSelect) {
@@ -274,6 +392,29 @@ public class EditBox extends AbstractWidget implements Renderable {
 
    public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
       if (this.isActive() && this.isFocused()) {
+         if (pKeyCode == GLFW.GLFW_KEY_Z || pKeyCode == GLFW.GLFW_KEY_Y) {
+            if (Screen.hasControlDown() && !Screen.hasAltDown()) {
+               if (!Screen.hasShiftDown()) {
+                  UndoOwner[] owners = {modernUI_MC$undoOwner()};
+                  if (pKeyCode == GLFW.GLFW_KEY_Z) {
+                     // CTRL+Z
+                     if (modernUI_MC$undoManager.countUndos(owners) > 0) {
+                        modernUI_MC$undoManager.undo(owners, 1);
+                        return true;
+                     }
+                  } else if (modernUI_MC$tryRedo(owners)) {
+                     // CTRL+Y
+                     return true;
+                  }
+               } else if (pKeyCode == GLFW.GLFW_KEY_Z) {
+                  UndoOwner[] owners = {modernUI_MC$undoOwner()};
+                  if (modernUI_MC$tryRedo(owners)) {
+                     // CTRL+SHIFT+Z
+                     return true;
+                  }
+               }
+            }
+         }
          switch (pKeyCode) {
             case 259:
                if (this.isEditable) {
@@ -362,6 +503,22 @@ public class EditBox extends AbstractWidget implements Renderable {
       } else {
          return false;
       }
+   }
+   private UndoOwner modernUI_MC$undoOwner() {
+      return modernUI_MC$undoManager.getOwner("EditBox", this);
+   }
+
+   private boolean modernUI_MC$tryRedo(UndoOwner[] owners) {
+      if (modernUI_MC$undoManager.countRedos(owners) > 0) {
+         modernUI_MC$undoManager.redo(owners, 1);
+         return true;
+      }
+      return false;
+   }
+
+   @Override
+   public UndoManager modernUI_MC$getUndoManager() {
+      return modernUI_MC$undoManager;
    }
 
    public void onClick(double pMouseX, double pMouseY) {

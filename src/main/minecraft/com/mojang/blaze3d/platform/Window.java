@@ -109,8 +109,6 @@ public final class Window implements AutoCloseable {
       }
       GLFW.glfwMakeContextCurrent(this.window);
       GL.createCapabilities();
-      int limit = RenderSystem.maxSupportedTextureSize();
-      GLFW.glfwSetWindowSizeLimits(this.window, -1, -1, limit, limit);
       this.setMode();
       this.refreshFramebufferSize();
       GLFW.glfwSetFramebufferSizeCallback(this.window, this::onFramebufferResize);
@@ -119,6 +117,7 @@ public final class Window implements AutoCloseable {
       GLFW.glfwSetWindowFocusCallback(this.window, this::onFocus);
       GLFW.glfwSetCursorEnterCallback(this.window, this::onEnter);
    }
+
    private void initMuiWindow() {
       if (MuiModApi.get().isGLVersionPromoted()) {
          return;
@@ -156,7 +155,8 @@ public final class Window implements AutoCloseable {
          GLFW.glfwSetErrorCallback(callback);
       }
    }
-    public int getRefreshRate() {
+
+   public int getRefreshRate() {
       RenderSystem.assertOnRenderThread();
       return GLX._getRefreshRate(this);
    }
@@ -437,8 +437,8 @@ public final class Window implements AutoCloseable {
    }
 
    public int calculateScale(int pGuiScale, boolean pForceUnicode) {
-      int r = MuiModApi.calcGuiScales((Window) (Object) this);
-      return (pGuiScale > 0 ? MathUtil.clamp(pGuiScale, r >> 8 & 0xf, r & 0xf) : r >> 4 & 0xf);
+      int r = MuiModApi.calcGuiScales(this);
+      return pGuiScale > 0 ? MathUtil.clamp(pGuiScale, r >> 8 & 0xf, r & 0xf) : r >> 4 & 0xf;
    }
 
    public void setGuiScale(double pScaleFactor) {

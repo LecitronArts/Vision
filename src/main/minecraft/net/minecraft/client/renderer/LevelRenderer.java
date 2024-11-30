@@ -1367,7 +1367,6 @@ public class LevelRenderer implements ResourceManagerReloadListener, AutoCloseab
          Shaders.endBlockEntities();
       }
 
-      ReflectorForge.dispatchRenderStageS(Reflector.RenderLevelStageEvent_Stage_AFTER_BLOCK_ENTITIES, this, pPoseStack, pProjectionMatrix, this.ticks, pCamera, frustum);
       this.renderOverlayDamaged = true;
       profilerfiller.popPush("destroyProgress");
 
@@ -1417,8 +1416,6 @@ public class LevelRenderer implements ResourceManagerReloadListener, AutoCloseab
             multibuffersource$buffersource.endBatch(RenderType.lines());
             ShadersRender.endOutline();
          }
-      } else if (hitresult != null && hitresult.getType() == HitResult.Type.ENTITY) {
-         Reflector.ForgeHooksClient_onDrawHighlight.call(this, pCamera, hitresult, pPartialTick, pPoseStack, multibuffersource$buffersource);
       }
 
       this.minecraft.debugRenderer.render(pPoseStack, multibuffersource$buffersource, d0, d1, d2);
@@ -1550,7 +1547,6 @@ public class LevelRenderer implements ResourceManagerReloadListener, AutoCloseab
             Shaders.endWeather();
          }
 
-         ReflectorForge.dispatchRenderStageS(Reflector.RenderLevelStageEvent_Stage_AFTER_WEATHER, this, pPoseStack, pProjectionMatrix, this.ticks, pCamera, frustum);
          this.renderWorldBorder(pCamera);
          RenderSystem.depthMask(true);
       }

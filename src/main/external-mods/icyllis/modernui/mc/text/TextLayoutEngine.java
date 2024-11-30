@@ -101,7 +101,6 @@ public class TextLayoutEngine extends FontResourceManager
      * Distance field benefits in 3D world, but it looks bad in 2D UI,
      * unless the text is scaled and it is large. SDF use font size 4x base size.
      *
-     * @see icyllis.modernui.mc.text.mixin.MixinGameRenderer
      */
     public static boolean sCurrentInWorldRendering;
 

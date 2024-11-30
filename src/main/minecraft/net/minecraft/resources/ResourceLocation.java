@@ -33,7 +33,7 @@ public class ResourceLocation implements Comparable<ResourceLocation> {
    protected ResourceLocation(String pNamespace, String pPath, @Nullable ResourceLocation.Dummy pDummy) {
       this.namespace = pNamespace;
       this.path = pPath;
-      this.defaultNamespace = true;
+      this.defaultNamespace = "minecraft".equals(pNamespace);
    }
 
    public ResourceLocation(String pNamespace, String pPath) {

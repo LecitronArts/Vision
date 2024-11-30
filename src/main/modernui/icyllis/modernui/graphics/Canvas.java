@@ -120,7 +120,7 @@ public abstract class Canvas {
      *               drawn during restore()
      * @return value to pass to restoreToCount() to balance this call
      * @deprecated this method does nothing, you should manually create a layer, or possibly manage a
-     * pool of layers, or use {@link icyllis.modernui.view.View#LAYER_TYPE_HARDWARE}.
+     * pool of layers.
      */
     @Deprecated
     public final int saveLayer(@Nullable RectF bounds, int alpha) {
@@ -138,7 +138,7 @@ public abstract class Canvas {
      *
      * @see #saveLayer(RectF, int)
      * @deprecated this method does nothing, you should manually create a layer, or possibly manage a
-     * pool of layers, or use {@link icyllis.modernui.view.View#LAYER_TYPE_HARDWARE}.
+     * pool of layers.
      */
     @Deprecated
     public abstract int saveLayer(float left, float top, float right, float bottom, int alpha);

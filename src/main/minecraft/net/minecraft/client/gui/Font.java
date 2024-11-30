@@ -8,9 +8,11 @@ import com.mojang.blaze3d.font.GlyphInfo;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import java.util.List;
 import java.util.function.Function;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import icyllis.modernui.mc.text.ModernStringSplitter;
+import icyllis.modernui.mc.text.ModernTextRenderer;
 import icyllis.modernui.mc.text.TextLayoutEngine;
 import net.minecraft.client.StringSplitter;
 import net.minecraft.client.gui.font.FontSet;
@@ -33,6 +35,7 @@ import net.optifine.util.MathUtils;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Vector3f;
+import org.spongepowered.asm.mixin.Unique;
 
 public class Font implements IForgeFont {
    private static final float EFFECT_DEPTH = 0.01F;
@@ -44,6 +47,8 @@ public class Font implements IForgeFont {
    final boolean filterFishyGlyphs;
    private final StringSplitter splitter;
    private Matrix4f matrixShadow = new Matrix4f();
+   private final ModernTextRenderer modernUI_MC$textRenderer =
+           TextLayoutEngine.getInstance().getTextRenderer();
 
    public Font(Function<ResourceLocation, FontSet> pFonts, boolean pFilterFishyGlyphs) {
       this.fonts = pFonts;
@@ -58,57 +63,44 @@ public class Font implements IForgeFont {
    }
 
    public String bidirectionalShaping(String pText) {
-      try {
-         Bidi bidi = new Bidi((new ArabicShaping(8)).shape(pText), 127);
-         bidi.setReorderingMode(0);
-         return bidi.writeReordered(2);
-      } catch (ArabicShapingException arabicshapingexception1) {
-         return pText;
-      }
+      return pText;
    }
 
    public int drawInBatch(String pText, float pX, float pY, int pColor, boolean pDropShadow, Matrix4f pMatrix, MultiBufferSource pBuffer, Font.DisplayMode pDisplayMode, int pBackgroundColor, int pPackedLightCoords) {
       return this.drawInBatch(pText, pX, pY, pColor, pDropShadow, pMatrix, pBuffer, pDisplayMode, pBackgroundColor, pPackedLightCoords, this.isBidirectional());
    }
 
-   public int drawInBatch(String pText, float pX, float pY, int pColor, boolean pDropShadow, Matrix4f pMatrix, MultiBufferSource pBuffer, Font.DisplayMode pDisplayMode, int pBackgroundColor, int pPackedLightCoords, boolean pBidirectional) {
-      return this.drawInternal(pText, pX, pY, pColor, pDropShadow, pMatrix, pBuffer, pDisplayMode, pBackgroundColor, pPackedLightCoords, pBidirectional);
+   public int drawInBatch(@Nonnull String text, float x, float y, int color, boolean dropShadow,
+                          @Nonnull Matrix4f matrix, @Nonnull MultiBufferSource source, Font.DisplayMode displayMode,
+                          int colorBackground, int packedLight, @Deprecated boolean bidiFlag) {
+      return (int) modernUI_MC$textRenderer.drawText(text, x, y, color, dropShadow, matrix, source,
+              displayMode, colorBackground, packedLight) + (dropShadow ? 1 : 0);
    }
 
-   public int drawInBatch(Component pText, float pX, float pY, int pColor, boolean pDropShadow, Matrix4f pMatrix, MultiBufferSource pBuffer, Font.DisplayMode pDisplayMode, int pBackgroundColor, int pPackedLightCoords) {
-      return this.drawInBatch(pText.getVisualOrderText(), pX, pY, pColor, pDropShadow, pMatrix, pBuffer, pDisplayMode, pBackgroundColor, pPackedLightCoords);
+   public int drawInBatch(@Nonnull Component text, float x, float y, int color, boolean dropShadow,
+                          @Nonnull Matrix4f matrix, @Nonnull MultiBufferSource source, Font.DisplayMode displayMode,
+                          int colorBackground, int packedLight) {
+      return (int) modernUI_MC$textRenderer.drawText(text, x, y, color, dropShadow, matrix, source,
+              displayMode, colorBackground, packedLight) + (dropShadow ? 1 : 0);
    }
 
-   public int drawInBatch(FormattedCharSequence pText, float pX, float pY, int pColor, boolean pDropShadow, Matrix4f pMatrix, MultiBufferSource pBuffer, Font.DisplayMode pDisplayMode, int pBackgroundColor, int pPackedLightCoords) {
-      return this.drawInternal(pText, pX, pY, pColor, pDropShadow, pMatrix, pBuffer, pDisplayMode, pBackgroundColor, pPackedLightCoords);
+   public int drawInBatch(@Nonnull FormattedCharSequence text, float x, float y, int color, boolean dropShadow,
+                          @Nonnull Matrix4f matrix, @Nonnull MultiBufferSource source, Font.DisplayMode displayMode,
+                          int colorBackground, int packedLight) {
+        /*if (text instanceof FormattedTextWrapper)
+            // Handle Enchantment Table
+            if (((FormattedTextWrapper) text).mText.visit((style, string) -> style.getFont().equals(Minecraft
+            .ALT_FONT) ?
+                    FormattedText.STOP_ITERATION : Optional.empty(), Style.EMPTY).isPresent())
+                return callDrawInternal(text, x, y, color, dropShadow, matrix, source, seeThrough, colorBackground,
+                        packedLight);*/
+      return (int) modernUI_MC$textRenderer.drawText(text, x, y, color, dropShadow, matrix, source,
+              displayMode, colorBackground, packedLight) + (dropShadow ? 1 : 0);
    }
 
-   public void drawInBatch8xOutline(FormattedCharSequence pText, float pX, float pY, int pColor, int pBackgroundColor, Matrix4f pMatrix, MultiBufferSource pBufferSource, int pPackedLightCoords) {
-      int i = adjustColor(pBackgroundColor);
-      Font.StringRenderOutput font$stringrenderoutput = new Font.StringRenderOutput(pBufferSource, 0.0F, 0.0F, i, false, pMatrix, Font.DisplayMode.NORMAL, pPackedLightCoords);
-
-      for(int j = -1; j <= 1; ++j) {
-         for(int k = -1; k <= 1; ++k) {
-            if (j != 0 || k != 0) {
-               float[] afloat = new float[]{pX};
-               int l = j;
-               int i1 = k;
-               pText.accept((p_168654_7_, p_168654_8_, p_168654_9_) -> {
-                  boolean flag = p_168654_8_.isBold();
-                  FontSet fontset = this.getFontSet(p_168654_8_.getFont());
-                  GlyphInfo glyphinfo = fontset.getGlyphInfo(p_168654_9_, this.filterFishyGlyphs);
-                  font$stringrenderoutput.x = afloat[0] + (float)l * glyphinfo.getShadowOffset();
-                  font$stringrenderoutput.y = pY + (float)i1 * glyphinfo.getShadowOffset();
-                  afloat[0] += glyphinfo.getAdvance(flag);
-                  return font$stringrenderoutput.accept(p_168654_7_, p_168654_8_.withColor(i), p_168654_9_);
-               });
-            }
-         }
-      }
-
-      Font.StringRenderOutput font$stringrenderoutput1 = new Font.StringRenderOutput(pBufferSource, pX, pY, adjustColor(pColor), false, pMatrix, Font.DisplayMode.POLYGON_OFFSET, pPackedLightCoords);
-      pText.accept(font$stringrenderoutput1);
-      font$stringrenderoutput1.finish(0, pX);
+   public void drawInBatch8xOutline(@Nonnull FormattedCharSequence text, float x, float y, int color, int outlineColor,
+                                    @Nonnull Matrix4f matrix, @Nonnull MultiBufferSource source, int packedLight) {
+      modernUI_MC$textRenderer.drawText8xOutline(text, x, y, color, outlineColor, matrix, source, packedLight);
    }
 
    private static int adjustColor(int pColor) {

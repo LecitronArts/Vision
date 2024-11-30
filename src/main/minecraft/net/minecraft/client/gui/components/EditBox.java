@@ -5,6 +5,12 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import icyllis.modernui.mc.text.TextLayout;
+import icyllis.modernui.mc.text.TextLayoutEngine;
+import icyllis.modernui.mc.text.VanillaTextWrapper;
+import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -13,6 +19,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
@@ -23,6 +31,7 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.joml.Matrix4f;
 
 @OnlyIn(Dist.CLIENT)
 public class EditBox extends AbstractWidget implements Renderable {
@@ -70,9 +79,10 @@ public class EditBox extends AbstractWidget implements Renderable {
       super(pX, pY, pWidth, pHeight, pMessage);
       this.font = pFont;
       if (pEditBox != null) {
+         formatter = (s, i) -> new VanillaTextWrapper(s);
          this.setValue(pEditBox.getValue());
       }
-
+      formatter = (s, i) -> new VanillaTextWrapper(s);
    }
 
    public void setResponder(Consumer<String> pResponder) {
@@ -373,55 +383,148 @@ public class EditBox extends AbstractWidget implements Renderable {
             ResourceLocation resourcelocation = SPRITES.get(this.isActive(), this.isFocused());
             pGuiGraphics.blitSprite(resourcelocation, this.getX(), this.getY(), this.getWidth(), this.getHeight());
          }
+         final TextLayoutEngine engine = TextLayoutEngine.getInstance();
 
-         int l1 = this.isEditable ? this.textColor : this.textColorUneditable;
-         int i = this.cursorPos - this.displayPos;
-         String s = this.font.plainSubstrByWidth(this.value.substring(this.displayPos), this.getInnerWidth());
-         boolean flag = i >= 0 && i <= s.length();
-         boolean flag1 = this.isFocused() && (Util.getMillis() - this.focusedTime) / 300L % 2L == 0L && flag;
-         int j = this.bordered ? this.getX() + 4 : this.getX();
-         int k = this.bordered ? this.getY() + (this.height - 8) / 2 : this.getY();
-         int l = j;
-         int i1 = Mth.clamp(this.highlightPos - this.displayPos, 0, s.length());
-         if (!s.isEmpty()) {
-            String s1 = flag ? s.substring(0, i) : s;
-            l = pGuiGraphics.drawString(this.font, this.formatter.apply(s1, this.displayPos), j, k, l1);
-         }
+         final int color = isEditable ? textColor : textColorUneditable;
 
-         boolean flag2 = this.cursorPos < this.value.length() || this.value.length() >= this.getMaxLength();
-         int j1 = l;
-         if (!flag) {
-            j1 = i > 0 ? j + this.width : j;
-         } else if (flag2) {
-            j1 = l - 1;
-            --l;
-         }
+         final String viewText =
+                 engine.getStringSplitter().headByWidth(value.substring(displayPos), getInnerWidth(), Style.EMPTY);
+         final int viewCursorPos = cursorPos - displayPos;
+         final int clampedViewHighlightPos = Mth.clamp(highlightPos - displayPos, 0, viewText.length());
 
-         if (!s.isEmpty() && flag && i < s.length()) {
-            pGuiGraphics.drawString(this.font, this.formatter.apply(s.substring(i), this.cursorPos), l, k, l1);
-         }
+         final boolean cursorInRange = viewCursorPos >= 0 && viewCursorPos <= viewText.length();
+         final boolean cursorVisible =
+                 isFocused() && (((Util.getMillis() - focusedTime) / 500) & 1) == 0 && cursorInRange;
 
-         if (this.hint != null && s.isEmpty() && !this.isFocused()) {
-            pGuiGraphics.drawString(this.font, this.hint, l, k, l1);
-         }
+         final int baseX = bordered ? getX() + 4 : getX();
+         final int baseY = bordered ? getY() + (height - 8) / 2 : getY();
+         float hori = baseX;
 
-         if (!flag2 && this.suggestion != null) {
-            pGuiGraphics.drawString(this.font, this.suggestion, j1 - 1, k, -8355712);
-         }
+         final Matrix4f matrix = pGuiGraphics.pose().last().pose();
+         final MultiBufferSource.BufferSource bufferSource = pGuiGraphics.bufferSource();
 
-         if (flag1) {
-            if (flag2) {
-               pGuiGraphics.fill(RenderType.guiOverlay(), j1, k - 1, j1 + 1, k + 1 + 9, -3092272);
+         final boolean separate;
+         if (!viewText.isEmpty()) {
+            String subText = cursorInRange ? viewText.substring(0, viewCursorPos) : viewText;
+            FormattedCharSequence subSequence = formatter.apply(subText, displayPos);
+            if (subSequence != null &&
+                    !(subSequence instanceof VanillaTextWrapper)) {
+               separate = true;
+               hori = engine.getTextRenderer().drawText(subSequence, hori, baseY, color, true,
+                       matrix, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
             } else {
-               pGuiGraphics.drawString(this.font, "_", j1, k, l1);
+               separate = false;
+               hori = engine.getTextRenderer().drawText(viewText, hori, baseY, color, true,
+                       matrix, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+            }
+         } else {
+            separate = false;
+         }
+
+         final boolean cursorNotAtEnd = cursorPos < value.length() || value.length() >= getMaxLength();
+
+         // XXX: BiDi is not supported here
+         final float cursorX;
+         if (cursorInRange) {
+            if (!separate && !viewText.isEmpty()) {
+               TextLayout layout = engine.lookupVanillaLayout(viewText,
+                       Style.EMPTY, TextLayoutEngine.COMPUTE_ADVANCES);
+               float curAdv = 0;
+               int stripIndex = 0;
+               for (int i = 0; i < viewCursorPos; i++) {
+                  if (viewText.charAt(i) == ChatFormatting.PREFIX_CODE) {
+                     i++;
+                     continue;
+                  }
+                  curAdv += layout.getAdvances()[stripIndex++];
+               }
+               cursorX = baseX + curAdv;
+            } else {
+               cursorX = hori;
+            }
+         } else {
+            cursorX = viewCursorPos > 0 ? baseX + width : baseX;
+         }
+
+         if (!viewText.isEmpty() && cursorInRange && viewCursorPos < viewText.length() && separate) {
+            String subText = viewText.substring(viewCursorPos);
+            FormattedCharSequence subSequence = formatter.apply(subText, cursorPos);
+            if (subSequence != null &&
+                    !(subSequence instanceof VanillaTextWrapper)) {
+               engine.getTextRenderer().drawText(subSequence, hori, baseY, color, true,
+                       matrix, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+            } else {
+               engine.getTextRenderer().drawText(subText, hori, baseY, color, true,
+                       matrix, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
             }
          }
 
-         if (i1 != i) {
-            int k1 = j + this.font.width(s.substring(0, i1));
-            this.renderHighlight(pGuiGraphics, j1, k - 1, k1 - 1, k + 1 + 9);
+         if (!cursorNotAtEnd && suggestion != null) {
+            engine.getTextRenderer().drawText(suggestion, cursorX, baseY, 0xFF808080, true,
+                    matrix, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
          }
 
+         if (viewCursorPos != clampedViewHighlightPos) {
+            pGuiGraphics.flush();
+
+            TextLayout layout = engine.lookupVanillaLayout(viewText,
+                    Style.EMPTY, TextLayoutEngine.COMPUTE_ADVANCES);
+            float startX = baseX;
+            float endX = cursorX;
+            int stripIndex = 0;
+            for (int i = 0; i < clampedViewHighlightPos; i++) {
+               if (viewText.charAt(i) == ChatFormatting.PREFIX_CODE) {
+                  i++;
+                  continue;
+               }
+               startX += layout.getAdvances()[stripIndex++];
+            }
+
+            if (endX < startX) {
+               float temp = startX;
+               startX = endX;
+               endX = temp;
+            }
+            if (startX > getX() + width) {
+               startX = getX() + width;
+            }
+            if (endX > getX() + width) {
+               endX = getX() + width;
+            }
+
+            VertexConsumer consumer = pGuiGraphics.bufferSource().getBuffer(RenderType.guiOverlay());
+            consumer.vertex(matrix, startX, baseY + 10, 0)
+                    .color(51, 181, 229, 56).endVertex();
+            consumer.vertex(matrix, endX, baseY + 10, 0)
+                    .color(51, 181, 229, 56).endVertex();
+            consumer.vertex(matrix, endX, baseY - 1, 0)
+                    .color(51, 181, 229, 56).endVertex();
+            consumer.vertex(matrix, startX, baseY - 1, 0)
+                    .color(51, 181, 229, 56).endVertex();
+            pGuiGraphics.flush();
+         } else if (cursorVisible) {
+            if (cursorNotAtEnd) {
+               pGuiGraphics.flush();
+
+               VertexConsumer consumer = pGuiGraphics.bufferSource().getBuffer(RenderType.guiOverlay());
+               consumer.vertex(matrix, cursorX - 0.5f, baseY + 10, 0)
+                       .color(208, 208, 208, 255).endVertex();
+               consumer.vertex(matrix, cursorX + 0.5f, baseY + 10, 0)
+                       .color(208, 208, 208, 255).endVertex();
+               consumer.vertex(matrix, cursorX + 0.5f, baseY - 1, 0)
+                       .color(208, 208, 208, 255).endVertex();
+               consumer.vertex(matrix, cursorX - 0.5f, baseY - 1, 0)
+                       .color(208, 208, 208, 255).endVertex();
+               pGuiGraphics.flush();
+            } else {
+               engine.getTextRenderer().drawText(CURSOR_APPEND_CHARACTER, cursorX, baseY, color, true,
+                       matrix, bufferSource, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+
+               pGuiGraphics.flush();
+            }
+         } else {
+            pGuiGraphics.flush();
+         }
       }
    }
 

@@ -14,6 +14,8 @@ import java.util.function.UnaryOperator;
 import javax.annotation.Nullable;
 
 import de.florianmichael.viafabricplus.settings.impl.VisualSettings;
+import icyllis.modernui.mc.text.ModernTextRenderer;
+import icyllis.modernui.mc.text.TextLayoutEngine;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.AttackIndicatorStatus;
@@ -28,7 +30,9 @@ import net.minecraft.client.gui.components.SubtitleOverlay;
 import net.minecraft.client.gui.components.spectator.SpectatorGui;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -78,6 +82,7 @@ import net.optifine.CustomColors;
 import net.optifine.CustomItems;
 import net.optifine.TextureAnimations;
 import net.optifine.reflect.Reflector;
+import org.joml.Matrix4f;
 
 public class Gui {
    private static final ResourceLocation CROSSHAIR_SPRITE = new ResourceLocation("hud/crosshair");
@@ -606,7 +611,7 @@ public class Gui {
       }
 
       this.minecraft.getProfiler().pop();
-      if (this.minecraft.player.experienceLevel > 0) {
+      /*if (this.minecraft.player.experienceLevel > 0) {
          this.minecraft.getProfiler().push("expLevel");
          int j1 = 8453920;
          if (Config.isCustomColors()) {
@@ -624,6 +629,34 @@ public class Gui {
          this.minecraft.getProfiler().pop();
       }
 
+       */
+      LocalPlayer player = minecraft.player;
+      if (player != null && player.experienceLevel > 0) {
+         String s = Integer.toString(player.experienceLevel);
+         TextLayoutEngine engine = TextLayoutEngine.getInstance();
+         float w = engine.getStringSplitter().measureText(s);
+         float x = (screenWidth - w) / 2;
+         float y = screenHeight - 31 - 4;
+         float offset = ModernTextRenderer.sOutlineOffset;
+         Matrix4f pose = pGuiGraphics.pose().last().pose();
+         // end batch for each draw to prevent transparency sorting
+         MultiBufferSource.BufferSource source = pGuiGraphics.bufferSource();
+         engine.getTextRenderer().drawText(s, x + offset, y, 0xff000000, false,
+                 pose, source, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+         source.endBatch();
+         engine.getTextRenderer().drawText(s, x - offset, y, 0xff000000, false,
+                 pose, source, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+         source.endBatch();
+         engine.getTextRenderer().drawText(s, x, y + offset, 0xff000000, false,
+                 pose, source, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+         source.endBatch();
+         engine.getTextRenderer().drawText(s, x, y - offset, 0xff000000, false,
+                 pose, source, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+         source.endBatch();
+         engine.getTextRenderer().drawText(s, x, y, 0xff80ff20, false,
+                 pose, source, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+         pGuiGraphics.flush();
+      }
    }
 
    public void renderSelectedItemName(GuiGraphics pGuiGraphics) {

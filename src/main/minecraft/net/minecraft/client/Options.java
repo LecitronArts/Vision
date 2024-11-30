@@ -516,7 +516,7 @@ public class Options {
    });
    public static final int AUTO_GUI_SCALE = 0;
    private static final int MAX_GUI_SCALE_INCLUSIVE = 2147483646;
-   private final OptionInstance<Integer> guiScale = new OptionInstance<>("options.guiScale", OptionInstance.noTooltip(), (p_231981_0_, p_231981_1_) -> {
+   private static OptionInstance<Integer> guiScale = new OptionInstance<>("options.guiScale", OptionInstance.noTooltip(), (p_231981_0_, p_231981_1_) -> {
       return p_231981_1_ == 0 ? Component.translatable("options.guiScale.auto") : Component.literal(Integer.toString(p_231981_1_));
    }, new OptionInstance.ClampingLazyMaxIntRange(0, () -> {
       Minecraft minecraft = Minecraft.getInstance();
@@ -589,7 +589,7 @@ public class Options {
    public boolean ofNaturalTextures = false;
    public boolean ofEmissiveTextures = true;
    public boolean ofFastMath = false;
-   public boolean ofFastRender = false;
+   public static boolean ofFastRender = false;
    public boolean ofDynamicFov = true;
    public boolean ofAlternateBlocks = true;
    public int ofDynamicLights = 3;
@@ -647,7 +647,7 @@ public class Options {
    public final OptionInstance SIMULATION_DISTANCE;
    public final OptionInstance AO = this.ambientOcclusion;
    public final OptionInstance FRAMERATE_LIMIT = this.framerateLimit;
-   public final OptionInstance GUI_SCALE = this.guiScale;
+   public static OptionInstance GUI_SCALE = guiScale;
    public final OptionInstance ENTITY_SHADOWS = this.entityShadows;
    public final OptionInstance GAMMA = this.gamma;
    public final OptionInstance ATTACK_INDICATOR = this.attackIndicator;
@@ -2907,4 +2907,8 @@ public class Options {
 
       <T> T process(String pName, T pValue, Function<String, T> pStringValuefier, Function<T, String> pValueStringifier);
    }
+   //mui
+   public void setGuiScale(OptionInstance<Integer> option) {
+      this.guiScale = option;
+   };
 }

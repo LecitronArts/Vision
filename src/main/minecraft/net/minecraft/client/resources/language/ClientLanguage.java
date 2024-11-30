@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import icyllis.modernui.mc.text.FormattedTextWrapper;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
@@ -72,7 +73,7 @@ public class ClientLanguage extends Language {
    }
 
    public FormattedCharSequence getVisualOrder(FormattedText pText) {
-      return FormattedBidiReorder.reorder(pText, this.defaultRightToLeft);
+      return new FormattedTextWrapper(pText);
    }
 
    public Map<String, String> getLanguageData() {

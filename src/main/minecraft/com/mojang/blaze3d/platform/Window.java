@@ -10,10 +10,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.IntConsumer;
-import java.util.function.IntSupplier;
-import java.util.function.LongSupplier;
-import java.util.function.Supplier;
 import javax.annotation.Nullable;
+
+import icyllis.modernui.ModernUI;
+import icyllis.modernui.graphics.MathUtil;
+import icyllis.modernui.mc.ModernUIClient;
+import icyllis.modernui.mc.MuiModApi;
+import icyllis.modernui.util.DisplayMetrics;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.main.SilentInitException;
 import net.minecraft.server.packs.PackResources;
@@ -32,12 +35,14 @@ import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 import org.slf4j.Logger;
 
+import static org.lwjgl.glfw.GLFW.glfwGetMonitorPhysicalSize;
+
 public final class Window implements AutoCloseable {
    private static final Logger LOGGER = LogUtils.getLogger();
    private final GLFWErrorCallback defaultErrorCallback = GLFWErrorCallback.create(this::defaultErrorCallback);
    private final WindowEventHandler eventHandler;
    private final ScreenManager screenManager;
-   private final long window;
+   private long window;
    private int windowedX;
    private int windowedY;
    private int windowedWidth;
@@ -88,55 +93,24 @@ public final class Window implements AutoCloseable {
       GLFW.glfwWindowHint(139275, 221185);
       GLFW.glfwWindowHint(139266, 3);
       GLFW.glfwWindowHint(139267, 2);
-      GLFW.glfwWindowHint(139272, 204801);
+      initMuiWindow();
       GLFW.glfwWindowHint(139270, 1);
-      long i = 0L;
-      if (Reflector.ImmediateWindowHandler_setupMinecraftWindow.exists()) {
-         i = Reflector.ImmediateWindowHandler_setupMinecraftWindow.callLong((IntSupplier)() -> {
-            return this.width;
-         }, (IntSupplier)() -> {
-            return this.height;
-         }, (Supplier<String>)() -> {
-            return pTitle;
-         }, (LongSupplier)() -> {
-            return this.fullscreen && monitor != null ? monitor.getMonitor() : 0L;
-         });
-         if (Config.isAntialiasing()) {
-            GLFW.glfwDestroyWindow(i);
-            i = 0L;
-         }
-      }
-
-      if (i != 0L) {
-         this.window = i;
+      this.window = GLFW.glfwCreateWindow(this.width, this.height, pTitle, this.fullscreen && monitor != null ? monitor.getMonitor() : 0L, 0L);
+      if (monitor != null) {
+         VideoMode videomode = monitor.getPreferredVidMode(this.fullscreen ? this.preferredFullscreenVideoMode : Optional.empty());
+         this.windowedX = this.x = monitor.getX() + videomode.getWidth() / 2 - this.width / 2;
+         this.windowedY = this.y = monitor.getY() + videomode.getHeight() / 2 - this.height / 2;
       } else {
-         this.window = GLFW.glfwCreateWindow(this.width, this.height, pTitle, this.fullscreen && monitor != null ? monitor.getMonitor() : 0L, 0L);
+         int[] aint1 = new int[1];
+         int[] aint = new int[1];
+         GLFW.glfwGetWindowPos(this.window, aint1, aint);
+         this.windowedX = this.x = aint1[0];
+         this.windowedY = this.y = aint[0];
       }
-
-      if (i == 0L || !Reflector.ImmediateWindowHandler_positionWindow.callBoolean(Optional.ofNullable(monitor), (IntConsumer)(w) -> {
-         this.width = this.windowedWidth = w;
-      }, (IntConsumer)(h) -> {
-         this.height = this.windowedHeight = h;
-      }, (IntConsumer)(x) -> {
-         this.x = this.windowedX = x;
-      }, (IntConsumer)(y) -> {
-         this.y = this.windowedY = y;
-      })) {
-         if (monitor != null) {
-            VideoMode videomode = monitor.getPreferredVidMode(this.fullscreen ? this.preferredFullscreenVideoMode : Optional.empty());
-            this.windowedX = this.x = monitor.getX() + videomode.getWidth() / 2 - this.width / 2;
-            this.windowedY = this.y = monitor.getY() + videomode.getHeight() / 2 - this.height / 2;
-         } else {
-            int[] aint1 = new int[1];
-            int[] aint = new int[1];
-            GLFW.glfwGetWindowPos(this.window, aint1, aint);
-            this.windowedX = this.x = aint1[0];
-            this.windowedY = this.y = aint[0];
-         }
-      }
-
       GLFW.glfwMakeContextCurrent(this.window);
       GL.createCapabilities();
+      int limit = RenderSystem.maxSupportedTextureSize();
+      GLFW.glfwSetWindowSizeLimits(this.window, -1, -1, limit, limit);
       this.setMode();
       this.refreshFramebufferSize();
       GLFW.glfwSetFramebufferSizeCallback(this.window, this::onFramebufferResize);
@@ -145,8 +119,44 @@ public final class Window implements AutoCloseable {
       GLFW.glfwSetWindowFocusCallback(this.window, this::onFocus);
       GLFW.glfwSetCursorEnterCallback(this.window, this::onEnter);
    }
-
-   public int getRefreshRate() {
+   private void initMuiWindow() {
+      if (MuiModApi.get().isGLVersionPromoted()) {
+         return;
+      }
+      GLFWErrorCallback callback = GLFW.glfwSetErrorCallback(null);
+      GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE);
+      GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE);
+      GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GLFW.GLFW_TRUE);
+      final int[][] versions = {{4, 6}, {4, 5}, {4, 1}, {3, 3}};
+      long window = 0;
+      try {
+         for (int[] version : versions) {
+            GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, version[0]);
+            GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, version[1]);
+            ModernUI.LOGGER.debug(ModernUI.MARKER, "Trying OpenGL {}.{}", version[0], version[1]);
+            window = GLFW.glfwCreateWindow(640, 480, "System Testing", 0, 0);
+            if (window != 0) {
+               ModernUI.LOGGER.info(ModernUI.MARKER, "Promoted to OpenGL {}.{} Core Profile",
+                       version[0], version[1]);
+               return;
+            }
+         }
+         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3);
+         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 2);
+         ModernUI.LOGGER.warn(ModernUI.MARKER, "Fallback to OpenGL 3.2 Core Profile");
+      } catch (Exception e) {
+         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3);
+         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 2);
+         ModernUI.LOGGER.warn(ModernUI.MARKER, "Fallback to OpenGL 3.2 Core Profile", e);
+      } finally {
+         if (window != 0) {
+            GLFW.glfwDestroyWindow(window);
+         }
+         GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_TRUE);
+         GLFW.glfwSetErrorCallback(callback);
+      }
+   }
+    public int getRefreshRate() {
       RenderSystem.assertOnRenderThread();
       return GLX._getRefreshRate(this);
    }
@@ -427,18 +437,48 @@ public final class Window implements AutoCloseable {
    }
 
    public int calculateScale(int pGuiScale, boolean pForceUnicode) {
-      int i;
-      for(i = 1; i != pGuiScale && i < this.framebufferWidth && i < this.framebufferHeight && this.framebufferWidth / (i + 1) >= 320 && this.framebufferHeight / (i + 1) >= 240; ++i) {
-      }
-
-      if (pForceUnicode && i % 2 != 0) {
-         ++i;
-      }
-
-      return i;
+      int r = MuiModApi.calcGuiScales((Window) (Object) this);
+      return (pGuiScale > 0 ? MathUtil.clamp(pGuiScale, r >> 8 & 0xf, r & 0xf) : r >> 4 & 0xf);
    }
 
    public void setGuiScale(double pScaleFactor) {
+      int oldScale = (int) guiScale;
+      int newScale = (int) pScaleFactor;
+      if (newScale != pScaleFactor) {
+         ModernUI.LOGGER.warn(ModernUI.MARKER,
+                 "Gui scale {} should be an integer, some mods break this", pScaleFactor);
+      }
+
+      DisplayMetrics metrics = new DisplayMetrics();
+      metrics.setToDefaults();
+
+      metrics.widthPixels = getWidth();
+      metrics.heightPixels = getHeight();
+
+      // the base scale is 2x, so divide by 2
+      metrics.density = newScale * 0.5f;
+      metrics.densityDpi = (int) (metrics.density * DisplayMetrics.DENSITY_DEFAULT);
+      metrics.scaledDensity = ModernUIClient.sFontScale * metrics.density;
+
+      Monitor monitor = findBestMonitor();
+      if (monitor != null) {
+         // physical DPI is usually not necessary...
+         try {
+            int[] w = {0}, h = {0};
+            org.lwjgl.glfw.GLFW.glfwGetMonitorPhysicalSize(monitor.getMonitor(), w, h);
+            VideoMode mode = monitor.getCurrentMode();
+            metrics.xdpi = 25.4f * mode.getWidth() / w[0];
+            metrics.ydpi = 25.4f * mode.getHeight() / h[0];
+         } catch (NoSuchMethodError ignored) {
+            // the method is missing in PojavLauncher-modified GLFW
+         }
+      }
+      var ctx = ModernUI.getInstance();
+      if (ctx != null) {
+         ctx.getResources().updateMetrics(metrics);
+      }
+
+      MuiModApi.dispatchOnWindowResize(getWidth(), getHeight(), newScale, oldScale);
       this.guiScale = pScaleFactor;
       int i = (int)((double)this.framebufferWidth / pScaleFactor);
       this.guiScaledWidth = (double)this.framebufferWidth / pScaleFactor > (double)i ? i + 1 : i;

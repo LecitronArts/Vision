@@ -13,6 +13,7 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import icyllis.modernui.mc.text.TextLayoutEngine;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import java.io.Reader;
@@ -45,6 +46,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.slf4j.Logger;
 
+import javax.annotation.Nonnull;
+
 @OnlyIn(Dist.CLIENT)
 public class FontManager implements PreparableReloadListener, AutoCloseable {
    static final Logger LOGGER = LogUtils.getLogger();
@@ -65,12 +68,19 @@ public class FontManager implements PreparableReloadListener, AutoCloseable {
       });
    }
 
-   public CompletableFuture<Void> reload(PreparableReloadListener.PreparationBarrier pPreparationBarrier, ResourceManager pResourceManager, ProfilerFiller pPreparationsProfiler, ProfilerFiller pReloadProfiler, Executor pBackgroundExecutor, Executor pGameExecutor) {
-      pPreparationsProfiler.startTick();
-      pPreparationsProfiler.endTick();
-      return this.prepare(pResourceManager, pBackgroundExecutor).thenCompose(pPreparationBarrier::wait).thenAcceptAsync((p_284609_) -> {
-         this.apply(p_284609_, pReloadProfiler);
-      }, pGameExecutor);
+   public CompletableFuture<Void> reload(@Nonnull PreparableReloadListener.PreparationBarrier preparationBarrier,
+                                         @Nonnull ResourceManager resourceManager,
+                                         @Nonnull ProfilerFiller preparationProfiler,
+                                         @Nonnull ProfilerFiller reloadProfiler,
+                                         @Nonnull Executor preparationExecutor,
+                                         @Nonnull Executor reloadExecutor) {
+      return TextLayoutEngine.getInstance().injectFontManager((FontManager) (Object) this)
+              .reload(preparationBarrier,
+                      resourceManager,
+                      preparationProfiler,
+                      reloadProfiler,
+                      preparationExecutor,
+                      reloadExecutor);
    }
 
    private CompletableFuture<FontManager.Preparation> prepare(ResourceManager pResourceManager, Executor pExecutor) {
@@ -308,4 +318,7 @@ public class FontManager implements PreparableReloadListener, AutoCloseable {
       public void visitOptionalDependencies(Consumer<ResourceLocation> pVisitor) {
       }
    }
+   public Map<ResourceLocation, FontSet> getFontSets() {
+      return fontSets;
+   };
 }

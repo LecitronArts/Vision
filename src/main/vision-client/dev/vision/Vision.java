@@ -4,6 +4,7 @@ import de.florianmichael.viafabricplus.ViaFabricPlus;
 import de.florianmichael.viafabricplus.event.LoadCallback;
 import dev.tr7zw.entityculling.EntityCullingMod;
 import dev.vision.module.ModuleManager;
+import icyllis.modernui.mc.fabric.ModernUIFabricClient;
 import meteordevelopment.orbit.EventBus;
 import meteordevelopment.orbit.IEventBus;
 import net.burningtnt.accountsx.AccountsX;
@@ -22,13 +23,16 @@ public class Vision {
     public String CLIENT_VERSION = "0.1 Preview";
     public String CLIENT_PACKAGE = "dev.vision";
     public Path CLIENT_PATH = mc.gameDirectory.toPath().resolve(CLIENT_NAME);
+    public Path CLIENT_ROOT_PATH = mc.gameDirectory.toPath();
     public final Logger LOGGER = LoggerFactory.getLogger(CLIENT_NAME);
     public IEventBus EVENT_BUS = new EventBus();
+    public ModernUIFabricClient modernUIFabricClient = new ModernUIFabricClient();
 
     public ModuleManager moduleManager = new ModuleManager();
 
     public void setupClient() {
         try {
+            ModernUIFabricClient.onInitializeClient();
             EntityCullingMod.INSTANCE.init();
             AccountsX.INSTANCE.init();
             LoadCallback.EVENT.invoker().onLoad(LoadCallback.State.PRE);

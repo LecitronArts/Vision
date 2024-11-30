@@ -85,6 +85,11 @@ import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
 import dev.vision.Vision;
 import dev.tr7zw.entityculling.EntityCullingMod;
 import dev.vision.events.EventTick;
+import icyllis.modernui.mc.BlurHandler;
+import icyllis.modernui.mc.ModernUIClient;
+import icyllis.modernui.mc.MuiModApi;
+import icyllis.modernui.mc.UIManager;
+import icyllis.modernui.mc.fabric.ModernUIFabricClient;
 import me.empty.api.event.handler.EventManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.CrashReport;
@@ -272,6 +277,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.io.FileUtils;
 import org.joml.Matrix4f;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 import org.slf4j.Logger;
 
@@ -528,11 +534,9 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
       this.resourceManager.registerReloadListener(new GrassColorReloadListener());
       this.resourceManager.registerReloadListener(new FoliageColorReloadListener());
       this.window.setErrorSection("Startup");
+      Vision.INSTANCE.setupClient();
       RenderSystem.setupDefaultState(0, 0, this.window.getWidth(), this.window.getHeight());
       this.window.setErrorSection("Post startup");
-
-      Vision.INSTANCE.setupClient();
-
       this.blockColors = BlockColors.createDefault();
       this.itemColors = ItemColors.createDefault(this.blockColors);
       this.modelManager = new ModelManager(this.textureManager, this.blockColors, this.options.mipmapLevels().get());
@@ -1101,6 +1105,7 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
             }
          }
 
+         MuiModApi.dispatchOnScreenChange(screen, pGuiScreen);
          this.screen = pGuiScreen;
          if (this.screen != null) {
             this.screen.added();
@@ -1177,6 +1182,7 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
          this.guiSprites.close();
          this.textureManager.close();
          this.resourceManager.close();
+         UIManager.destroy();
          Util.shutdownExecutors();
       } catch (Throwable throwable) {
          LOGGER.error("Shutdown failure!", throwable);
@@ -1250,7 +1256,9 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
       this.profiler.pop();
       if (!this.noRender) {
          this.profiler.popPush("gameRenderer");
+         ModernUIFabricClient.START_RENDER_TICK.invoker().run();
          this.gameRenderer.render(this.pause ? this.pausePartialTick : this.timer.partialTick, i, pRenderLevel);
+         ModernUIFabricClient.END_RENDER_TICK.invoker().run();
          this.profiler.pop();
       }
 
@@ -1393,6 +1401,23 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
    }
 
    private int getFramerateLimit() {
+      if ((BlurHandler.sFramerateInactive != 0 ||
+              BlurHandler.sFramerateMinimized != 0) &&
+              !isWindowActive()) {
+         if (BlurHandler.sFramerateMinimized != 0 &&
+                 BlurHandler.sFramerateMinimized < BlurHandler.sFramerateInactive &&
+                 GLFW.glfwGetWindowAttrib(window.getWindow(), GLFW.GLFW_ICONIFIED) != 0) {
+            return (Math.min(
+                    BlurHandler.sFramerateMinimized,
+                    window.getFramerateLimit()
+            ));
+         } else if (BlurHandler.sFramerateInactive != 0) {
+            return (Math.min(
+                    BlurHandler.sFramerateInactive,
+                    window.getFramerateLimit()
+            ));
+         }
+      }
       return this.level != null || this.screen == null && this.overlay == null ? this.window.getFramerateLimit() : 60;
    }
 
@@ -2359,6 +2384,9 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
    }
 
    public boolean allowsTelemetry() {
+      if (ModernUIClient.sRemoveTelemetrySession) {
+         return false;
+      }
       return SharedConstants.IS_RUNNING_IN_IDE ? false : this.userProperties().flag(UserFlag.TELEMETRY_ENABLED);
    }
 

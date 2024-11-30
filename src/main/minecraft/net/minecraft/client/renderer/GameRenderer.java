@@ -31,7 +31,12 @@ import java.util.function.Consumer;
 import javax.annotation.Nullable;
 
 import dev.vision.events.EventRender2D;
+import icyllis.modernui.mc.BlurHandler;
+import icyllis.modernui.mc.text.TextLayoutEngine;
+import icyllis.modernui.mc.text.TextRenderType;
 import me.empty.api.event.handler.EventManager;
+import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
+import net.fabricmc.fabric.impl.client.rendering.FabricShaderProgram;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
 import net.minecraft.ReportedException;
@@ -344,10 +349,7 @@ public class GameRenderer implements AutoCloseable {
          this.loadEffect(new ResourceLocation("shaders/post/spider.json"));
       } else if (pEntity instanceof EnderMan) {
          this.loadEffect(new ResourceLocation("shaders/post/invert.json"));
-      } else if (Reflector.ForgeHooksClient_loadEntityShader.exists()) {
-         Reflector.call(Reflector.ForgeHooksClient_loadEntityShader, pEntity, this);
       }
-
    }
 
    public void cycleEffect() {
@@ -366,7 +368,7 @@ public class GameRenderer implements AutoCloseable {
 
    }
 
-   void loadEffect(ResourceLocation pResourceLocation) {
+   public void loadEffect(ResourceLocation pResourceLocation) {
       if (GLX.isUsingFBOs()) {
          if (this.postEffect != null) {
             this.postEffect.close();
@@ -451,6 +453,7 @@ public class GameRenderer implements AutoCloseable {
          positionTexColorShader = this.preloadShader(pResourceProvider, "position_tex_color", DefaultVertexFormat.POSITION_TEX_COLOR);
          rendertypeTextShader = this.preloadShader(pResourceProvider, "rendertype_text", DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP);
       }
+      TextRenderType.preloadShaders();
    }
 
    private ShaderInstance preloadShader(ResourceProvider pResourceProvider, String pName, VertexFormat pFormat) {
@@ -649,6 +652,14 @@ public class GameRenderer implements AutoCloseable {
          list1.add(Pair.of(new ShaderInstance(pResourceProvider, "rendertype_breeze_wind", DefaultVertexFormat.NEW_ENTITY), (p_304052_0_) -> {
             rendertypeBreezeWindShader = p_304052_0_;
          }));
+         //fabric
+         CoreShaderRegistrationCallback.RegistrationContext context = (id, vertexFormat, loadCallback) -> {
+            ShaderInstance program = new FabricShaderProgram(pResourceProvider, id, vertexFormat);
+            list1.add(Pair.of(program, loadCallback));
+         };
+         CoreShaderRegistrationCallback.EVENT.invoker().registerShaders(context);
+
+         ReflectorForge.postModLoaderEvent(Reflector.RegisterShadersEvent_Constructor, pResourceProvider, list1);
       } catch (IOException ioexception) {
          list1.forEach((p_172728_0_) -> {
             p_172728_0_.getFirst().close();
@@ -718,6 +729,7 @@ public class GameRenderer implements AutoCloseable {
       }
 
       this.minecraft.levelRenderer.resize(pWidth, pHeight);
+      BlurHandler.INSTANCE.resize(pWidth, pHeight);
    }
 
    public void pick(float pPartialTicks) {
@@ -1195,6 +1207,7 @@ public class GameRenderer implements AutoCloseable {
    }
 
    public void renderLevel(float pPartialTicks, long pFinishTimeNano, PoseStack pPoseStack) {
+      TextLayoutEngine.sCurrentInWorldRendering = true;
       this.lightTexture.updateLightTexture(pPartialTicks);
       if (this.minecraft.getCameraEntity() == null) {
          this.minecraft.setCameraEntity(this.minecraft.player);
@@ -1276,7 +1289,7 @@ public class GameRenderer implements AutoCloseable {
       if (flag) {
          Shaders.endRender();
       }
-
+      TextLayoutEngine.sCurrentInWorldRendering = false;
       this.minecraft.getProfiler().pop();
    }
 

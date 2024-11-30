@@ -3,6 +3,8 @@ package net.minecraft.client.gui.font;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+
+import icyllis.modernui.mc.MuiModApi;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.Util;
@@ -153,7 +155,7 @@ public class TextFieldHelper {
    }
 
    public void moveByChars(int pDirection, boolean pKeepSelection) {
-      this.cursorPos = Util.offsetByCodepoints(this.getMessageFn.get(), this.cursorPos, pDirection);
+      this.cursorPos = MuiModApi.offsetByGrapheme(this.getMessageFn.get(), this.cursorPos, pDirection);
       this.resetSelectionIfNeeded(pKeepSelection);
    }
 
@@ -189,7 +191,7 @@ public class TextFieldHelper {
          if (this.selectionPos != this.cursorPos) {
             s1 = this.deleteSelection(s);
          } else {
-            int i = Util.offsetByCodepoints(s, this.cursorPos, pDirection);
+            int i = MuiModApi.offsetByGrapheme(s, this.cursorPos, pDirection);
             int j = Math.min(i, this.cursorPos);
             int k = Math.max(i, this.cursorPos);
             s1 = (new StringBuilder(s)).delete(j, k).toString();

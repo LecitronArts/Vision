@@ -11,11 +11,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
+
+import icyllis.modernui.mc.text.FormattedTextWrapper;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
@@ -98,6 +101,10 @@ public abstract class Language {
    public abstract FormattedCharSequence getVisualOrder(FormattedText p_128116_);
 
    public List<FormattedCharSequence> getVisualOrder(List<FormattedText> pText) {
-      return pText.stream().map(this::getVisualOrder).collect(ImmutableList.toImmutableList());
+      List<FormattedCharSequence> list = new ArrayList<>(pText.size());
+      for (FormattedText text : pText) {
+         list.add(new FormattedTextWrapper(text));
+      }
+      return list;
    }
 }

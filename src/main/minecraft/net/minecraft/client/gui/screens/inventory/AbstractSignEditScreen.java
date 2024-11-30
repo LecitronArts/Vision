@@ -143,6 +143,7 @@ public abstract class AbstractSignEditScreen extends Screen {
    }
 
    private void renderSignText(GuiGraphics pGuiGraphics) {
+      pGuiGraphics.flush();
       pGuiGraphics.pose().translate(0.0F, 0.0F, 4.0F);
       Vector3f vector3f = this.getSignTextScale();
       pGuiGraphics.pose().scale(vector3f.x(), vector3f.y(), vector3f.z());

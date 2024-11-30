@@ -263,5 +263,9 @@ public interface MultiBufferSource {
          this.fixedBuffers.remove(rt);
          this.cachedBuffers.remove(rt);
       }
+
+      public Map<RenderType, BufferBuilder> getFixedBuffers() {
+         return fixedBuffers;
+      };
    }
 }

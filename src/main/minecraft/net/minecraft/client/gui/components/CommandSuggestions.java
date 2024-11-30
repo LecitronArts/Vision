@@ -32,6 +32,7 @@ import javax.annotation.Nullable;
 
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+import icyllis.modernui.mc.text.VanillaTextWrapper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -358,7 +359,7 @@ public class CommandSuggestions {
 
    private FormattedCharSequence formatChat(String p_93915_, int p_93916_) {
       if (this.viaFabricPlus$cancelTabComplete()) {
-         return (FormattedCharSequence.forward(p_93915_, Style.EMPTY));
+         return new VanillaTextWrapper(p_93915_);
       }
       return this.currentParse != null ? formatText(this.currentParse, p_93915_, p_93916_) : FormattedCharSequence.forward(p_93915_, Style.EMPTY);
    }

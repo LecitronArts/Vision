@@ -1,12 +1,18 @@
 package net.minecraft.client;
 
 import com.google.common.collect.Lists;
+
+import java.text.StringCharacterIterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+
+import com.ibm.icu.text.BreakIterator;
+import icyllis.modernui.ModernUI;
+import icyllis.modernui.text.method.WordIterator;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
@@ -147,6 +153,33 @@ public class StringSplitter {
    }
 
    public static int getWordPosition(String pContent, int pSkipCount, int pCursorPoint, boolean pIncludeWhitespace) {
+      if (pSkipCount == -1 || pSkipCount == 1) {
+         int offset;
+         if (pIncludeWhitespace) {
+            WordIterator wordIterator = new WordIterator();
+            wordIterator.setCharSequence(pContent, pCursorPoint, pCursorPoint);
+            if (pSkipCount == -1) {
+               offset = wordIterator.preceding(pCursorPoint);
+            } else {
+               offset = wordIterator.following(pCursorPoint);
+            }
+         } else {
+            BreakIterator wordIterator = BreakIterator.getWordInstance(
+                    ModernUI.getSelectedLocale()
+            );
+            wordIterator.setText(new StringCharacterIterator(pContent, pCursorPoint));
+            if (pSkipCount == -1) {
+               offset = wordIterator.preceding(pCursorPoint);
+            } else {
+               offset = wordIterator.following(pCursorPoint);
+            }
+         }
+         if (offset != BreakIterator.DONE) {
+            return (offset);
+         } else {
+            return (pCursorPoint);
+         }
+      }
       int i = pCursorPoint;
       boolean flag = pSkipCount < 0;
       int j = Math.abs(pSkipCount);

@@ -14,6 +14,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
+
+import icyllis.modernui.mc.ModernUIClient;
 import net.minecraft.SharedConstants;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -66,6 +68,9 @@ public class ClientTelemetryManager implements AutoCloseable {
    }
 
    private TelemetryEventSender createEventSender() {
+      if (ModernUIClient.sRemoveTelemetrySession) {
+         return TelemetryEventSender.DISABLED;
+      }
       if (!this.minecraft.allowsTelemetry()) {
          return TelemetryEventSender.DISABLED;
       } else {

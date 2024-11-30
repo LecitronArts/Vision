@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
+import icyllis.modernui.mc.BlurHandler;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
 import net.minecraft.ReportedException;
@@ -380,6 +381,7 @@ public abstract class Screen extends AbstractContainerEventHandler implements Re
    }
 
    public void renderTransparentBackground(GuiGraphics pGuiGraphics) {
+      BlurHandler.INSTANCE.drawScreenBackground(pGuiGraphics, 0, 0, width, height);
       pGuiGraphics.fillGradient(0, 0, this.width, this.height, -1072689136, -804253680);
    }
 

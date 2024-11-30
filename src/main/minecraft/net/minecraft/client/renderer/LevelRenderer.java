@@ -9,6 +9,7 @@ import com.google.common.collect.Sets;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.shaders.Uniform;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -27,6 +28,8 @@ import com.mojang.math.Axis;
 import dev.tr7zw.entityculling.EntityCullingModBase;
 import dev.tr7zw.entityculling.access.EntityRendererInter;
 import dev.tr7zw.entityculling.versionless.access.Cullable;
+import icyllis.modernui.mc.text.TextLayoutEngine;
+import icyllis.modernui.mc.text.TextRenderType;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
@@ -61,6 +64,7 @@ import net.minecraft.client.GraphicsStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.ParticleStatus;
 import net.minecraft.client.PrioritizeChunkUpdates;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientChunkCache;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
@@ -180,8 +184,11 @@ import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
 import org.joml.Vector4f;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
+
+import static icyllis.modernui.ModernUI.LOGGER;
 
 public class LevelRenderer implements ResourceManagerReloadListener, AutoCloseable {
    private static final Logger LOGGER = LogUtils.getLogger();
@@ -1223,7 +1230,30 @@ public class LevelRenderer implements ResourceManagerReloadListener, AutoCloseab
       if (flag1) {
          Shaders.beginBlockEntities();
       }
-
+      if (Screen.hasAltDown() &&
+              InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_KP_7)) {
+         LOGGER.info("Capture from MixinLevelRendererDBG.afterEntities()");
+         LOGGER.info("Param PoseStack.last().pose(): {}", pPoseStack.last().pose());
+         LOGGER.info("Param Camera.getPosition(): {}, pitch: {}, yaw: {}, rot: {}, detached: {}",
+                 pCamera.getPosition(), pCamera.getXRot(), pCamera.getYRot(), pCamera.rotation(), pCamera.isDetached());
+         LOGGER.info("Param ProjectionMatrix: {}", pProjectionMatrix);
+         LOGGER.info("RenderSystem.getModelViewStack().last().pose(): {}",
+                 RenderSystem.getModelViewStack().last().pose());
+         LOGGER.info("RenderSystem.getModelViewMatrix(): {}", RenderSystem.getModelViewMatrix());
+         LOGGER.info("RenderSystem.getInverseViewRotationMatrix: {}", RenderSystem.getInverseViewRotationMatrix());
+         LOGGER.info("GameRenderer.getMainCamera().getPosition(): {}, pitch: {}, yaw: {}, rot: {}, detached: {}",
+                 Minecraft.getInstance().gameRenderer.getMainCamera().getPosition(),
+                 pCamera.getXRot(), pCamera.getYRot(), pCamera.rotation(), pCamera.isDetached());
+         LocalPlayer player = Minecraft.getInstance().player;
+         if (player != null) {
+            LOGGER.info("LocalPlayer: yaw: {}, yawHead: {}, eyePos: {}",
+                    player.getYRot(), player.getYHeadRot(), player.getEyePosition(pPartialTick));
+         }
+         Entity cameraEntity = Minecraft.getInstance().cameraEntity;
+         if (cameraEntity != null) {
+            LOGGER.info("CameraEntity position: {}", cameraEntity.position());
+         }
+      }
       profilerfiller.popPush("blockentities");
       SignRenderer.updateTextRenderDistance();
       boolean flag6 = Reflector.IForgeBlockEntity_getRenderBoundingBox.exists();
@@ -1309,6 +1339,18 @@ public class LevelRenderer implements ResourceManagerReloadListener, AutoCloseab
       multibuffersource$buffersource.endBatch(Sheets.signSheet());
       multibuffersource$buffersource.endBatch(Sheets.hangingSignSheet());
       multibuffersource$buffersource.endBatch(Sheets.chestSheet());
+
+      if (TextLayoutEngine.sUseTextShadersInWorld) {
+         TextRenderType firstSDFFillType = TextRenderType.getFirstSDFFillType();
+         TextRenderType firstSDFStrokeType = TextRenderType.getFirstSDFStrokeType();
+         if (firstSDFFillType != null) {
+            renderBuffers.bufferSource().endBatch(firstSDFFillType);
+         }
+         if (firstSDFStrokeType != null) {
+            renderBuffers.bufferSource().endBatch(firstSDFStrokeType);
+         }
+      }
+
       this.renderBuffers.outlineBufferSource().endOutlineBatch();
       if (Config.isFastRender()) {
          multibuffersource$buffersource.disableCache();

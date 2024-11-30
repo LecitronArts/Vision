@@ -26,4 +26,7 @@ public class ClientTextTooltip implements ClientTooltipComponent {
    public void renderText(Font pFont, int pMouseX, int pMouseY, Matrix4f pMatrix, MultiBufferSource.BufferSource pBufferSource) {
       pFont.drawInBatch(this.text, (float)pMouseX, (float)pMouseY, -1, true, pMatrix, pBufferSource, Font.DisplayMode.NORMAL, 0, 15728880);
    }
+   public FormattedCharSequence getText() {
+      return text;
+   }
 }

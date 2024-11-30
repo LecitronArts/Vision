@@ -92,6 +92,9 @@ public final class NativeImage implements AutoCloseable {
    private boolean isOutsideBounds(int pX, int pY) {
       return pX < 0 || pX >= this.width || pY < 0 || pY >= this.height;
    }
+   public long getPixels() {
+      return pixels;
+   };
 
    public static NativeImage read(InputStream pTextureStream) throws IOException {
       return read(NativeImage.Format.RGBA, pTextureStream);

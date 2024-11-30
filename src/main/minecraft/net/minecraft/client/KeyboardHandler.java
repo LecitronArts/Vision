@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 import de.florianmichael.viafabricplus.access.IMouseKeyboard;
 import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
 import dev.vision.events.EventKeyPress;
+import icyllis.modernui.mc.MuiModApi;
 import me.empty.api.event.handler.EventManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.CrashReport;
@@ -352,6 +353,7 @@ public class KeyboardHandler implements IMouseKeyboard {
    }
 
    public void keyPress(long pWindowPointer, int pKey, int pScanCode, int pAction, int pModifiers) {
+      MuiModApi.dispatchOnPreKeyInput(pWindowPointer, pKey, pScanCode, pAction, pModifiers);
       if (pWindowPointer == this.minecraft.getWindow().getWindow()) {
          boolean flag = InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), 292);
          if (this.debugCrashKeyTime > 0L) {

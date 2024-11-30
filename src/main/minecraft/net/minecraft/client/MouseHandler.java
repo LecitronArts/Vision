@@ -14,6 +14,7 @@ import de.florianmichael.viafabricplus.access.IMouseKeyboard;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import de.florianmichael.viafabricplus.protocoltranslator.util.MathUtil;
 import de.florianmichael.viafabricplus.settings.impl.DebugSettings;
+import icyllis.modernui.mc.UIManager;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.util.Mth;
 import net.minecraft.util.SmoothDouble;
@@ -125,6 +126,9 @@ public class MouseHandler implements IMouseKeyboard {
             }
          }
 
+      }
+      if (pWindowPointer == minecraft.getWindow().getWindow()) {
+         UIManager.getInstance().onPostMouseInput(pButton, pAction, pModifiers);
       }
    }
 

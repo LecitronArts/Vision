@@ -333,4 +333,8 @@ public class PostChain implements AutoCloseable {
          return pTarget.equals("minecraft:main") ? this.screenTarget : this.customRenderTargets.get(pTarget);
       }
    }
+   //mui
+   public List<PostPass> getPasses() {
+      return passes;
+   };
 }

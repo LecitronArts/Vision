@@ -314,8 +314,7 @@ public class ProtocolTranslator {
 
                     ViaBackwardsPlatformImpl::new,
                     ViaFabricPlusViaLegacyPlatformImpl::new,
-                    ViaAprilFoolsPlatformImpl::new,
-                    ViaBedrockPlatformImpl::new
+                    ViaAprilFoolsPlatformImpl::new
             );
             ProtocolVersion.register(AUTO_DETECT_PROTOCOL);
             PostViaVersionLoadCallback.EVENT.invoker().onPostViaVersionLoad();

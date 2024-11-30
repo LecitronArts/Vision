@@ -4,6 +4,8 @@ import com.google.common.collect.Ordering;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+
+import icyllis.modernui.mc.ModernUIClient;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.MobEffectTextureManager;
@@ -124,5 +126,9 @@ public abstract class EffectRenderingInventoryScreen<T extends AbstractContainer
       }
 
       return mutablecomponent;
+   }
+   @Override
+   public boolean isPauseScreen() {
+      return ModernUIClient.sInventoryPause;
    }
 }

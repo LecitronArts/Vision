@@ -15,6 +15,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -23,6 +24,12 @@ import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
+
+import icyllis.arc3d.engine.ContextOptions;
+import icyllis.modernui.ModernUI;
+import icyllis.modernui.core.Core;
+import icyllis.modernui.mc.ModernUIClient;
+import icyllis.modernui.mc.fabric.UIManagerFabric;
 import net.minecraft.Util;
 import net.minecraft.client.GraphicsStatus;
 import net.minecraft.client.Minecraft;
@@ -43,6 +50,8 @@ import org.joml.Matrix4fc;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallbackI;
+import org.lwjgl.opengl.GL;
+import org.lwjgl.system.Configuration;
 import org.slf4j.Logger;
 
 @DontObfuscate
@@ -150,9 +159,6 @@ public class RenderSystem {
    }
 
    public static void assertOnRenderThread() {
-      if (!isOnRenderThread()) {
-         throw constructThreadException();
-      }
    }
 
    public static void assertOnGameThread() {
@@ -586,6 +592,13 @@ public class RenderSystem {
    }
 
    public static TimeSource.NanoTimeSource initBackendSystem() {
+      //RenderSystem.assertInInitPhase();
+      String name = Configuration.OPENGL_LIBRARY_NAME.get();
+      if (name != null) {
+         // non-system library should load before window creation
+         ModernUI.LOGGER.info(ModernUI.MARKER, "OpenGL library: {}", name);
+         Objects.requireNonNull(GL.getFunctionProvider(), "Implicit OpenGL loading is required");
+      }
       assertInInitPhase();
       return GLX._initGlfw()::getAsLong;
    }
@@ -594,6 +607,13 @@ public class RenderSystem {
       assertInInitPhase();
       GLX._init(pDebugVerbosity, pSynchronous);
       apiDescription = GLX.getOpenGLVersionString();
+      Core.initialize();
+      ContextOptions options = new ContextOptions();
+      options.mDriverBugWorkarounds = ModernUIClient.getGpuDriverBugWorkarounds();
+      if (!Core.initOpenGL(options)) {
+         Core.glShowCapsErrorDialog();
+      }
+      UIManagerFabric.initialize();
    }
 
    public static void setErrorCallback(GLFWErrorCallbackI pCallback) {

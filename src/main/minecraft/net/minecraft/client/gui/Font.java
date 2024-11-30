@@ -9,6 +9,9 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import java.util.List;
 import java.util.function.Function;
 import javax.annotation.Nullable;
+
+import icyllis.modernui.mc.text.ModernStringSplitter;
+import icyllis.modernui.mc.text.TextLayoutEngine;
 import net.minecraft.client.StringSplitter;
 import net.minecraft.client.gui.font.FontSet;
 import net.minecraft.client.gui.font.glyphs.BakedGlyph;
@@ -45,7 +48,7 @@ public class Font implements IForgeFont {
    public Font(Function<ResourceLocation, FontSet> pFonts, boolean pFilterFishyGlyphs) {
       this.fonts = pFonts;
       this.filterFishyGlyphs = pFilterFishyGlyphs;
-      this.splitter = new StringSplitter((p_243025_1_, p_243025_2_) -> {
+      this.splitter = new ModernStringSplitter(TextLayoutEngine.getInstance(), (p_243025_1_, p_243025_2_) -> {
          return this.getFontSet(p_243025_2_.getFont()).getGlyphInfo(p_243025_1_, this.filterFishyGlyphs).getAdvance(p_243025_2_.isBold());
       });
    }

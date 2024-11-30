@@ -24,7 +24,7 @@ public class KeyMapping implements Comparable<KeyMapping> {
    public static final String CATEGORY_INVENTORY = "key.categories.inventory";
    public static final String CATEGORY_INTERFACE = "key.categories.ui";
    public static final String CATEGORY_CREATIVE = "key.categories.creative";
-   private static final Map<String, Integer> CATEGORY_SORT_ORDER = Util.make(Maps.newHashMap(), (p_90845_) -> {
+   public static final Map<String, Integer> CATEGORY_SORT_ORDER = Util.make(Maps.newHashMap(), (p_90845_) -> {
       p_90845_.put("key.categories.movement", 1);
       p_90845_.put("key.categories.gameplay", 2);
       p_90845_.put("key.categories.inventory", 3);

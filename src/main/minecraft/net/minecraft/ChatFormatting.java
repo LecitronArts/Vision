@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+
+import icyllis.modernui.mc.MuiModApi;
 import net.minecraft.util.StringRepresentable;
 
 public enum ChatFormatting implements StringRepresentable {
@@ -128,16 +130,8 @@ public enum ChatFormatting implements StringRepresentable {
    }
 
    @Nullable
-   public static ChatFormatting getByCode(char pFormattingCode) {
-      char c0 = Character.toLowerCase(pFormattingCode);
-
-      for(ChatFormatting chatformatting : values()) {
-         if (chatformatting.code == c0) {
-            return chatformatting;
-         }
-      }
-
-      return null;
+   public static ChatFormatting getByCode(char formattingCode) {
+      return MuiModApi.getFormattingByCode(formattingCode);
    }
 
    public static Collection<String> getNames(boolean pGetColor, boolean pGetFancyStyling) {

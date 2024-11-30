@@ -6,6 +6,10 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import de.florianmichael.viafabricplus.fixes.ClientsideFixes;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import de.florianmichael.viafabricplus.settings.impl.VisualSettings;
+import icyllis.modernui.mc.FontResourceManager;
+import icyllis.modernui.mc.IModernEditBox;
+import icyllis.modernui.mc.ModernUIClient;
+import icyllis.modernui.mc.MuiModApi;
 import net.minecraft.client.GuiMessageTag;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -23,6 +27,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.regex.Matcher;
+
 @OnlyIn(Dist.CLIENT)
 public class ChatScreen extends Screen {
    public static final double MOUSE_SCROLL_SPEED = 7.0D;
@@ -33,6 +39,7 @@ public class ChatScreen extends Screen {
    protected EditBox input;
    private String initial;
    CommandSuggestions commandSuggestions;
+   private boolean modernUI_MC$broadcasting;
 
    public ChatScreen(String pInitial) {
       super(Component.translatable("chat_screen.title"));
@@ -75,6 +82,35 @@ public class ChatScreen extends Screen {
    }
 
    private void onEdited(String p_95611_) {
+      if (!modernUI_MC$broadcasting &&
+              ModernUIClient.sEmojiShortcodes &&
+              !input.getValue().startsWith("/") &&
+              (!(input instanceof IModernEditBox) ||
+                      !((IModernEditBox) input).modernUI_MC$getUndoManager().isInUndo())) {
+         final FontResourceManager manager = FontResourceManager.getInstance();
+         CYCLE:
+         for (;;) {
+            final Matcher matcher = MuiModApi.EMOJI_SHORTCODE_PATTERN.matcher(input.getValue());
+            while (matcher.find()) {
+               int start = matcher.start();
+               int end = matcher.end();
+               if (end - start > 2) {
+                  String replacement = manager.lookupEmojiShortcode(
+                          input.getValue().substring(start + 1, end - 1)
+                  );
+                  if (replacement != null) {
+                     modernUI_MC$broadcasting = true;
+                     input.setHighlightPos(start);
+                     input.setCursorPosition(end);
+                     input.insertText(replacement);
+                     modernUI_MC$broadcasting = false;
+                     continue CYCLE;
+                  }
+               }
+            }
+            break;
+         }
+      }
       String s = this.input.getValue();
       boolean viafix;
       if (this.viaFabricPlus$keepTabComplete()) {

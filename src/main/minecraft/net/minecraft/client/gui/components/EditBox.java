@@ -267,7 +267,7 @@ public class EditBox extends AbstractWidget implements Renderable, IModernEditBo
                   if (modernUI_MC$undoManager.isInUndo()) {
                      return;
                   }
-                  String oldText = value.substring(j, pNum);
+                  String oldText = value.substring(i, j);
                   if (oldText.isEmpty()) {
                      return;
                   }
@@ -275,7 +275,7 @@ public class EditBox extends AbstractWidget implements Renderable, IModernEditBo
                           modernUI_MC$undoOwner(),
                           /*cursorPos*/ cursorPos,
                           oldText,
-                          j,
+                          i,
                           ""
                   );
                   modernUI_MC$addEdit(edit, false);
@@ -392,29 +392,6 @@ public class EditBox extends AbstractWidget implements Renderable, IModernEditBo
 
    public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
       if (this.isActive() && this.isFocused()) {
-         if (pKeyCode == GLFW.GLFW_KEY_Z || pKeyCode == GLFW.GLFW_KEY_Y) {
-            if (Screen.hasControlDown() && !Screen.hasAltDown()) {
-               if (!Screen.hasShiftDown()) {
-                  UndoOwner[] owners = {modernUI_MC$undoOwner()};
-                  if (pKeyCode == GLFW.GLFW_KEY_Z) {
-                     // CTRL+Z
-                     if (modernUI_MC$undoManager.countUndos(owners) > 0) {
-                        modernUI_MC$undoManager.undo(owners, 1);
-                        return true;
-                     }
-                  } else if (modernUI_MC$tryRedo(owners)) {
-                     // CTRL+Y
-                     return true;
-                  }
-               } else if (pKeyCode == GLFW.GLFW_KEY_Z) {
-                  UndoOwner[] owners = {modernUI_MC$undoOwner()};
-                  if (modernUI_MC$tryRedo(owners)) {
-                     // CTRL+SHIFT+Z
-                     return true;
-                  }
-               }
-            }
-         }
          switch (pKeyCode) {
             case 259:
                if (this.isEditable) {
@@ -428,6 +405,29 @@ public class EditBox extends AbstractWidget implements Renderable, IModernEditBo
             case 266:
             case 267:
             default:
+               if (pKeyCode == GLFW.GLFW_KEY_Z || pKeyCode == GLFW.GLFW_KEY_Y) {
+                  if (Screen.hasControlDown() && !Screen.hasAltDown()) {
+                     if (!Screen.hasShiftDown()) {
+                        UndoOwner[] owners = {modernUI_MC$undoOwner()};
+                        if (pKeyCode == GLFW.GLFW_KEY_Z) {
+                           // CTRL+Z
+                           if (modernUI_MC$undoManager.countUndos(owners) > 0) {
+                              modernUI_MC$undoManager.undo(owners, 1);
+                              return true;
+                           }
+                        } else if (modernUI_MC$tryRedo(owners)) {
+                           // CTRL+Y
+                           return true;
+                        }
+                     } else if (pKeyCode == GLFW.GLFW_KEY_Z) {
+                        UndoOwner[] owners = {modernUI_MC$undoOwner()};
+                        if (modernUI_MC$tryRedo(owners)) {
+                           // CTRL+SHIFT+Z
+                           return true;
+                        }
+                     }
+                  }
+               }
                if (Screen.isSelectAll(pKeyCode)) {
                   this.moveCursorToEnd(false);
                   this.setHighlightPos(0);

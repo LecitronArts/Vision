@@ -90,8 +90,6 @@ public class TextureAtlasSprite {
       this.u1 = 1.0F;
       this.v0 = 0.0F;
       this.v1 = 1.0F;
-      this.baseU = Math.min(this.u0, this.u1);
-      this.baseV = Math.min(this.v0, this.v1);
       this.indexInMap = parent.indexInMap;
       this.baseU = parent.baseU;
       this.baseV = parent.baseV;

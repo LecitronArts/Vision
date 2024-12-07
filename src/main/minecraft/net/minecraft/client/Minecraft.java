@@ -91,6 +91,7 @@ import icyllis.modernui.mc.MuiModApi;
 import icyllis.modernui.mc.UIManager;
 import icyllis.modernui.mc.fabric.ModernUIFabricClient;
 import me.empty.api.event.handler.EventManager;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
@@ -806,6 +807,7 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
 
    public void run() {
       this.gameThread = Thread.currentThread();
+      ClientLifecycleEvents.CLIENT_STARTED.invoker().onClientStarted(this);
       if (Runtime.getRuntime().availableProcessors() > 4) {
          this.gameThread.setPriority(10);
       }
@@ -1133,6 +1135,7 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
    public void destroy() {
       try {
          LOGGER.info("Stopping!");
+         ClientLifecycleEvents.CLIENT_STOPPING.invoker().onClientStopping(this);
 
          try {
             this.narrator.destroy();

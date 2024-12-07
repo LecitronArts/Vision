@@ -78,12 +78,12 @@ public class FootStepParticle1_12_2 extends TextureSheetParticle {
     }
 
     public static void init() {
-        //final SimpleParticleType footStepType = FabricParticleTypes.simple(true); caused game crash
+        final SimpleParticleType footStepType = FabricParticleTypes.simple(true); //caused game crash
 
         //Registry.register(BuiltInRegistries.PARTICLE_TYPE, new ResourceLocation("viafabricplus", "footstep"), footStepType);
-        //ParticleFactoryRegistry.getInstance().register(footStepType, FootStepParticle1_12_2.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(footStepType, FootStepParticle1_12_2.Factory::new);
 
-        //ID = BuiltInRegistries.PARTICLE_TYPE.getId(footStepType);
+        ID = BuiltInRegistries.PARTICLE_TYPE.getId(footStepType);
     }
 
     public static class Factory implements ParticleProvider<SimpleParticleType> {

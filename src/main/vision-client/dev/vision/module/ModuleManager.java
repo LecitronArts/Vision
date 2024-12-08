@@ -5,7 +5,6 @@ import dev.vision.module.modules.combat.KillAura;
 import dev.vision.module.modules.hud.WaterMark;
 import dev.vision.module.modules.movement.NoSlow;
 import dev.vision.module.modules.movement.Sprint;
-import dev.vision.module.modules.screen.ClickGUI;
 import me.empty.api.event.component.EventTarget;
 import me.empty.api.event.handler.EventManager;
 
@@ -29,7 +28,6 @@ public class ModuleManager {
         add(new WaterMark());
 
         // Screen
-        add(new ClickGUI());
 
         EventManager.register(this);
     }

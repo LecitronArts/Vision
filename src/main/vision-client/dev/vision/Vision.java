@@ -49,4 +49,12 @@ public class Vision {
         EVENT_BUS.subscribe(this);
         LOGGER.info("Registered event factory.");
     }
+    public static String[] resourceCreateSpoof() {
+        return new String[]{
+                "minecraft",
+                "realms",
+                "modernui",
+                "viafabricplus",
+                "vision"};
+    }
 }

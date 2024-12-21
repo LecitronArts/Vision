@@ -37,32 +37,8 @@ public abstract class ModernUIMod {
     public static volatile boolean sDevelopment;
     public static volatile boolean sDeveloperMode;
 
-    protected static boolean sOptiFineLoaded;
-    protected static boolean sIrisApiLoaded;
-    protected static volatile boolean sLegendaryTooltipsLoaded;
-    protected static volatile boolean sUntranslatedItemsLoaded;
-
     private static volatile Boolean sTextEngineEnabled;
 
-    static {
-        try {
-            Class<?> clazz = Class.forName("optifine.Installer");
-            sOptiFineLoaded = true;
-            try {
-                String version = (String) clazz.getMethod("getOptiFineVersion").invoke(null);
-                LOGGER.info(MARKER, "OptiFine installed: {}", version);
-            } catch (Exception e) {
-                LOGGER.info(MARKER, "OptiFine installed...");
-            }
-        } catch (Exception ignored) {
-        }
-        try {
-            Class.forName("net.irisshaders.iris.api.v0.IrisApi");
-            sIrisApiLoaded = true;
-            LOGGER.info(MARKER, "Iris API installed...");
-        } catch (Exception ignored) {
-        }
-    }
 
     @Nonnull
     public static ResourceLocation location(String path) {
@@ -70,19 +46,7 @@ public abstract class ModernUIMod {
     }
 
     public static boolean isOptiFineLoaded() {
-        return sOptiFineLoaded;
-    }
-
-    public static boolean isIrisApiLoaded() {
-        return sIrisApiLoaded;
-    }
-
-    public static boolean isLegendaryTooltipsLoaded() {
-        return sLegendaryTooltipsLoaded;
-    }
-
-    public static boolean isUntranslatedItemsLoaded() {
-        return sUntranslatedItemsLoaded;
+        return true;
     }
 
     public static boolean isDeveloperMode() {

@@ -8,6 +8,8 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import javax.annotation.Nullable;
+
+import dev.vision.Vision;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -53,7 +55,7 @@ public class ClientPackSource extends BuiltInPackSource {
    }
 
    private static VanillaPackResources createVanillaPackSource(Path pAssetIndex) {
-      VanillaPackResourcesBuilder vanillapackresourcesbuilder = (new VanillaPackResourcesBuilder()).setMetadata(BUILT_IN_METADATA).exposeNamespace("minecraft", "realms");
+      VanillaPackResourcesBuilder vanillapackresourcesbuilder = (new VanillaPackResourcesBuilder()).setMetadata(BUILT_IN_METADATA).exposeNamespace(Vision.resourceCreateSpoof());
       return vanillapackresourcesbuilder.applyDevelopmentConfig().pushJarResources().pushAssetPath(PackType.CLIENT_RESOURCES, pAssetIndex).build();
    }
 

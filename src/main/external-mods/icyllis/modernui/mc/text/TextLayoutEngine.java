@@ -469,13 +469,6 @@ public class TextLayoutEngine extends FontResourceManager
                 Typeface.SERIF);
         mFontCollections.putIfAbsent(MONOSPACED,
                 Typeface.MONOSPACED);
-        // register logical fonts in default namespace
-        mFontCollections.putIfAbsent(new ResourceLocation(SANS_SERIF.getPath()),
-                Typeface.SANS_SERIF);
-        mFontCollections.putIfAbsent(new ResourceLocation(SERIF.getPath()),
-                Typeface.SERIF);
-        mFontCollections.putIfAbsent(new ResourceLocation(MONOSPACED.getPath()),
-                Typeface.MONOSPACED);
 
         if (sDefaultFontBehavior == DEFAULT_FONT_BEHAVIOR_IGNORE_ALL || // exclude everything
                 (sDefaultFontBehavior == DEFAULT_FONT_BEHAVIOR_ONLY_INCLUDE && // include nothing

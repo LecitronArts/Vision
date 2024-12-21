@@ -855,37 +855,9 @@ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements 
    }
 
    private void createSearchTrees() {
-      this.searchRegistry.register(SearchRegistry.CREATIVE_NAMES, (p_231451_) -> {
-         return new FullTextSearchTree<>((p_210797_) -> {
-            return p_210797_.getTooltipLines((Player)null, TooltipFlag.Default.NORMAL.asCreative()).stream().map((p_231455_) -> {
-               return ChatFormatting.stripFormatting(p_231455_.getString()).trim();
-            }).filter((p_231449_) -> {
-               return !p_231449_.isEmpty();
-            });
-         }, (p_91317_) -> {
-            return Stream.of(BuiltInRegistries.ITEM.getKey(p_91317_.getItem()));
-         }, p_231451_);
-      });
-      this.searchRegistry.register(SearchRegistry.CREATIVE_TAGS, (p_231430_) -> {
-         return new IdSearchTree<>((p_231353_) -> {
-            return p_231353_.getTags().map(TagKey::location);
-         }, p_231430_);
-      });
-      this.searchRegistry.register(SearchRegistry.RECIPE_COLLECTIONS, (p_301514_) -> {
-         return new FullTextSearchTree<>((p_301513_) -> {
-            return p_301513_.getRecipes().stream().flatMap((p_301519_) -> {
-               return p_301519_.value().getResultItem(p_301513_.registryAccess()).getTooltipLines((Player)null, TooltipFlag.Default.NORMAL).stream();
-            }).map((p_301515_) -> {
-               return ChatFormatting.stripFormatting(p_301515_.getString()).trim();
-            }).filter((p_301516_) -> {
-               return !p_301516_.isEmpty();
-            });
-         }, (p_301517_) -> {
-            return p_301517_.getRecipes().stream().map((p_301512_) -> {
-               return BuiltInRegistries.ITEM.getKey(p_301512_.value().getResultItem(p_301517_.registryAccess()).getItem());
-            });
-         }, p_301514_);
-      });
+      this.searchRegistry.register(SearchRegistry.CREATIVE_NAMES, (p_231451_) -> new FullTextSearchTree<>((p_210797_) -> p_210797_.getTooltipLines(null, TooltipFlag.Default.NORMAL.asCreative()).stream().map((p_231455_) -> ChatFormatting.stripFormatting(p_231455_.getString()).trim()).filter((p_231449_) -> !p_231449_.isEmpty()), (p_91317_) -> Stream.of(BuiltInRegistries.ITEM.getKey(p_91317_.getItem())), p_231451_));
+      this.searchRegistry.register(SearchRegistry.CREATIVE_TAGS, (p_231430_) -> new IdSearchTree<>((p_231353_) -> p_231353_.getTags().map(TagKey::location), p_231430_));
+      this.searchRegistry.register(SearchRegistry.RECIPE_COLLECTIONS, (p_301514_) -> new FullTextSearchTree<>((p_301513_) -> p_301513_.getRecipes().stream().flatMap((p_301519_) -> p_301519_.value().getResultItem(p_301513_.registryAccess()).getTooltipLines((Player)null, TooltipFlag.Default.NORMAL).stream()).map((p_301515_) -> ChatFormatting.stripFormatting(p_301515_.getString()).trim()).filter((p_301516_) -> !p_301516_.isEmpty()), (p_301517_) -> p_301517_.getRecipes().stream().map((p_301512_) -> BuiltInRegistries.ITEM.getKey(p_301512_.value().getResultItem(p_301517_.registryAccess()).getItem())), p_301514_));
       CreativeModeTabs.searchTab().setSearchTreeBuilder((p_255439_) -> {
          this.populateSearchTree(SearchRegistry.CREATIVE_NAMES, p_255439_);
          this.populateSearchTree(SearchRegistry.CREATIVE_TAGS, p_255439_);

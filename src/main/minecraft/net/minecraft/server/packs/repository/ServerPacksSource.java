@@ -32,7 +32,11 @@ public class ServerPacksSource extends BuiltInPackSource {
 
    @VisibleForTesting
    public static VanillaPackResources createVanillaPackSource() {
-      return (new VanillaPackResourcesBuilder()).setMetadata(BUILT_IN_METADATA).exposeNamespace("minecraft").applyDevelopmentConfig().pushJarResources().build();
+      return (new VanillaPackResourcesBuilder()).setMetadata(BUILT_IN_METADATA)
+              .exposeNamespace("minecraft")
+              .applyDevelopmentConfig()
+              .pushJarResources()
+              .build();
    }
 
    protected Component getPackTitle(String pId) {

@@ -1,10 +1,6 @@
 package dev.vision.module;
 
 import dev.vision.events.EventKeyPress;
-import dev.vision.module.modules.combat.KillAura;
-import dev.vision.module.modules.hud.WaterMark;
-import dev.vision.module.modules.movement.NoSlow;
-import dev.vision.module.modules.movement.Sprint;
 import me.empty.api.event.component.EventTarget;
 import me.empty.api.event.handler.EventManager;
 
@@ -18,14 +14,10 @@ public class ModuleManager {
     public void init() {
         modules.clear();
         // Combat
-        add(new KillAura());
 
         // Movement
-        add(new NoSlow());
-        add(new Sprint());
 
         // HUD
-        add(new WaterMark());
 
         // Screen
 

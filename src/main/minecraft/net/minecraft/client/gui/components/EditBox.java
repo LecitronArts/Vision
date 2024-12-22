@@ -40,7 +40,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
-import org.spongepowered.asm.mixin.Unique;
 
 @OnlyIn(Dist.CLIENT)
 public class EditBox extends AbstractWidget implements Renderable, IModernEditBox {
@@ -69,9 +68,7 @@ public class EditBox extends AbstractWidget implements Renderable, IModernEditBo
    @Nullable
    private Consumer<String> responder;
    private Predicate<String> filter = Objects::nonNull;
-   private BiFunction<String, Integer, FormattedCharSequence> formatter = (p_94147_, p_94148_) -> {
-      return FormattedCharSequence.forward(p_94147_, Style.EMPTY);
-   };
+   private BiFunction<String, Integer, FormattedCharSequence> formatter;
    @Nullable
    private Component hint;
    private long focusedTime = Util.getMillis();

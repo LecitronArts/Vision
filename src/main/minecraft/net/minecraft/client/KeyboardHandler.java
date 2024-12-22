@@ -445,31 +445,11 @@ public class KeyboardHandler implements IMouseKeyboard {
             Screen.wrapScreenError(() -> {
                if (pAction != 1 && pAction != 2) {
                   if (pAction == 0) {
-                     if (Reflector.ForgeHooksClient_onScreenKeyReleasedPre.exists()) {
-                        aboolean[0] = Reflector.callBoolean(Reflector.ForgeHooksClient_onScreenKeyReleasedPre, screen, pKey, pScanCode, pModifiers);
-                        if (aboolean[0]) {
-                           return;
-                        }
-                     }
-
                      aboolean[0] = screen.keyReleased(pKey, pScanCode, pModifiers);
-                     if (Reflector.ForgeHooksClient_onScreenKeyReleasedPost.exists() && !aboolean[0]) {
-                        aboolean[0] = Reflector.callBoolean(Reflector.ForgeHooksClient_onScreenKeyReleasedPost, screen, pKey, pScanCode, pModifiers);
-                     }
                   }
                } else {
-                  if (Reflector.ForgeHooksClient_onScreenKeyPressedPre.exists()) {
-                     aboolean[0] = Reflector.callBoolean(Reflector.ForgeHooksClient_onScreenKeyPressedPre, screen, pKey, pScanCode, pModifiers);
-                     if (aboolean[0]) {
-                        return;
-                     }
-                  }
-
                   screen.afterKeyboardAction();
                   aboolean[0] = screen.keyPressed(pKey, pScanCode, pModifiers);
-                  if (Reflector.ForgeHooksClient_onScreenKeyPressedPost.exists() && !aboolean[0]) {
-                     aboolean[0] = Reflector.callBoolean(Reflector.ForgeHooksClient_onScreenKeyPressedPost, screen, pKey, pScanCode, pModifiers);
-                  }
                }
 
             }, "keyPressed event handler", screen.getClass().getCanonicalName());
@@ -487,12 +467,11 @@ public class KeyboardHandler implements IMouseKeyboard {
                flag2 = this.minecraft.screen == null;
                if (!flag2) {
                   Screen screen1 = this.minecraft.screen;
-                  if (!(screen1 instanceof PauseScreen)) {
+                  if (!(screen1 instanceof PauseScreen pausescreen)) {
                      break label152;
                   }
 
-                  PauseScreen pausescreen = (PauseScreen)screen1;
-                  if (pausescreen.showsPauseMenu()) {
+                   if (pausescreen.showsPauseMenu()) {
                      break label152;
                   }
                }
@@ -555,7 +534,6 @@ public class KeyboardHandler implements IMouseKeyboard {
             }
          }
       }
-
    }
 
    private void charTyped(long pWindowPointer, int pCodePoint, int pModifiers) {

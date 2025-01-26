@@ -51,11 +51,13 @@ public interface ContainerEventHandler extends GuiEventListener {
 
    default boolean mouseReleased(double pMouseX, double pMouseY, int pButton) {
       this.setDragging(false);
-      return this.getChildAt(pMouseX, pMouseY).filter((p_94708_) -> p_94708_.mouseReleased(pMouseX, pMouseY, pButton)).isPresent();
+      return this.getChildAt(pMouseX, pMouseY).filter((p_94708_) -> {
+         return p_94708_.mouseReleased(pMouseX, pMouseY, pButton);
+      }).isPresent();
    }
 
    default boolean mouseDragged(double pMouseX, double pMouseY, int pButton, double pDragX, double pDragY) {
-      return this.getFocused() != null && this.isDragging() && pButton == 0 && this.getFocused().mouseDragged(pMouseX, pMouseY, pButton, pDragX, pDragY);
+      return this.getFocused() != null && this.isDragging() && pButton == 0 ? this.getFocused().mouseDragged(pMouseX, pMouseY, pButton, pDragX, pDragY) : false;
    }
 
    boolean isDragging();

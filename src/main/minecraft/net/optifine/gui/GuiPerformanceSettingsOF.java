@@ -10,8 +10,6 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.optifine.config.Option;
 
-import java.util.function.Consumer;
-
 public class GuiPerformanceSettingsOF extends GuiScreenOF {
    private Screen prevScreen;
    private Options settings;
@@ -32,10 +30,7 @@ public class GuiPerformanceSettingsOF extends GuiScreenOF {
          int j = this.width / 2 - 155 + i % 2 * 160;
          int k = this.height / 6 + 21 * (i / 2) - 12;
          AbstractWidget abstractwidget = this.addRenderableWidget(optioninstance.createButton(this.minecraft.options, j, k, 150));
-         if (optioninstance == Option.FAST_RENDER){
-            abstractwidget.active = false;
-         }
-         abstractwidget.setTooltip(null);
+         abstractwidget.setTooltip((Tooltip)null);
       }
 
       this.addRenderableWidget(new GuiButtonOF(200, this.width / 2 - 100, this.height / 6 + 168 + 11, I18n.get("gui.done")));

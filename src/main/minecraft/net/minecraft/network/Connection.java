@@ -7,7 +7,7 @@ import baritone.api.event.events.type.EventState;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Queues;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.llamalad7.mixinextras.sugar.Local;
+
 import com.mojang.logging.LogUtils;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
@@ -572,7 +572,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
    /*   }*/
    }
 
-   private static ChannelFuture useRakNetPingHandlers(Bootstrap instance, InetAddress inetHost, int inetPort, @Local(argsOnly = true) Connection clientConnection, @Local(argsOnly = true) boolean isConnecting) {
+   private static ChannelFuture useRakNetPingHandlers(Bootstrap instance, InetAddress inetHost, int inetPort, Connection clientConnection, boolean isConnecting) {
       if (BedrockProtocolVersion.bedrockLatest.equals(( clientConnection).viaFabricPlus$getTargetVersion()) && !isConnecting) {
          // Bedrock edition / RakNet has different handlers for pinging a server
          return instance.register().syncUninterruptibly().channel().bind(new InetSocketAddress(0)).addListeners(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE, (ChannelFutureListener) f -> {

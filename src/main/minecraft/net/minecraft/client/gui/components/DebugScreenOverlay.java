@@ -9,7 +9,6 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import de.florianmichael.viafabricplus.access.IChunkTracker;
 import de.florianmichael.viafabricplus.access.IRakSessionCodec;
 import de.florianmichael.viafabricplus.fixes.tracker.JoinGameDataTracker;
-import de.florianmichael.viafabricplus.injection.ViaFabricPlusMixinPlugin;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import de.florianmichael.viafabricplus.settings.impl.GeneralSettings;
 import de.florianmichael.viafabricplus.util.ChatUtil;
@@ -78,7 +77,6 @@ import net.minecraft.world.phys.HitResult;
 import net.optifine.Config;
 import net.optifine.SmartAnimations;
 import net.optifine.TextureAnimations;
-import net.optifine.reflect.Reflector;
 import net.optifine.render.RenderCache;
 import net.optifine.util.GpuMemory;
 import net.optifine.util.MemoryMonitor;
@@ -91,7 +89,6 @@ import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.storage.Seed
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.storage.EntityTracker;
 import org.cloudburstmc.netty.channel.raknet.RakClientChannel;
 import org.cloudburstmc.netty.handler.codec.raknet.common.RakSessionCodec;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 public class DebugScreenOverlay {
    private static final int COLOR_GREY = 14737632;

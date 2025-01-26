@@ -1,6 +1,5 @@
 package net.minecraft.client.gui.screens;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.logging.LogUtils;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import de.florianmichael.viafabricplus.ViaFabricPlus;
@@ -162,26 +161,6 @@ public class ConnectScreen extends Screen {
                });
             }
 
-         }
-         private ChannelFuture setServerInfoAndHandleDisconnect(InetSocketAddress address, boolean useEpoll, Connection connection, Operation<ChannelFuture> original) {
-
-            ProtocolVersion targetVersion = ProtocolTranslator.getTargetVersion();
-            if (pServerData.viaFabricPlus$forcedVersion() != null && !pServerData.viaFabricPlus$passedDirectConnectScreen()) {
-               targetVersion = pServerData.viaFabricPlus$forcedVersion();
-               pServerData.viaFabricPlus$passDirectConnectScreen(false); // reset state
-            }
-            if (targetVersion == ProtocolTranslator.AUTO_DETECT_PROTOCOL) {
-               updateStatus(Component.translatable("base.viafabricplus.detecting_server_version"));
-               targetVersion = ProtocolVersionDetector.get(address, ProtocolTranslator.NATIVE_VERSION);
-            }
-            ProtocolTranslator.setTargetVersion(targetVersion, true);
-
-            viaFabricPlus$useClassiCubeAccount = AuthenticationSettings.global().setSessionNameToClassiCubeNameInServerList.getValue() && ViaFabricPlusClassicMPPassProvider.classicMpPassForNextJoin != null;
-
-            final ChannelFuture future = original.call(address, useEpoll, connection);
-            ProtocolTranslator.injectPreviousVersionReset(future.channel());
-
-            return future;
          }
          private static ServerPackManager.PackPromptStatus convertPackStatus(ServerData.ServerPackStatus p_310302_) {
             ServerPackManager.PackPromptStatus serverpackmanager$packpromptstatus;

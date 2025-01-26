@@ -460,9 +460,7 @@ public abstract class Screen extends AbstractContainerEventHandler implements Re
       } catch (Throwable throwable) {
          CrashReport crashreport = CrashReport.forThrowable(throwable, pErrorDesc);
          CrashReportCategory crashreportcategory = crashreport.addCategory("Affected screen");
-         crashreportcategory.setDetail("Screen name", () -> {
-            return pScreenName;
-         });
+         crashreportcategory.setDetail("Screen name", () -> pScreenName);
          throw new ReportedException(crashreport);
       }
    }

@@ -1,9 +1,6 @@
 package net.minecraft.client.gui;
 
 import com.google.common.collect.Lists;
-import com.ibm.icu.text.ArabicShaping;
-import com.ibm.icu.text.ArabicShapingException;
-import com.ibm.icu.text.Bidi;
 import com.mojang.blaze3d.font.GlyphInfo;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import java.util.List;
@@ -35,7 +32,6 @@ import net.optifine.util.MathUtils;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Vector3f;
-import org.spongepowered.asm.mixin.Unique;
 
 public class Font implements IForgeFont {
    private static final float EFFECT_DEPTH = 0.01F;

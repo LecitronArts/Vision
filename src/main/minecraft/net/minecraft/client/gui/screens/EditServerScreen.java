@@ -15,7 +15,6 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.spongepowered.asm.mixin.Unique;
 
 @OnlyIn(Dist.CLIENT)
 public class EditServerScreen extends Screen {

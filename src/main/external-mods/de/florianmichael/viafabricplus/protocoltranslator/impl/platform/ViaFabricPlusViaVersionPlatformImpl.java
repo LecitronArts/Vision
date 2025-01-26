@@ -22,9 +22,9 @@ package de.florianmichael.viafabricplus.protocoltranslator.impl.platform;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.configuration.AbstractViaConfig;
-import de.florianmichael.viafabricplus.injection.ViaFabricPlusMixinPlugin;
 import de.florianmichael.viafabricplus.protocoltranslator.ProtocolTranslator;
 import de.florianmichael.viafabricplus.protocoltranslator.impl.viaversion.ViaFabricPlusVLViaConfig;
+import dev.vision.Vision;
 import net.raphimc.vialoader.impl.platform.ViaVersionPlatformImpl;
 
 import java.io.File;
@@ -43,8 +43,8 @@ public class ViaFabricPlusViaVersionPlatformImpl extends ViaVersionPlatformImpl 
     @Override
     public JsonObject getDump() {
         final JsonObject platformDump = new JsonObject();
-        platformDump.addProperty("version", ViaFabricPlusMixinPlugin.VFP_VERSION);
-        platformDump.addProperty("impl_version", ViaFabricPlusMixinPlugin.VFP_IMPL_VERSION);
+        platformDump.addProperty("version", "Vision Edit - " + Vision.INSTANCE.CLIENT_VERSION);
+        platformDump.addProperty("impl_version", "Vision Edit - " + Vision.INSTANCE.CLIENT_VERSION);
         platformDump.addProperty("native_version", ProtocolTranslator.NATIVE_VERSION.toString());
 
         final JsonArray mods = new JsonArray();

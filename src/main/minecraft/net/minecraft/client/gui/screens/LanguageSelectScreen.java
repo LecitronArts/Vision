@@ -3,7 +3,6 @@ package net.minecraft.client.gui.screens;
 import dev.chachy.lazylanguageloader.client.api.scroll.Scrollable;
 import dev.chachy.lazylanguageloader.client.impl.state.StateManager;
 import dev.chachy.lazylanguageloader.client.impl.utils.Constants;
-import icyllis.modernui.mc.MuiModApi;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -120,7 +119,7 @@ public class LanguageSelectScreen extends OptionsSubScreen {
    }
 
    private void lazyLanguageLoader$$fixScroll() {
-      if(packSelectionList instanceof Scrollable) {
+      if (packSelectionList instanceof Scrollable) {
          if (((Scrollable) packSelectionList).hasScrolled()) {
             packSelectionList.setScrollAmount(packSelectionList.getScrollAmount());
          } else {

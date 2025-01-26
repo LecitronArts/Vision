@@ -131,16 +131,12 @@ public abstract class BlockBehaviour implements FeatureElement {
    /** @deprecated */
    @Deprecated
    public boolean isPathfindable(BlockState pState, BlockGetter pLevel, BlockPos pPos, PathComputationType pType) {
-      switch (pType) {
-         case LAND:
-            return !pState.isCollisionShapeFullBlock(pLevel, pPos);
-         case WATER:
-            return pLevel.getFluidState(pPos).is(FluidTags.WATER);
-         case AIR:
-            return !pState.isCollisionShapeFullBlock(pLevel, pPos);
-         default:
-            return false;
-      }
+       return switch (pType) {
+           case LAND -> !pState.isCollisionShapeFullBlock(pLevel, pPos);
+           case WATER -> pLevel.getFluidState(pPos).is(FluidTags.WATER);
+           case AIR -> !pState.isCollisionShapeFullBlock(pLevel, pPos);
+           default -> false;
+       };
    }
 
    /** @deprecated */

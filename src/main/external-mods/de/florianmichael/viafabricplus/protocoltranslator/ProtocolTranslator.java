@@ -44,13 +44,9 @@ import io.netty.util.AttributeKey;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.Connection;
-import net.raphimc.viabedrock.api.BedrockProtocolVersion;
-import net.raphimc.viabedrock.protocol.data.ProtocolConstants;
 import net.raphimc.vialoader.ViaLoader;
 import net.raphimc.vialoader.impl.platform.ViaAprilFoolsPlatformImpl;
 import net.raphimc.vialoader.impl.platform.ViaBackwardsPlatformImpl;
-import net.raphimc.vialoader.impl.platform.ViaBedrockPlatformImpl;
-import org.cloudburstmc.netty.channel.raknet.config.RakChannelOption;
 
 import java.io.File;
 import java.nio.file.FileAlreadyExistsException;
@@ -59,7 +55,6 @@ import java.nio.file.StandardOpenOption;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * This class represents the whole Protocol Translator, here all important variables are stored

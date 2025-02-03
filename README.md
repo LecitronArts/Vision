@@ -12,7 +12,9 @@
 - [x] 内置账户管理器
 - [x] 内置Baritone
 - [x] 内置ViaVersion
-- [ ] ModernUI支持
+- [x] ModernUI支持
+- [ ] 客户端基础功能
+- [ ] bypasses
 
 ### 作者
 
